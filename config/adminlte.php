@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Mobile Mandu',
+    'title' => 'Mobile Mandu Test',
     'title_prefix' => '',
     'title_postfix' => '',
 
