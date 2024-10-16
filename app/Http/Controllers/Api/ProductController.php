@@ -176,7 +176,8 @@ class ProductController extends BaseController
 
             // Apply the rating filter with grouping and AVG on reviews
             $products = $products->whereHas('reviews', function ($query) use ($min_rating, $max_rating) {
-                $query->selectRaw('product_id, AVG(rating) as avg_rating') // Select only the product_id and AVG
+                $query->select('product_id') // Select only the product_id
+                    ->selectRaw('AVG(rating) as avg_rating') // Select average rating
                     ->groupBy('product_id')  // Group by product_id
                     ->havingRaw('AVG(rating) >= ? AND AVG(rating) <= ?', [$min_rating, $max_rating]);
             });
