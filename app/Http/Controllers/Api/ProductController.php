@@ -138,50 +138,54 @@ class ProductController extends BaseController
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
-    public function searchProducts(Request $request, $paginage = 8)
+    public function searchProducts(Request $request, $paginate = 8)
     {
         $products = Product::where('status', 'publish');
+
         if (isset($request->query) && $request->query != '') {
             $products = $products->where(function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->get('query') . '%')
                     ->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
         }
+
         if (isset($request->categories) && is_array($request->categories) && count($request->categories) > 0) {
             $category_ids = $request->categories;
             $products = $products->whereHas('categories', function ($query) use ($category_ids) {
                 $query->whereIn('categories.id', $category_ids);
             });
         }
+
         if (isset($request->brand) && is_array($request->brand) && count($request->brand) > 0) {
             $brand_ids = $request->brand;
             $products = $products->whereIn('brand_id', $brand_ids);
         }
+
         if (isset($request->min_price) && $request->min_price > 0) {
             $products = $products->where('price', '>=', $request->min_price);
         }
+
         if (isset($request->max_price) && $request->max_price > 0) {
             $products = $products->where('price', '<=', $request->max_price);
         }
-        // Filter by min rating with grouping
-        if (isset($request->min_rating) && $request->min_rating > 0) {
-            $products = $products->whereHas('reviews', function ($query) use ($request) {
-                $query->selectRaw('AVG(rating) as avg_rating, product_id')
-                    ->groupBy('product_id')
-                    ->havingRaw('AVG(rating) >= ?', [$request->min_rating]);
-            });
+
+        // Filter by ratings using join and groupBy
+        if (isset($request->min_rating) || isset($request->max_rating)) {
+            $products = $products->join('reviews', 'products.id', '=', 'reviews.product_id')
+                ->selectRaw('products.*, AVG(reviews.rating) as avg_rating')
+                ->groupBy('products.id');
+
+            if (isset($request->min_rating) && $request->min_rating > 0) {
+                $products = $products->havingRaw('AVG(reviews.rating) >= ?', [$request->min_rating]);
+            }
+
+            if (isset($request->max_rating) && $request->max_rating > 0) {
+                $products = $products->havingRaw('AVG(reviews.rating) <= ?', [$request->max_rating]);
+            }
         }
 
-        // Filter by max rating with grouping
-        if (isset($request->max_rating) && $request->max_rating > 0) {
-            $products = $products->whereHas('reviews', function ($query) use ($request) {
-                $query->selectRaw('AVG(rating) as avg_rating, product_id')
-                    ->groupBy('product_id')
-                    ->havingRaw('AVG(rating) <= ?', [$request->max_rating]);
-            });
-        }
+        $products = $products->paginate($paginate);
 
-        $products = $products->paginate($paginage);
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
