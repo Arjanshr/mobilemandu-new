@@ -16,9 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'is_admin' => IsAdmin::class
         ]);
-        $middleware->web(append: [
-            \App\Http\Middleware\CorsMiddleware::class,
-        ]);
+        // $middleware->web(append: [
+        //     \App\Http\Middleware\CorsMiddleware::class,
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
