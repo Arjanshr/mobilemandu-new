@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends BaseController
 {
-    public function getProductByBrand(Brand $brand, $paginage = 8, Request $request)
+    public function getProductByBrand(Brand $brand, $paginate = 8, Request $request)
     {
 
         $products = Product::where('brand_id', $brand->id)
@@ -45,7 +45,7 @@ class ProductController extends BaseController
         if (isset($request->max_rating) && $request->max_rating > 0) {
             // $products = $products->where('rating', '<=', $request->max_rating);
         }
-        $products = $products->paginate($paginage);
+        $products = $products->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
@@ -80,7 +80,7 @@ class ProductController extends BaseController
         return $this->sendResponse($data, 'Ratinge range for selected brand');
     }
 
-    public function getProductByCategory(Category $category, $paginage = 8, Request $request)
+    public function getProductByCategory(Category $category, $paginate = 8, Request $request)
     {
         $products = $category->products()
             ->where('status', 'publish');
@@ -100,7 +100,7 @@ class ProductController extends BaseController
         if (isset($request->max_rating) && $request->max_rating > 0) {
             // $products = $products->where('rating', '<=', $request->max_rating);
         }
-        $products = $products->paginate($paginage);
+        $products = $products->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
@@ -130,11 +130,11 @@ class ProductController extends BaseController
         return $this->sendResponse($data, 'Ratinge range for selected category');
     }
 
-    public function getProductByBrandAndCategory(Brand $brand, Category $category, $paginage = 8)
+    public function getProductByBrandAndCategory(Brand $brand, Category $category, $paginate = 8)
     {
         $products = $category->products()->where('brand_id', $brand->id)
             ->where('status', 'publish')
-            ->paginate($paginage);
+            ->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
@@ -169,21 +169,21 @@ class ProductController extends BaseController
             $products = $products->where('price', '<=', $request->max_price);
         }
 
-        // Filter by ratings using join and groupBy
+        // Filter products by average rating (min_rating and max_rating)
         if (isset($request->min_rating) || isset($request->max_rating)) {
-            $products = $products->join('reviews', 'products.id', '=', 'reviews.product_id')
-                ->selectRaw('products.*, AVG(reviews.rating) as avg_rating')
-                ->groupBy('products.id');
+            $min_rating = $request->min_rating ?? 0;  // Default to 0 if not set
+            $max_rating = $request->max_rating ?? 5;  // Default to 5 if not set
 
-            if (isset($request->min_rating) && $request->min_rating > 0) {
-                $products = $products->havingRaw('AVG(reviews.rating) >= ?', [$request->min_rating]);
-            }
-
-            if (isset($request->max_rating) && $request->max_rating > 0) {
-                $products = $products->havingRaw('AVG(reviews.rating) <= ?', [$request->max_rating]);
-            }
+            // Apply the rating filter with grouping and AVG on reviews
+            $products = $products->whereHas('reviews', function ($query) use ($min_rating, $max_rating) {
+                $query->selectRaw('AVG(rating) as avg_rating, product_id')
+                    ->groupBy('product_id')
+                    ->havingRaw('AVG(rating) >= ?', [$min_rating])
+                    ->havingRaw('AVG(rating) <= ?', [$max_rating]);
+            });
         }
 
+        // Fetch the products with paginated results
         $products = $products->paginate($paginate);
 
 
