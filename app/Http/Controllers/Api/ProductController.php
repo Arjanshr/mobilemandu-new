@@ -176,7 +176,7 @@ class ProductController extends BaseController
 
             // Apply the rating filter with grouping and AVG on reviews
             $products = $products->whereHas('reviews', function ($query) use ($min_rating, $max_rating) {
-                $query->selectRaw('product_id, AVG(rating) as avg_rating') // Select only the needed fields
+                $query->selectRaw('product_id, AVG(rating) as avg_rating') // Select only the product_id and AVG
                     ->groupBy('product_id')  // Group by product_id
                     ->havingRaw('AVG(rating) >= ? AND AVG(rating) <= ?', [$min_rating, $max_rating]);
             });
@@ -184,7 +184,6 @@ class ProductController extends BaseController
 
         // Fetch products with pagination
         $products = $products->paginate($paginate);
-
 
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
