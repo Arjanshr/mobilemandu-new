@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -162,17 +163,22 @@ class ProductController extends BaseController
         if (isset($request->max_price) && $request->max_price > 0) {
             $products = $products->where('price', '<=', $request->max_price);
         }
+        // Filter by min rating with grouping
         if (isset($request->min_rating) && $request->min_rating > 0) {
-            $products = $products->with('reviews')
-                ->whereHas('reviews', function ($query) use ($request) {
-                    $query->havingRaw('AVG(rating) >= ?', [$request->min_rating]); // Use AVG to filter users
-                });
+            $products = $products->whereHas('reviews', function ($query) use ($request) {
+                $query->selectRaw('AVG(rating) as avg_rating, product_id')
+                    ->groupBy('product_id')
+                    ->havingRaw('AVG(rating) >= ?', [$request->min_rating]);
+            });
         }
+
+        // Filter by max rating with grouping
         if (isset($request->max_rating) && $request->max_rating > 0) {
-            $products = $products->with('reviews')
-                ->whereHas('reviews', function ($query) use ($request) {
-                    $query->havingRaw('AVG(rating) <= ?', [$request->max_rating]); // Use AVG to filter users
-                });
+            $products = $products->whereHas('reviews', function ($query) use ($request) {
+                $query->selectRaw('AVG(rating) as avg_rating, product_id')
+                    ->groupBy('product_id')
+                    ->havingRaw('AVG(rating) <= ?', [$request->max_rating]);
+            });
         }
 
         $products = $products->paginate($paginage);
