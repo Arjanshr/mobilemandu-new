@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\UserController;
 Route::prefix('v1')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
+        Route::post('registers', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
         Route::post('password/email', [AuthController::class, 'resetPasswordSendEmail']);
