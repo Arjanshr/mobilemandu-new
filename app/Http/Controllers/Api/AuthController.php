@@ -18,6 +18,7 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
+        return $request;
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'nullable|string',
