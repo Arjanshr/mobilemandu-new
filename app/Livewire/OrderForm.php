@@ -93,7 +93,7 @@ class OrderForm extends Component
         $this->total_quantity = array_sum(array_column($this->order_items, 'quantity'));
         $this->total_discount = array_sum(array_column($this->order_items, 'discount'));
         $this->total_amount = array_sum(array_column($this->order_items, 'amount'));
-        $this->grand_total = array_sum(array_column($this->order_items, 'total'));
+        $this->grand_total = array_sum(array_column($this->order_items, 'total'))+ $this->shipping_price??0;
         $this->dispatch('select2Hydrate');
     }
 
