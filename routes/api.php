@@ -70,7 +70,7 @@ Route::prefix('v1')->group(function () {
 
         //Social Logins
         Route::get('social-login-data/{provider?}', [SocialiteController::class, 'loginSocial']);
-        Route::get('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial']);
+        Route::post('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial']);
 
         //Home Page Contents
         Route::get('/content/{content_type?}/{items_per_page?}', [ContentController::class, 'getProductList']);

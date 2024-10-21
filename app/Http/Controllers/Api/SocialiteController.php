@@ -37,41 +37,46 @@ class SocialiteController extends BaseController
         return $this->sendResponse($data, 'Data retrived successfully.');
     }
 
-    public function callbackSocial(Request $request, string $provider)
+    public function callbackSocial(Request $request, $provider)
     {
-        $this->validateProvider($request);
+        $providers['provider'] = $provider;
+        $this->validateProvider($providers);
+        // return $request;
 
-        $response = Socialite::driver($provider)->stateless()->user();
+        // $response = Socialite::driver($provider)->stateless()->user();
+
+        // return $response;
 
         $user = User::firstOrCreate(
-            ['email' => $response->getEmail()],
+            ['email' => $request->email],
             ['password' => str()->password()]
         )->assignRole('customer');
-        $data = [$provider . '_id' => $response->getId()];
+        $data = [$provider . '_id' => $request->facebook_id];
 
         if ($user->wasRecentlyCreated) {
-            $data['name'] = $response->getName() ?? $response->getNickname();
-            $data['avatar'] = $response->getAvatar();
+            $data['name'] = $request->name?? $request->nickname;
+            $data['avatar'] = $request->avatar_url;
 
             event(new Registered($user));
         }
         $user->update($data);
-        Auth::login($user, remember: true);
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
+        // return $user->createToken('MyApp')->plainTextToken;
+        // Auth::login($user, remember: true);
+        // if (Auth::attempt(['email' => $request->email])) {
+            // $user = Auth::user();
             $success['token'] =  $user->createToken('MyApp')->plainTextToken;
             $success['name'] =  $user->name;
 
             return $this->sendResponse($success, 'User login successfully.');
-        } else {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
-        }
+        // } else {
+        //     return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+        // }
     }
 
-    protected function validateProvider(Request $request): array
+    protected function validateProvider($provider): array
     {
         return $this->getValidationFactory()->make(
-            $request->route()->parameters(),
+            $provider,
             ['provider' => 'in:facebook,google,github']
         )->validate();
     }
