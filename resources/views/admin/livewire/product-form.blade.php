@@ -24,9 +24,9 @@
             </div>
             <!-- Description -->
             <div class="form-group col-sm-12">
-                <label for="name">Description</label>
+                <label for="description">Description</label>
                 <textarea id="description" name="description">{{ isset($product) ? $product->description : old('description') }}</textarea>
-                @error('name')
+                @error('description')
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>
@@ -76,6 +76,16 @@
                     @endif
                 </select>
                 @error('category_id')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <!-- Price -->
+            <div class="form-group col-sm-4">
+                <label for="price">Price*</label>
+                <input type="text" class="form-control" id="price" name="price" placeholder="Price"
+                    value="{{ isset($product) ? $product->price : old('price') }}" wire:model="price" required>
+                @error('price')
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>

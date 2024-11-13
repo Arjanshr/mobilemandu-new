@@ -27,6 +27,7 @@ class ProductRequest extends FormRequest
             'category_id'=>['required','array'],
             'brand_id'=>['required','numeric'],
             'description'=>['nullable','string'],
+            'price'=>['nullable','numeric'],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
         ];
     }

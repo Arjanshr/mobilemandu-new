@@ -58,6 +58,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        // return $product;
         return view('admin.product.form', compact('product'));
     }
 
@@ -66,6 +67,7 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->brand_id = $request->brand_id;
         $product->description = $request->description;
+        $product->price = $request->price;
         $product->status = $request->status;
         $product->save();
         $product->categories()->sync($request->category_id);
