@@ -13,6 +13,7 @@ class ProductForm extends Component
     public $categories;
     public $message;
     public $name;
+    public $price;
     public $product;
     public $description;
 
@@ -24,6 +25,7 @@ class ProductForm extends Component
         $this->brands = Brand::get();
         if($this->product){
             $this->name = $this->product->name;
+            $this->price = $this->product->price;
             $this->description = $this->product->description;
         }
     }
