@@ -37,7 +37,7 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             "slug" => $this->slug,
-            "imageLink" => $this->image ? asset('storage/brands/' . $this->image) : asset('images/default.png'),
+            "imageLink" => $this->image ? asset('storage/categories/' . $this->image) : asset('images/default.png'),
             "subcategories" => $subcategories,
             "brands" => $this->brands($this->products),
         ];
