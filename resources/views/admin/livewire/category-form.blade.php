@@ -8,7 +8,7 @@
         </div>
     </div>
     <form method="POST"
-        action="{{ isset($category) ? route('category.update', $category->id) : route('category.insert') }}">
+        action="{{ isset($category) ? route('category.update', $category->id) : route('category.insert') }}"  enctype="multipart/form-data">
         @csrf
         @if (isset($category))
             @method('patch')
@@ -63,7 +63,18 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>
-            <div class="form-group col-sm-6">
+            <div class="form-group col-sm-4">
+                <label for="image">Image</label>
+                <input type="file" class="form-control" name="image"/>
+                @if (isset($category) && $category->image)
+                    <img src="{{ asset('storage/categories/' . $category->image) }}"class="img-fluid img-thumbnail"
+                        style="height:100px" />
+                @endif
+                @error('image')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="form-group col-sm-12">
                 <input id="submit" type="submit" value="{{ isset($category) ? 'Edit' : 'Create' }}"
                     class="btn btn-primary" />
             </div>

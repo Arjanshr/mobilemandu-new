@@ -28,7 +28,17 @@ class CategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'parent_id'=>['nullable','numeric'],
+            'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
             'status'=>['required', new Enum(CategoryStatus::class)]
         ];
+    }
+
+    protected function passedValidation()
+    {
+        if ($this->hasFile('image')) {
+            $image_name = rand(0, 99999) . time() . '.' . $this->image->extension();
+            $this->image->move(storage_path('app/public/categories'), $image_name);
+            $this['image']->file_name = $image_name;
+        }
     }
 }

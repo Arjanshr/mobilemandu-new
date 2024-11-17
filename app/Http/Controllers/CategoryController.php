@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\CategoryType;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
+use Illuminate\Support\Facades\File;
 
 class CategoryController extends Controller
 {
@@ -22,7 +23,10 @@ class CategoryController extends Controller
 
     public function insert(CategoryRequest $request)
     {
-        $category = Category::create($request->validated());
+        // return $request;
+        $category = $request->validated();
+        $category['image'] = $request->hasFile('image') ? $request->validated()['image']->file_name : null;
+        Category::create($category);
         toastr()->success('Category Created Successfully!');
         return redirect()->route('categories');
     }
@@ -43,6 +47,11 @@ class CategoryController extends Controller
         $category->name = $request->name;
         $category->parent_id = $request->parent_id;
         $category->status = $request->status;
+        if ($request->hasFile('image')) {
+            if (File::exists(storage_path("app/public/categories/$category->image")))
+                File::delete(storage_path("app/public/categories/$category->image"));
+            $category->image = $request->validated()['image']->file_name;
+        }
         $category->save();
         toastr()->success('Category Edited Successfully!');
         return redirect()->route('categories');
