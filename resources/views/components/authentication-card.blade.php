@@ -20,7 +20,7 @@
         <div class="mt-3 space-x-0.5 text-sm leading-5 text-left" style="color:#212936">
             <span class="opacity-[47%]"> Don't have an account? </span>
             <a class="underline cursor-pointer opacity-[67%] hover:opacity-[80%]" data-auth="register-link"
-                href="https://test.mobilemandu.com/auth/register" wire:navigate="">
+                href="{{route('register')}}" wire:navigate="">
                 Sign up
             </a>
         </div>
