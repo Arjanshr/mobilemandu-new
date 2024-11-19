@@ -149,6 +149,12 @@ class ProductController extends Controller
         toastr()->success('Product Specification Deleted Successfully!');
         return redirect()->route('product.specifications', $product_specification->product_id);
     }
+    public function deleteAllSpecifications(Product $product)
+    {
+        $product->specifications()->delete();
+        toastr()->success('Product Specification Deleted Successfully!');
+        return redirect()->route('product.specifications', $product->id);
+    }
 
     public function createFeatures(Product $product)
     {

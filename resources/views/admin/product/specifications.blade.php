@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', $product->name.' Specifications')
+@section('title', $product->name . ' Specifications')
 
 @section('content_header')
-    <h1>{{$product->name}} Specifications</h1>
+    <h1>{{ $product->name }} Specifications</h1>
 @stop
 @section('content')
     <section class="content">
@@ -15,7 +15,20 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <a href="{{ route('product.specification.create',$product->id) }}" class="btn btn-success">Add Specification</a>
+                                        <a href="{{ route('product.specification.create', $product->id) }}"
+                                            class="btn btn-success">Add Specification</a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <form method="post"
+                                            action="{{ route('product.specification.delete.all', $product->id) }}"
+                                            style="display: initial;">
+                                            @csrf
+                                            @method('delete')
+                                            <button class="deleteAll btn btn-danger btn-sm" type="submit" title="Delete"
+                                                onclick="">
+                                                Delete All Specifications
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -98,6 +111,23 @@
 @section('js')
     <script>
         $(document.body).on('click', '.delete', function(event) {
+            event.preventDefault();
+            var form = $(this).closest("form");
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit()
+                }
+            })
+        });
+        $(document.body).on('click', '.deleteAll', function(event) {
             event.preventDefault();
             var form = $(this).closest("form");
             Swal.fire({
