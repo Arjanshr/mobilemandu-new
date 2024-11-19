@@ -30,7 +30,7 @@
                                         <form>
                                             <div class="row">
                                                 <!-- Brand-->
-                                                <div class="form-group col-sm-5">
+                                                <div class="form-group col-sm-3">
                                                     <label for="brand_id">Brand</label>
                                                     <select id='brand_id' name="brand_id" class="form-control">
                                                         <option value="">Select a Brand</option>
@@ -48,7 +48,7 @@
                                                 </div>
 
                                                 <!-- Categories-->
-                                                <div class="form-group col-sm-6">
+                                                <div class="form-group col-sm-4">
                                                     <label for="category_id">Categories</label><br />
                                                     <select name="category_id[]" id="categories" class="form-control" multiple>
                                                         <option value="">--select--</option>
@@ -60,6 +60,14 @@
                                                             @endforeach
                                                         @endif
                                                     </select>
+                                                    @error('category_id')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                                <!-- Categories-->
+                                                <div class="form-group col-sm-4">
+                                                    <label for="category_id">Keyword</label><br />
+                                                    <input type="text" name="query" value="{{$query??''}}" class="form-control"/>
                                                     @error('category_id')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror

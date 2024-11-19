@@ -20,6 +20,7 @@ class ProductController extends Controller
     {
         $selected_brand = $request->brand_id ?? null;
         $selected_categories = $request->category_id ?? [];
+        $query = $request->get('query')??null;
         $products = Product::with('images')
             ->orderBy('id', 'DESC');
         if ($selected_brand != null) {
@@ -30,10 +31,19 @@ class ProductController extends Controller
                 $q->whereIn('categories.id', $selected_categories);
             });
         }
+        if (isset($request->query) && $request->query != '') {
+            
+            $products = $products->where(function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->get('query') . '%')
+                    ->orWhere('description', 'like', '%' . $request->get('query') . '%');
+            });
+        }else{
+
+        }
         $products = $products->paginate(10);
         $categories = Category::get();
         $brands = Brand::get();
-        return view('admin.product.index', compact('products', 'categories', 'brands', 'selected_brand', 'selected_categories'));
+        return view('admin.product.index', compact('products', 'categories', 'brands', 'selected_brand', 'selected_categories','query'));
     }
 
     public function create()
