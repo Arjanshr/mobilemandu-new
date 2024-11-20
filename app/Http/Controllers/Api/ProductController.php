@@ -82,8 +82,11 @@ class ProductController extends BaseController
 
     public function getProductByCategory(Category $category, $paginate = 8, Request $request)
     {
-        $products = $category->products()
-            ->where('status', 'publish');
+        $cat_ids = $category->getAllChildrenIds()->toArray();
+        array_push($cat_ids, $category->id);
+        $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
+            $q->whereIn('id', $cat_ids);
+        })->where('status', 'publish');
         if (isset($request->brands) && is_array($request->brands) && count($request->brands) > 0) {
             $brand_ids = $request->brands;
             $products = $products->whereIn('brand_id', $brand_ids);
