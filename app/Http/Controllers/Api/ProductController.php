@@ -241,8 +241,12 @@ class ProductController extends BaseController
         return $this->sendResponse($data, 'Ratinge range for product list');
     }
 
-    public function productDetails(Product $product)
+    public function productDetails($product_id_or_slug)
     {
+        $product  = Product::find($product_id_or_slug);
+        if(!$product){
+            $product = Product::where('slug',$product_id_or_slug)->first();
+        }
         return $this->sendResponse(ProductDetailResource::make($product), 'Product detail retrieved successfully.');
     }
 

@@ -59,7 +59,7 @@ Route::prefix('v1')->group(function () {
         Route::get('products/get_rating_list_for_search', [ProductController::class, 'getRatingRangeForSearch']);
 
         //Product Detail
-        Route::get('product/test/{product}',[ProductController::class,'productDetails']);
+        Route::get('product_detail/test/{product}',[ProductController::class,'productDetails']);
         Route::get('product_detail/{product}', [ProductController::class, 'productDetails']);
         Route::get('product_specifications/{product}', [ProductController::class, 'productSpecifications']);
         Route::get('product_features/{product}', [ProductController::class, 'productFeatures']);
