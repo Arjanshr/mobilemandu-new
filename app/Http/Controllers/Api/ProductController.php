@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends BaseController
 {
-    public function getProductByBrand(Brand $brand_id_or_slug, $paginate = 8, Request $request)
+    public function getProductByBrand($brand_id_or_slug, $paginate = 8, Request $request)
     {
         $brand  = Brand::find($brand_id_or_slug);
         if(!$brand){
