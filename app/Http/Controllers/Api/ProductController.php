@@ -22,9 +22,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends BaseController
 {
-    public function getProductByBrand(Brand $brand, $paginate = 8, Request $request)
+    public function getProductByBrand(Brand $brand_id_or_slug, $paginate = 8, Request $request)
     {
-
+        $brand  = Brand::find($brand_id_or_slug);
+        if(!$brand){
+            $brand = Brand::where('slug',$brand_id_or_slug)->first();
+        }
         $products = Product::where('brand_id', $brand->id)
             ->where('status', 'publish');
         if (isset($request->categories) && is_array($request->categories) && count($request->categories) > 0) {
@@ -80,8 +83,14 @@ class ProductController extends BaseController
         return $this->sendResponse($data, 'Ratinge range for selected brand');
     }
 
-    public function getProductByCategory(Category $category, $paginate = 8, Request $request)
+    public function getProductByCategory($category_id_or_slug, $paginate = 8, Request $request)
     {
+        $category  = Category::find($category_id_or_slug);
+        if(!$category){
+            $category = Category::where('slug',$category_id_or_slug)->first();
+        }
+        $cat_ids = [];
+        if(!$category!=null)
         $cat_ids = $category->getAllChildrenIds()->toArray();
         array_push($cat_ids, $category->id);
         $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
