@@ -25,28 +25,32 @@ class ProductController extends BaseController
     public function getProductByBrand($brand_id_or_slug, $paginate = 8, Request $request)
     {
         $brand  = Brand::find($brand_id_or_slug);
-        if(!$brand){
-            $brand = Brand::where('slug',$brand_id_or_slug)->first();
+        if (!$brand) {
+            $brand = Brand::where('slug', $brand_id_or_slug)->first();
         }
-        $products = Product::where('brand_id', $brand->id)
-            ->where('status', 'publish');
-        if (isset($request->categories) && is_array($request->categories) && count($request->categories) > 0) {
-            $category_ids = $request->categories;
-            $products = $products->whereHas('categories', function ($query) use ($category_ids) {
-                $query->whereIn('categories.id', $category_ids);
-            });
-        }
-        if (isset($request->min_price) && $request->min_price > 0) {
-            $products = $products->where('price', '>=', $request->min_price);
-        }
-        if (isset($request->max_price) && $request->max_price > 0) {
-            $products = $products->where('price', '<=', $request->max_price);
-        }
-        if (isset($request->min_rating) && $request->min_rating > 0) {
-            // $products = $products->where('rating', '>=', $request->min_rating);
-        }
-        if (isset($request->max_rating) && $request->max_rating > 0) {
-            // $products = $products->where('rating', '<=', $request->max_rating);
+        if ($brand) {
+            $products = Product::where('brand_id', $brand->id)
+                ->where('status', 'publish');
+            if (isset($request->categories) && is_array($request->categories) && count($request->categories) > 0) {
+                $category_ids = $request->categories;
+                $products = $products->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('categories.id', $category_ids);
+                });
+            }
+            if (isset($request->min_price) && $request->min_price > 0) {
+                $products = $products->where('price', '>=', $request->min_price);
+            }
+            if (isset($request->max_price) && $request->max_price > 0) {
+                $products = $products->where('price', '<=', $request->max_price);
+            }
+            if (isset($request->min_rating) && $request->min_rating > 0) {
+                // $products = $products->where('rating', '>=', $request->min_rating);
+            }
+            if (isset($request->max_rating) && $request->max_rating > 0) {
+                // $products = $products->where('rating', '<=', $request->max_rating);
+            }
+        }else{
+            $products = Product::where('status','publish');
         }
         $products = $products->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
@@ -86,12 +90,12 @@ class ProductController extends BaseController
     public function getProductByCategory($category_id_or_slug, $paginate = 8, Request $request)
     {
         $category  = Category::find($category_id_or_slug);
-        if(!$category){
-            $category = Category::where('slug',$category_id_or_slug)->first();
+        if (!$category) {
+            $category = Category::where('slug', $category_id_or_slug)->first();
         }
         $cat_ids = [];
-        if(!$category!=null)
-        $cat_ids = $category->getAllChildrenIds()->toArray();
+        if (!$category != null)
+            $cat_ids = $category->getAllChildrenIds()->toArray();
         array_push($cat_ids, $category->id);
         $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
             $q->whereIn('id', $cat_ids);
@@ -253,8 +257,8 @@ class ProductController extends BaseController
     public function productDetails($product_id_or_slug)
     {
         $product  = Product::find($product_id_or_slug);
-        if(!$product){
-            $product = Product::where('slug',$product_id_or_slug)->first();
+        if (!$product) {
+            $product = Product::where('slug', $product_id_or_slug)->first();
         }
         return $this->sendResponse(ProductDetailResource::make($product), 'Product detail retrieved successfully.');
     }

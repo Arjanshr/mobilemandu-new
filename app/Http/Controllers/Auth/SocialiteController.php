@@ -30,7 +30,7 @@ class SocialiteController extends Controller
         $user = User::firstOrCreate(
             ['email' => $response->getEmail()],
             ['password' => str()->password()]
-        )->assignRole('employee');
+        );
         $data = [$provider . '_id' => $response->getId()];
 
         if ($user->wasRecentlyCreated) {
