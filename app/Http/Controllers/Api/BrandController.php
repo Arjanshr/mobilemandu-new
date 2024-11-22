@@ -14,8 +14,10 @@ class BrandController extends BaseController
         $brands =  Brand::get();
         return $this->sendResponse(BrandResource::collection($brands), 'Brands retrieved successfully.');
     }
-    public function details(Brand $brand)
+    public function details($brand_id_or_slug)
     {
+        $brand = Brand::where('id', $brand_id_or_slug)
+            ->orWhere('slug', $brand_id_or_slug)->firstOrFail();
         return $this->sendResponse(BrandResource::make($brand), 'Brand detail retrieved successfully.');
     }
 }
