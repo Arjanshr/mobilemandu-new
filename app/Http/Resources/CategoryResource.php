@@ -20,13 +20,13 @@ class CategoryResource extends JsonResource
         foreach ($this->children as $count => $subcategory) {
             $subcategories[$count]['id'] = $subcategory->id;
             $subcategories[$count]['name'] = $subcategory->name;
-            $subcategories[$count]['slug'] = $subcategory->name;
+            $subcategories[$count]['slug'] = $subcategory->slug;
             $subcategories[$count]['brand'] = $this->brands($subcategory->products ?? []);
             if ($subcategory->children->count() > 0) {
                 foreach ($subcategory->children as $count1=> $scat) {
                     $subcategories[$count][$count1]['id'] = $scat->id;
                     $subcategories[$count][$count1]['name'] = $scat->name;
-                    $subcategories[$count][$count1]['slug'] = $scat->name;
+                    $subcategories[$count][$count1]['slug'] = $scat->slug;
                     $subcategories[$count][$count1]['brand'] = $this->brands($scat->products ?? []);
                 }
             }

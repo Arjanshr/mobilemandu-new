@@ -23,7 +23,7 @@ class CategoryController extends BaseController
     public function details($category_id_or_slug)
     {
         $category = Category::where('id', $category_id_or_slug)
-        ->orWhere('slug', $category_id_or_slug)->firstOrFail();
+            ->orWhere('slug', $category_id_or_slug)->firstOrFail();
         return $this->sendResponse(CategoryResource::make($category), 'Category detail retrieved successfully.');
     }
 }
