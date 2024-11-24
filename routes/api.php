@@ -88,6 +88,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::get('profile', [UserController::class, 'profile']);
+        Route::post('profile', [UserController::class, 'editProfile']);
         Route::get('addresses', [UserController::class, 'addresses']);
 
     });

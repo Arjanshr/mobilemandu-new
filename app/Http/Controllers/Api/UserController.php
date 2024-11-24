@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -19,5 +20,28 @@ class UserController extends BaseController
     {
         $addresses = auth()->user()->addresses;
         return $this->sendResponse(AddressResource::collection($addresses), 'Addresses retrieved successfully.');
+    }
+
+    public function editProfile(UserRequest $request)
+    {
+        // return $request;
+        $user = auth()->user();
+        // return $user;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->dob = $request->dob;
+        $user->gender = $request->gender;
+        $user->address = $request->address;
+        if ($this->passwordValidation($request->password))
+            $user->password = bcrypt($request->password);
+        $user->save();
+        return $this->sendResponse(null, 'Profile updated successfully.');
+    }
+
+    private function passwordValidation($password)
+    {
+        if(strlen($password)>=6) return true;
+        return false;
     }
 }

@@ -32,7 +32,6 @@ class CategoryResource extends JsonResource
             }
         }
 
-        // return $brand_ids;
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -51,7 +50,6 @@ class CategoryResource extends JsonResource
                 $brand_ids[] = $product->brand->id;
             }
         }
-        // }
         $brands = null;
         if ($brand_ids != null)
             $brands = Brand::select('id', 'name', 'slug')->whereIn('id', $brand_ids)->get();
