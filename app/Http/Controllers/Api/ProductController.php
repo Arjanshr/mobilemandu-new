@@ -94,7 +94,7 @@ class ProductController extends BaseController
             $category = Category::where('slug', $category_id_or_slug)->first();
         }
         $cat_ids = [];
-        if (!$category != null)
+        if (!$category||$category != null)
             $cat_ids = $category->getAllChildrenIds()->toArray();
         array_push($cat_ids, $category->id);
         $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
