@@ -24,9 +24,7 @@ class UserController extends BaseController
 
     public function editProfile(UserRequest $request)
     {
-        // return $request;
         $user = auth()->user();
-        // return $user;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
