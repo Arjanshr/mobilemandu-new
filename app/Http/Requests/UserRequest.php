@@ -24,8 +24,8 @@ class UserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->user)],
-            'phone' => ['nullable','string', Rule::unique('users')->ignore($this->user)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->user()->id)],
+            'phone' => ['nullable','string', Rule::unique('users')->ignore($this->user()->id)],
             'gender' => ['required', 'in:male,female'],
             'dob' => ['nullable', 'date'],
             'password'=>['nullable','min:6'],
