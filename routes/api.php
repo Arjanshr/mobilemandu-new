@@ -90,6 +90,7 @@ Route::prefix('v1')->group(function () {
         Route::get('profile', [UserController::class, 'profile']);
         Route::post('profile', [UserController::class, 'editProfile']);
         Route::get('addresses', [UserController::class, 'addresses']);
+        Route::post('password/change', [UserController::class, 'editPassword']);
 
     });
 });

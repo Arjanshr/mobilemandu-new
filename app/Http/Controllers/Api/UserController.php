@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -37,9 +39,28 @@ class UserController extends BaseController
         return $this->sendResponse($user, 'Profile updated successfully.');
     }
 
+    public function editPassword(Request $request)
+    {
+        $user = auth()->user();
+        $this->validate($request, [
+            'password' => 'required',
+            'new_password' => 'confirmed|min:6|different:password',
+        ]);
+        if (Hash::check($request->password, $user->password)) { 
+            $user->fill([
+             'password' => Hash::make($request->new_password)
+             ])->save();
+         
+            return $this->sendResponse(null, 'Password updated successfully.');
+         
+         } else {
+            return $this->sendError('error', 'Password does not match.');
+         }
+    }
+
     private function passwordValidation($password)
     {
-        if(strlen($password)>=6) return true;
+        if (strlen($password) >= 6) return true;
         return false;
     }
 }
