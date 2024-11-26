@@ -13,7 +13,6 @@ class UserController extends BaseController
 {
     public function profile()
     {
-        return 'get';
         $user = auth()->user();
         return $this->sendResponse(UserResource::make($user), 'Profile retrieved successfully.');
     }
