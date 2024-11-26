@@ -25,7 +25,6 @@ class UserController extends BaseController
     public function editProfile(UserRequest $request)
     {
         $user = auth()->user();
-        return $user;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
@@ -35,7 +34,7 @@ class UserController extends BaseController
         if ($this->passwordValidation($request->password))
             $user->password = bcrypt($request->password);
         $user->save();
-        return $this->sendResponse(null, 'Profile updated successfully.');
+        return $this->sendResponse($user, 'Profile updated successfully.');
     }
 
     private function passwordValidation($password)
