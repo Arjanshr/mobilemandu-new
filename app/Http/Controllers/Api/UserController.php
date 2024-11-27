@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
+use App\Http\Resources\OrderItemResource;
+use App\Http\Resources\OrderResource;
 use App\Http\Resources\UserResource;
+use App\Models\Order;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -62,5 +65,18 @@ class UserController extends BaseController
     {
         if (strlen($password) >= 6) return true;
         return false;
+    }
+
+    public function orders()
+    {
+        $orders = auth()->user()->orders;
+        return $this->sendResponse(OrderResource::collection($orders), 'Orders retrieved successfully.');
+    }
+    
+
+    public function orderItems(Order $order)
+    {
+        $order_items = $order->order_items;
+        return $this->sendResponse(OrderItemResource::collection($order_items), 'Order Items retrieved successfully.');
     }
 }

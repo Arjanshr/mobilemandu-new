@@ -100,9 +100,14 @@ class User extends Authenticatable
         $this->notify(new ResetPasswordNotification($token,request()->reset_url));
     }
 
-    public function Addresses()
+    public function addresses()
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
 }

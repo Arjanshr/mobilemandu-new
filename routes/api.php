@@ -91,6 +91,8 @@ Route::prefix('v1')->group(function () {
         Route::post('profile', [UserController::class, 'editProfile']);
         Route::get('addresses', [UserController::class, 'addresses']);
         Route::post('password/change', [UserController::class, 'editPassword']);
+        Route::get('orders', [UserController::class, 'orders']);
+        Route::get('order-items/{order}', [UserController::class, 'orderItems']);
 
     });
 });

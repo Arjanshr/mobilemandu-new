@@ -107,5 +107,9 @@
                 }
             })
         });
+        $(document).ready(function() {
+            $('#example2').DataTable();
+            $('.dataTables_length').addClass('bs-select');
+        })
     </script>
 @stop
