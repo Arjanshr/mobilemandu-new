@@ -93,6 +93,9 @@ Route::prefix('v1')->group(function () {
         Route::post('password/change', [UserController::class, 'editPassword']);
         Route::get('orders', [UserController::class, 'orders']);
         Route::get('order-items/{order}', [UserController::class, 'orderItems']);
+        Route::get('to-be-reviewed', [UserController::class, 'itemsToBeReviewed']);
+        Route::get('reviews', [UserController::class, 'myReviews']);
+        Route::post('/post-review/{order}/{product}', [UserController::class, 'postReview']);
 
     });
 });
