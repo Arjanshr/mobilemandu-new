@@ -94,19 +94,26 @@ class UserController extends BaseController
 
     public function myReviews()
     {
-        $reviews = Review::where('user_id',auth()->user()->id)->get();
+        $reviews = Review::where('user_id', auth()->user()->id)->get();
         return $this->sendResponse(MyReviewsResource::collection($reviews), 'My reviews retrieved successfully.');
     }
 
-    public function postReview(Order $order,Product $product,ReviewRequest $request)
+    public function postReview(Order $order, Product $product, ReviewRequest $request)
     {
         $review = new Review();
         $review->order_id = $order->id;
         $review->product_id = $product->id;
         $review->user_id = auth()->user()->id;
         $review->rating = $request->rating;
-        $review->review = $request->review??null;
+        $review->review = $request->review ?? null;
         $review->save();
+        $order_items = OrderItem::where('review', 'pending')
+            ->where('order_id', $order->id)
+            ->where('product_id', $product->id)
+            ->whereRelation('order', 'user_id', '=', auth()->user()->id)
+            ->firstOrFail();
+        $order_items->review = 'completed';
+        $order_items->save();
         return $this->sendResponse(null, 'Review posted successfully');
     }
 }
