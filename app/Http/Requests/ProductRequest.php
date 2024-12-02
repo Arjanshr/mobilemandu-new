@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProductStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class ProductRequest extends FormRequest
 {
@@ -29,6 +31,7 @@ class ProductRequest extends FormRequest
             'description'=>['nullable','string'],
             'price'=>['nullable','numeric'],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
+            'status'=>['required',new Enum(ProductStatus::class)]
         ];
     }
 
