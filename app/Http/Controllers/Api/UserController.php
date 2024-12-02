@@ -83,11 +83,21 @@ class UserController extends BaseController
         $order_items = $order->order_items;
         return $this->sendResponse(OrderItemResource::collection($order_items), 'Order Items retrieved successfully.');
     }
+    public function cancelOrder(Order $order)
+    {
+        if($order->status == 'pending'){
+            $order->status = 'cancelled';
+            $order->save();
+            return $this->sendResponse($order, 'Order canceled successfully.');
+        }
+        return $this->sendError('error', 'This order cannot be canceled now.');
+    }
 
     public function itemsToBeReviewed()
     {
         $order_items = OrderItem::where('review', 'pending')
             ->whereRelation('order', 'user_id', '=', auth()->user()->id)
+            ->whereRelation('order', 'status', '=', 'completed')
             ->get();
         return $this->sendResponse(OrderItemResource::collection($order_items), 'To be reviewed items retrieved successfully.');
     }

@@ -92,6 +92,7 @@ Route::prefix('v1')->group(function () {
         Route::get('addresses', [UserController::class, 'addresses']);
         Route::post('password/change', [UserController::class, 'editPassword']);
         Route::get('orders', [UserController::class, 'orders']);
+        Route::get('cancel-order/{order}', [UserController::class, 'cancelOrder']);
         Route::get('order-items/{order}', [UserController::class, 'orderItems']);
         Route::get('to-be-reviewed', [UserController::class, 'itemsToBeReviewed']);
         Route::get('reviews', [UserController::class, 'myReviews']);
