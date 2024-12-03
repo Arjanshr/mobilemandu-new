@@ -82,7 +82,7 @@ class UserController extends BaseController
     public function canceledOrders()
     {
         $orders = Order::where('user_id', auth()->user()->id)
-            ->where('status', '=', 'canceled')
+            ->where('status', '=', 'cancelled')
             ->get();
         return $this->sendResponse(OrderResource::collection($orders), 'Orders retrieved successfully.');
     }
