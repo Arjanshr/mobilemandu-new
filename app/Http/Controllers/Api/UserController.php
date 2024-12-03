@@ -84,7 +84,7 @@ class UserController extends BaseController
         $orders = Order::where('user_id', auth()->user()->id)
             ->where('status', '=', 'cancelled')
             ->get();
-        return $this->sendResponse(OrderResource::collection($orders), 'Orders retrieved successfully.');
+        return $this->sendResponse(OrderResource::collection($orders), 'Canceled orders retrieved successfully.');
     }
 
     public function orderItems(Order $order)
