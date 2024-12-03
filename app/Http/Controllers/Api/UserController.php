@@ -7,6 +7,7 @@ use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\MyReviewsResource;
+use App\Http\Resources\MyWishlistsResource;
 use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductReviewsResource;
@@ -15,6 +16,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\Wishlist;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -77,6 +79,13 @@ class UserController extends BaseController
         $orders = auth()->user()->orders;
         return $this->sendResponse(OrderResource::collection($orders), 'Orders retrieved successfully.');
     }
+    public function canceledOrders()
+    {
+        $orders = Order::where('user_id', auth()->user()->id)
+            ->where('status', '=', 'canceled')
+            ->get();
+        return $this->sendResponse(OrderResource::collection($orders), 'Orders retrieved successfully.');
+    }
 
     public function orderItems(Order $order)
     {
@@ -85,7 +94,7 @@ class UserController extends BaseController
     }
     public function cancelOrder(Order $order)
     {
-        if($order->status == 'pending'){
+        if ($order->status == 'pending') {
             $order->status = 'cancelled';
             $order->save();
             return $this->sendResponse($order, 'Order canceled successfully.');
@@ -125,5 +134,29 @@ class UserController extends BaseController
         $order_items->review = 'completed';
         $order_items->save();
         return $this->sendResponse(null, 'Review posted successfully');
+    }
+
+    public function addToWishlist(Product $product)
+    {
+        $wishlist = new Wishlist();
+        $wishlist->user_id = auth()->user()->id;
+        $wishlist->product_id = $product->id;
+        $wishlist->save();
+        return $this->sendResponse(null, 'Product added to wishlist');
+    }
+
+    public function removeFromWishlist(Product $product)
+    {
+        $wishlist = Wishlist::where('user_id', auth()->user()->id)
+            ->where('product_id', $product->id)
+            ->firstOrFail();
+        $wishlist->delete();
+        return $this->sendResponse(null, 'Product removed from wishlist');
+    }
+
+    public function myWishLists() 
+    {
+        $wishlist = Wishlist::where('user_id', auth()->user()->id)->get();
+        return $this->sendResponse(MyWishlistsResource::collection($wishlist), 'My reviews retrieved successfully.');
     }
 }

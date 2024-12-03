@@ -92,11 +92,15 @@ Route::prefix('v1')->group(function () {
         Route::get('addresses', [UserController::class, 'addresses']);
         Route::post('password/change', [UserController::class, 'editPassword']);
         Route::get('orders', [UserController::class, 'orders']);
-        Route::get('cancel-order/{order}', [UserController::class, 'cancelOrder']);
+        Route::get('canceled-orders', [UserController::class, 'canceledOrders']);
+        Route::post('cancel-order/{order}', [UserController::class, 'cancelOrder']);
         Route::get('order-items/{order}', [UserController::class, 'orderItems']);
         Route::get('to-be-reviewed', [UserController::class, 'itemsToBeReviewed']);
         Route::get('reviews', [UserController::class, 'myReviews']);
-        Route::post('/post-review/{order}/{product}', [UserController::class, 'postReview']);
+        Route::post('post-review/{order}/{product}', [UserController::class, 'postReview']);
+        Route::get('wishlists', [UserController::class, 'myWishlists']);
+        Route::post('add-to-wishlist/{product}', [UserController::class, 'addToWishlist']);
+        Route::post('remove-from-wishlist/{product}', [UserController::class, 'removeFromWishlist']);
 
     });
 });
