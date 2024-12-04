@@ -27,6 +27,7 @@ class OrderResource extends JsonResource
             "address_id" => $this->address_id,
             "shipping_address" => $this->shipping_address,
             "area_id" => $this->area_id,
+            "cancellable" => $this->status == 'pending' ? true : false,
         ];
     }
 }
