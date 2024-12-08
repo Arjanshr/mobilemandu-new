@@ -89,6 +89,11 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3"></td>
+                                        <td colspan="3">SHIPPING FEE</td>
+                                        <td>Rs. {{ $order->shipping_price }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3"></td>
                                         <td colspan="3" class="table-light">GRAND TOTAL</td>
                                         <td class="table-light">Rs. {{ $order->grand_total }}</td>
                                     </tr>
