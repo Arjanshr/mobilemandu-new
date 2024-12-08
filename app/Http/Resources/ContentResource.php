@@ -19,7 +19,7 @@ class ContentResource extends JsonResource
             "name" => $this->product->name,
             "slug" => $this->product->slug,
             "rating" => $this->product->getAverageRating(),
-            "discounted_amount" => $this->product->price,
+            "discounted_amount" => $this->product->discounted_price,
             "original_amount" => $this->product->price,
             "added_to_cart" => false,
             "added_to_wishlist" => false,

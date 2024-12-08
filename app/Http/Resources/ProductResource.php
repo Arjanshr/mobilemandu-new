@@ -18,14 +18,14 @@ class ProductResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "slug" => $this->slug,
-            "rating" => 4.3,
-            "discounted_amount" => $this->price,
+            "rating" => $this->getAverageRating(),
+            "discounted_amount" => $this->discounted_price,
             "original_amount" => $this->price,
             "added_to_cart" => false,
             "added_to_wishlist" => false,
-            "image_link" => $this->getFirstMedia()?$this->getFirstMedia()->getUrl():null,
+            "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
             "offer" => null,
-            "status"=>$this->status
+            "status" => $this->status
         ];
     }
 }

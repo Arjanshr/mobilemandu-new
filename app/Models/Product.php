@@ -90,4 +90,14 @@ class Product extends Model implements HasMedia
         }
         return asset('storage/products/' . $primary_image);
     }
+
+    public function getDiscountedPriceAttribute()
+    {
+        return $this->campaigns()->first()?$this->campaigns()->first()->pivot->campaign_price:$this->price;
+    }
+
+    public function campaigns()
+    {
+        return $this->belongsToMany(Campaign::class)->withPivot('campaign_price');;
+    }
 }

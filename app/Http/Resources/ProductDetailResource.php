@@ -31,7 +31,7 @@ class ProductDetailResource extends JsonResource
             "description" => $this->description,
             "slug" => $this->slug,
             "average_rating" => $this->getAverageRating(),
-            "discounted_amount" => $this->price,
+            "discounted_amount" => $this->discounted_price,
             "original_amount" => $this->price,
             "added_to_cart" => false,
             "added_to_wishlist" => false,

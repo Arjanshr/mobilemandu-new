@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Mobile Mandu Test',
+    'title' => 'Mobile Mandu',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Mobile</b> Mandu Test',
+    'logo' => '<b>Mobile</b> Mandu',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -381,32 +381,24 @@ return [
                 // ],
             ],
         ],
-        // [
-        //     'header' => 'Parties',
-        //     'can' => ['browse-customers'],
-        // ],
-        // [
-        //     'text'    => 'Parties',
-        //     'icon'    => 'fas fa-fw fa-users',
-        //     'can' => ['browse-customers'],
-        //     'submenu' => [
-        //         [
-        //             'icon'    => 'fa fa-arrow-right',
-        //             'text' => 'Manage Customers',
-        //             'url'  => 'customers',
-        //             'can' => ['browse-customers'],
-        //             'active' => ['leads', 'leads*', 'regex:@^content/[0-9]+$@'],
-        //         ],
-        //         [
-        //             'icon'    => 'fa fa-arrow-right',
-        //             'text' => 'Manage Suppliers',
-        //             'url'  => 'suppliers',
-        //             'can' => ['browse-suppliers'],
-        //             'active' => ['followups', 'followups*', 'regex:@^content/[0-9]+$@'],
-        //         ],
-
-        //     ],
-        // ],
+        [
+            'header' => 'Campaigns',
+            'can' => ['browse-campaigns'],
+        ],
+        [
+            'text'    => 'Campaigns',
+            'icon'    => 'fas fa-fw fa-users',
+            'can' => ['browse-campaigns'],
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Campaigns',
+                    'url'  => 'admin/campaigns',
+                    'can' => ['browse-campaigns'],
+                    'active' => ['leads', 'leads*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
         // [
         //     'header' => 'INVENTORY',
         //     'can' => ['browse-products'],
