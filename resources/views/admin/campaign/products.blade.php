@@ -47,6 +47,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Product Name</th>
+                                                    <th>Default Price</th>
                                                     <th>Campaign Price</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -56,6 +57,7 @@
                                                     @foreach ($campaign->products as $product)
                                                         <tr>
                                                             <td>{{ $product->name }}</td>
+                                                            <td>{{ $product->price }}</td>
                                                             <td>
                                                                 <div class="row">
                                                                     <div class="col-10">

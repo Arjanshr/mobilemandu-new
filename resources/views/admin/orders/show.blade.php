@@ -106,27 +106,6 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                            {{-- <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Summary</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th> Total Quantity</th>
-                                    </tr>
-                                    @foreach ($summery as $type)
-                                    <tr>
-                                        <td>{{$type['type']}}</td>
-                                        <td>{{$type['total_quantity']}}</td>
-                                    </tr>
-                                    @endforeach
-                                </thead>
-                            </table> --}}
-                            <hr />
-                            <div>
-                                Thank you.
-                            </div>
                         </div>
                     </div>
                 </div>

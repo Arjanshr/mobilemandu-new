@@ -69,7 +69,15 @@ class CampaignsController extends Controller
     public function productsAction($id, Request $request)
     {
         $campaign = Campaign::with('products')->find($id);
-        $campaign->products()->syncWithPivotValues($request->products, ['campaign_price' => 0]);
+        $current_products_ids = $campaign->products->pluck('id')->toArray();
+        $sync_values = [];
+        foreach ($request->products as $product_id) {
+            if (!in_array($product_id, $current_products_ids)) {
+                $product = Product::find($product_id);
+                $sync_values[$product->id] = ['campaign_price' => $product->price];
+            }
+        }
+        $campaign->products()->syncWithoutDetaching($sync_values);
         return redirect()->route('campaigns.products', $campaign->id)->with('flash_success', 'Products Synced Successfully.');
     }
 
