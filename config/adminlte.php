@@ -344,7 +344,7 @@ return [
         ],
         [
             'header' => 'CONTENTS',
-            'can' => ['browse_featured_products','browse_new_arriavals','browse_popular_products','browse_combo_offers'],
+            'can' => ['browse-contents','browse-featured-products','browse-new-arriavals','browse-popular-products','browse-combo-offers'],
         ],
         [
             'text'    => 'Home Page',
