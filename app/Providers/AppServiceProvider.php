@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
             $count_orders = Order::where('status','=','pending')->count();
 
             $event->menu->addBefore('users', [
+                'can' => 'browse-orders',
                 'key' => 'manage_orders',
                 'text' => 'Manage Orders',
                 'url' => 'admin/orders',
