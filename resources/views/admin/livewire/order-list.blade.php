@@ -34,7 +34,7 @@
                                 <tr>
                                     <td width="20px">{{ $loop->iteration }}</td>
                                     <td>
-                                        @can('view-orders')
+                                        @can('read-orders')
                                             <a href="{{ route('order.show', $order->id) }}" class="btn btn-sm btn-primary"
                                                 title="view">
                                                 <i class="fa fa-eye"></i>
