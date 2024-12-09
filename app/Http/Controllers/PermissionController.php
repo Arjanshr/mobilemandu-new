@@ -24,7 +24,8 @@ class PermissionController extends Controller
         if ($request->fields) {
             foreach ($request->fields as $field) {
                 Permission::create([
-                    'name' => $field . '-' . $request->name
+                    'name' => $field . '-' . $request->name,
+                    'guard_name' => 'web'
                 ]);
             }
         } else {
