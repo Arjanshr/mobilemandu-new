@@ -55,7 +55,7 @@ class CampaignsController extends Controller
     public function delete(Campaign $campaign)
     {
         $campaign->delete();
-        return redirect()->route('campaigns.index')->with('flash_success', 'Campaign deleted successfully.');
+        return redirect()->route('campaigns')->with('flash_success', 'Campaign deleted successfully.');
     }
 
     public function products($id)
