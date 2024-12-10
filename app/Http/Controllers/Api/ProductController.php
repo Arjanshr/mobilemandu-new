@@ -256,9 +256,9 @@ class ProductController extends BaseController
 
     public function productDetails($product_id_or_slug)
     {
-        $product  = Product::find($product_id_or_slug);
+        $product = Product::where('slug', $product_id_or_slug)->first();
         if (!$product) {
-            $product = Product::where('slug', $product_id_or_slug)->first();
+            $product  = Product::find($product_id_or_slug);
         }
         return $this->sendResponse(ProductDetailResource::make($product), 'Product detail retrieved successfully.');
     }
