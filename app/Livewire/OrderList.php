@@ -35,8 +35,10 @@ class OrderList extends Component
     public function change($id)
     {
         $o = Order::find($id);
-        $o->status = $this->order_status[$id];
-        $o->save();
+        if (auth()->user()->can('edit-orders')) {
+            $o->status = $this->order_status[$id];
+            $o->save();
+        }
         $this->orders = Order::where('status', $this->status)->orderByDesc('id')->get();
         if ($this->status == 'all') {
             $this->orders = Order::orderByDesc('id')->get();

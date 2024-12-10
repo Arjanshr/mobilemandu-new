@@ -5,9 +5,10 @@
         </div>
     @endcan
     <div class="card-body">
-        <a href="#" class="btn btn-sm {{$status == 'all'?'btn-warning':'btn-primary'}}" wire:click="allOrders()">All Orders({{ $count['all'] }})</a>
+        <a href="#" class="btn btn-sm {{ $status == 'all' ? 'btn-warning' : 'btn-primary' }}"
+            wire:click="allOrders()">All Orders({{ $count['all'] }})</a>
         @foreach ($order_statuses as $order_status)
-            <a href="#" class="btn btn-sm {{$order_status->value == $status?'btn-warning':'btn-primary'}}"
+            <a href="#" class="btn btn-sm {{ $order_status->value == $status ? 'btn-warning' : 'btn-primary' }}"
                 wire:click="filterOrders('{{ $order_status->value }}')">{{ str_replace('_', ' ', ucfirst($order_status->value)) }}
                 ({{ $count[$order_status->value] }})
             </a>
@@ -30,7 +31,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orders as $index=>$order)
+                            @foreach ($orders as $index => $order)
                                 <tr>
                                     <td width="20px">{{ $loop->iteration }}</td>
                                     <td>
@@ -63,14 +64,18 @@
                                     <td>{{ $order->order_items->count() }}</td>
                                     <td>{{ $order->created_at->diffForHumans() }}</td>
                                     <td>
-                                        <select class="form-control"
-                                            wire:model="order_status.{{ $order->id }}" wire:change = "change({{$order->id}})">
-                                            @foreach ($order_statuses as $order_status)
-                                                <option value="{{ $order_status->value }}">
-                                                    {{ str_replace('_', ' ', ucfirst($order_status->value)) }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        @can('edit-orders')
+                                            <select class="form-control" wire:model="order_status.{{ $order->id }}"
+                                                wire:change = "change({{ $order->id }})">
+                                                @foreach ($order_statuses as $order_status)
+                                                    <option value="{{ $order_status->value }}">
+                                                        {{ str_replace('_', ' ', ucfirst($order_status->value)) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            {{ str_replace('_', ' ', ucfirst($order->status)) }}
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

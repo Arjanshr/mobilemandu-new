@@ -25,9 +25,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $events->listen(BuildingMenu::class, function (BuildingMenu $event) {
-            $count_orders = Order::where('status','=','pending')->count();
-
-            $event->menu->addBefore('users', [
+            $count_orders = Order::where('status', '=', 'pending')->count();
+            $event->menu->addAfter('search',[
                 'can' => 'browse-orders',
                 'key' => 'manage_orders',
                 'text' => 'Manage Orders',

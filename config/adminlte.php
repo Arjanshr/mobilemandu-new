@@ -308,6 +308,7 @@ return [
         [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
+            'key' => 'search',
         ],
 
         [
@@ -344,6 +345,7 @@ return [
         ],
         [
             'header' => 'CONTENTS',
+            'key'=>'contents',
             'can' => ['browse-contents','browse-featured-products','browse-new-arriavals','browse-popular-products','browse-combo-offers'],
         ],
         [
