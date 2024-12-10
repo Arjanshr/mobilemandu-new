@@ -52,9 +52,9 @@ class CampaignsController extends Controller
         return redirect()->route('campaigns');
     }
 
-    public function delete(Request $request)
+    public function delete(Campaign $campaign)
     {
-        $campaign = Campaign::find($request->id)->delete();
+        $campaign->delete();
         return redirect()->route('campaigns.index')->with('flash_success', 'Campaign deleted successfully.');
     }
 

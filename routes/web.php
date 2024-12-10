@@ -191,7 +191,7 @@ Route::middleware([
     Route::get('/campaigns/products/{campaign}', [CampaignsController::class,'products'])->name('campaigns.products')->middleware('can:read-campaigns');
 	Route::post('/campaigns/products/{campaign}', [CampaignsController::class,'productsAction'])->name('campaigns.products.action')->middleware('can:read-campaigns');
 	Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class,'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
-	Route::delete('/campaigns/delete', [CampaignsController::class,'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
+	Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class,'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
     Route::post('/update-discount',[CampaignsController::class,'updateDiscount']);
 
 
