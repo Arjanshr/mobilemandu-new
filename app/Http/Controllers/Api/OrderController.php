@@ -55,7 +55,6 @@ class OrderController extends BaseController
                 ->where('province_id', $request->province_id)
                 ->where('area_id', $request->area_id)
                 ->where('location', $request->location)
-                ->where('phone_number', $request->phone_number)
                 ->first();
             if (!$address) {
                 $address = Address::create(
