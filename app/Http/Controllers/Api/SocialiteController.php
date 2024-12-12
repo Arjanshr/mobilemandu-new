@@ -48,12 +48,12 @@ class SocialiteController extends BaseController
         // return $response;
 
         $user = User::firstOrCreate(
-            ['email' => $request->email],
-            ['password' => str()->password()]
+            [$provider . '_id' => $request->facebook_id],
         )->assignRole('customer');
-        $data = [$provider . '_id' => $request->facebook_id];
+        // $data = [$provider . '_id' => $request->facebook_id];
 
         if ($user->wasRecentlyCreated) {
+            $data['email'] = $request->email??null;
             $data['name'] = $request->name?? $request->nickname;
             $data['avatar'] = $request->avatar_url;
 
