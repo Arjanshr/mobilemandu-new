@@ -18,7 +18,6 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
-        return $request;
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'nullable|string',
@@ -36,6 +35,11 @@ class AuthController extends BaseController
 
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+        if ($request->hasFile('photo')) {
+            $image_name = rand(0, 99999) . time() . '.' . $request->photo->extension();
+            $request->photo->move(storage_path('app/public/profile-photos/'), $image_name);
+            $input['profile_photo_path'] = 'profile-photos/'.$image_name;
+        }
         $user = User::create($input)->assignRole('customer');
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['name'] =  $user->name;

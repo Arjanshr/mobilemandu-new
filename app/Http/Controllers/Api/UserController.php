@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class UserController extends BaseController
 {
@@ -46,6 +47,13 @@ class UserController extends BaseController
         $user->address = $request->address;
         if ($this->passwordValidation($request->password))
             $user->password = bcrypt($request->password);
+        if ($request->hasFile('photo')) {
+                if (File::exists(storage_path("app/public/$user->profile_photo_path")))
+                    File::delete(storage_path("app/public/$user->profile_photo_path"));
+            $image_name = rand(0, 99999) . time() . '.' . $request->photo->extension();
+            $request->photo->move(storage_path('app/public/profile-photos/'), $image_name);
+            $user->profile_photo_path = 'profile-photos/' . $image_name;
+        }
         $user->save();
         return $this->sendResponse($user, 'Profile updated successfully.');
     }
@@ -154,7 +162,7 @@ class UserController extends BaseController
         return $this->sendResponse(null, 'Product removed from wishlist');
     }
 
-    public function myWishLists() 
+    public function myWishLists()
     {
         $wishlist = Wishlist::where('user_id', auth()->user()->id)->get();
         return $this->sendResponse(MyWishlistsResource::collection($wishlist), 'My reviews retrieved successfully.');
