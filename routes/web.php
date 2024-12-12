@@ -24,9 +24,9 @@ Route::get('/storage-link', function () {
 });
 Route::get('/front-test', [FrontController::class, 'test'])->name('front.test');
 Route::middleware('guest')->group(function () {
-    Route::get('auth/{provider}/redirect', [SocialiteController::class, 'loginSocial'])
+    Route::get('auth/redirect/{provider}', [SocialiteController::class, 'loginSocial'])
         ->name('socialite.auth');
-    Route::get('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial'])
+    Route::get('auth/callback/{provider}', [SocialiteController::class, 'callbackSocial'])
         ->name('socialite.callback');
 });
 
