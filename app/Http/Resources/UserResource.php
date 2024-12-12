@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             "gender" => $this->gender,
             "email" => $this->email,
             "birthday" => $this->dob,
-            "profile_image_path" => $this->avatar??($this->profile_photo_path?url('storage/'.$this->profile_photo_path):asset('images/default.png'))
+            "profile_image_path" => $this->avatar??($this->profile_photo_url??asset('images/default.png'))
         ];
     }
 }
