@@ -43,7 +43,7 @@ class SocialiteController extends BaseController
         $this->validateProvider($providers);
 
         $user = User::firstOrCreate(
-            [$provider . '_id' => $request->facebook_id],
+            [$provider . '_id' => $request->provider_id],
         )->assignRole('customer');
 
         if ($user->wasRecentlyCreated) {
