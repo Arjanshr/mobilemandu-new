@@ -13,7 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends BaseController
 {
-    public function loginSocial(string $provider=null)
+    public function loginSocial(string $provider = null)
     {
         if ($provider == 'facebook') {
             $data['FACEBOOK_CLIENT_ID'] = env('FACEBOOK_CLIENT_ID');
@@ -41,36 +41,24 @@ class SocialiteController extends BaseController
     {
         $providers['provider'] = $provider;
         $this->validateProvider($providers);
-        // return $request;
-
-        // $response = Socialite::driver($provider)->stateless()->user();
-
-        // return $response;
 
         $user = User::firstOrCreate(
             [$provider . '_id' => $request->facebook_id],
         )->assignRole('customer');
-        // $data = [$provider . '_id' => $request->facebook_id];
 
         if ($user->wasRecentlyCreated) {
-            $data['email'] = $request->email??null;
-            $data['name'] = $request->name?? $request->nickname;
-            $data['avatar'] = $request->avatar_url;
+            $data['email'] = $request->email ?? null;
+            $data['name'] = $request->name ?? $request->nickname;
 
             event(new Registered($user));
         }
+        if ($request->avatar_url)
+            $data['avatar'] = $request->avatar_url;
         $user->update($data);
-        // return $user->createToken('MyApp')->plainTextToken;
-        // Auth::login($user, remember: true);
-        // if (Auth::attempt(['email' => $request->email])) {
-            // $user = Auth::user();
-            $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-            $success['name'] =  $user->name;
+        $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+        $success['name'] =  $user->name;
 
-            return $this->sendResponse($success, 'User login successfully.');
-        // } else {
-        //     return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
-        // }
+        return $this->sendResponse($success, 'User login successfully.');
     }
 
     protected function validateProvider($provider): array
