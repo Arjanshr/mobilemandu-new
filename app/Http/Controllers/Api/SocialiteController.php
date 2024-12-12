@@ -20,8 +20,7 @@ class SocialiteController extends BaseController
             $data['FACEBOOK_CLIENT_SECRET'] = env('FACEBOOK_CLIENT_SECRET');
             $data['FACEBOOK_REDIRECT_URI'] = env('FACEBOOK_REDIRECT_URI');
             $data['FACEBOOK_CONFIG_ID'] = env('FACEBOOK_CONFIG_ID');
-        } elseif ($provider == 'facebook') {
-
+        } elseif ($provider == 'google') {
             $data['GOOGLE_CLIENT_ID'] = env('GOOGLE_CLIENT_ID');
             $data['GOOGLE_CLIENT_SECRET'] = env('GOOGLE_CLIENT_SECRET');
             $data['GOOGLE_REDIRECT_URI'] = env('GOOGLE_REDIRECT_URI');

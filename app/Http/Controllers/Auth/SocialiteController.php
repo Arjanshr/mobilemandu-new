@@ -13,7 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
 {
-    public function loginSocial(Request $request, string $provider): RedirectResponse
+    public function loginSocial(Request $request, string $provider)
     {
         $this->validateProvider($request);
         return Socialite::driver($provider)
