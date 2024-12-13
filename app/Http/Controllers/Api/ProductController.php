@@ -207,7 +207,7 @@ class ProductController extends BaseController
         }
 
         // Fetch products with pagination
-        $products = $products->paginate($paginate);
+        $products = $products->orderBy('id','DESC')->paginate($paginate);
 
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
