@@ -49,10 +49,10 @@ class ProductController extends BaseController
             if (isset($request->max_rating) && $request->max_rating > 0) {
                 // $products = $products->where('rating', '<=', $request->max_rating);
             }
-        }else{
-            $products = Product::where('status','publish');
+        } else {
+            $products = Product::where('status', 'publish');
         }
-        $products = $products->paginate($paginate);
+        $products = $products->orderBy('id', 'DESC')->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
@@ -89,12 +89,12 @@ class ProductController extends BaseController
 
     public function getProductByCategory($category_id_or_slug, $paginate = 8, Request $request)
     {
-        $category  = Category::find($category_id_or_slug);
+        $category = Category::where('slug', $category_id_or_slug)->first();
         if (!$category) {
-            $category = Category::where('slug', $category_id_or_slug)->first();
+            $category  = Category::find($category_id_or_slug);
         }
         $cat_ids = [];
-        if (!$category||$category != null)
+        if ($category || $category != null)
             $cat_ids = $category->getAllChildrenIds()->toArray();
         array_push($cat_ids, $category->id);
         $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
@@ -116,13 +116,20 @@ class ProductController extends BaseController
         if (isset($request->max_rating) && $request->max_rating > 0) {
             // $products = $products->where('rating', '<=', $request->max_rating);
         }
-        $products = $products->paginate($paginate);
+        $products = $products->orderBy('id', 'DESC')->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
     public function getBrandsForCategoryFilter(Category $category)
     {
-        $brand_ids = $category->products()->select('brand_id')->get()->pluck('brand_id');
+        $cat_ids = [];
+        if ($category || $category != null)
+            $cat_ids = $category->getAllChildrenIds()->toArray();
+        array_push($cat_ids, $category->id);
+        $products = Product::whereHas('categories', function ($q) use ($cat_ids) {
+            $q->whereIn('id', $cat_ids);
+        })->where('status', 'publish');
+        $brand_ids = $products->select('brand_id')->get()->pluck('brand_id');
         $brands = Brand::whereIn('id', $brand_ids)->get();
         return $this->sendResponse(CategoriesForFilterResource::collection($brands)->resource, 'All available brands for selected category');
     }
