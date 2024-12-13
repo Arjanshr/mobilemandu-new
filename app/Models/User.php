@@ -82,7 +82,7 @@ class User extends Authenticatable
     public function isAdmin()
     {
 
-        if ($this->getRoleNames()->count() == 0 || array_intersect(['customer'], $this->getRoleNames()->toArray())) return false;
+        if ($this->getRoleNames()->count() == 0 || ($this->getRoleNames()->count() == 1 && array_intersect(['customer'], $this->getRoleNames()->toArray()))) return false;
         return true;
     }
 

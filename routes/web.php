@@ -193,6 +193,4 @@ Route::middleware([
 	Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class,'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
 	Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class,'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
     Route::post('/update-discount',[CampaignsController::class,'updateDiscount']);
-
-
 });

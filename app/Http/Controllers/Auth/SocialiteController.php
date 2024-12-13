@@ -17,7 +17,6 @@ class SocialiteController extends Controller
     {
         $this->validateProvider($request);
         return Socialite::driver($provider)
-            ->with(['config_id' => env('FACEBOOK_CONFIG_ID')])
             ->redirect();
     }
 
@@ -26,22 +25,20 @@ class SocialiteController extends Controller
         $this->validateProvider($request);
 
         $response = Socialite::driver($provider)->stateless()->user();
-
         $user = User::firstOrCreate(
-            ['email' => $response->getEmail()],
-            ['password' => str()->password()]
+            [$provider . '_id' => $response->getId()],
         );
-        $data = [$provider . '_id' => $response->getId()];
 
         if ($user->wasRecentlyCreated) {
             $data['name'] = $response->getName() ?? $response->getNickname();
-            $data['avatar'] = $response->getAvatar();
-
+            $data['email'] = $response->getEmail();
             event(new Registered($user));
         }
+        if ($response->getAvatar())
+            $data['avatar'] = $response->getAvatar();
         $user->update($data);
-
-        Auth::login($user, remember: true);
+        if ($user->isAdmin())
+            Auth::login($user, remember: true);
 
         return redirect()->route('admin.dashboard');
     }
