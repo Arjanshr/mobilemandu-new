@@ -93,11 +93,16 @@ class Product extends Model implements HasMedia
 
     public function getDiscountedPriceAttribute()
     {
-        return $this->campaigns()->first()?$this->campaigns()->first()->pivot->campaign_price:$this->price;
+        return $this->campaigns()->running()->first()?$this->campaigns()->running()->first()->pivot->campaign_price:$this->price;
     }
 
     public function campaigns()
     {
         return $this->belongsToMany(Campaign::class)->withPivot('campaign_price');;
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'publish');
     }
 }

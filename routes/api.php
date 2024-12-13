@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CampaignController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
@@ -83,6 +84,14 @@ Route::prefix('v1')->group(function () {
         Route::get('address/get-cities/{province_id?}', [OrderController::class, 'getCities']);
         Route::get('address/get-areas/{city_id?}', [OrderController::class, 'getAreas']);
         Route::get('address/get-shipping-price/{area}', [OrderController::class, 'getShippingPrice']);
+
+        //Campaigns
+        Route::get('campaigns/{status}', [CampaignController::class, 'getCampaigns']);
+        
+        
+        //Campaigns
+        Route::get('campaign_products/{campaign}', [CampaignController::class, 'getCampaignProducts']);
+
     });
 
     Route::middleware('auth:sanctum')->group(function () {
