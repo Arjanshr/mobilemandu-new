@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\SocialiteController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -87,10 +88,10 @@ Route::prefix('v1')->group(function () {
 
         //Campaigns
         Route::get('campaigns/{status}', [CampaignController::class, 'getCampaigns']);
-        
-        
-        //Campaigns
         Route::get('campaign_products/{campaign}', [CampaignController::class, 'getCampaignProducts']);
+
+        //Sliders
+        Route::get('sliders', [SliderController::class, 'sliders']);
 
     });
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -193,4 +194,17 @@ Route::middleware([
 	Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class,'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
 	Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class,'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
     Route::post('/update-discount',[CampaignsController::class,'updateDiscount']);
+
+    //Sliders routes
+    Route::get('/sliders', [SliderController::class, 'index'])->name('sliders')->middleware('can:browse-sliders');
+    Route::middleware('can:add-sliders')->group(function () {
+        Route::get('/sliders/create', [SliderController::class, 'create'])->name('slider.create');
+        Route::post('/sliders/insert', [SliderController::class, 'insert'])->name('slider.insert');
+    });
+    Route::get('/sliders/{slider}', [SliderController::class, 'show'])->name('slider.show')->middleware('can:read-sliders');
+    Route::middleware('can:edit-sliders')->group(function () {
+        Route::get('/sliders/edit/{slider}', [SliderController::class, 'edit'])->name('slider.edit');
+        Route::patch('/sliders/edit/{slider}', [SliderController::class, 'update'])->name('slider.update');
+    });
+    Route::delete('/sliders/delete/{slider}', [SliderController::class, 'delete'])->name('slider.delete')->middleware('can:delete-sliders');
 });

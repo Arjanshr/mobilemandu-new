@@ -344,6 +344,19 @@ return [
             ],
         ],
         [
+            'text'    => 'Sliders',
+            'icon'    => 'fas fa-fw fa-list',
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Sliders',
+                    'url'  => 'admin/sliders',
+                    'can' => ['browse-sliders'],
+                    'active' => ['sliders', 'sliders*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
             'header' => 'CONTENTS',
             'key'=>'contents',
             'can' => ['browse-contents','browse-featured-products','browse-new-arriavals','browse-popular-products','browse-combo-offers'],
