@@ -343,19 +343,7 @@ return [
                 ],
             ],
         ],
-        [
-            'text'    => 'Sliders',
-            'icon'    => 'fas fa-fw fa-list',
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Sliders',
-                    'url'  => 'admin/sliders',
-                    'can' => ['browse-sliders'],
-                    'active' => ['sliders', 'sliders*', 'regex:@^content/[0-9]+$@'],
-                ],
-            ],
-        ],
+        
         [
             'header' => 'CONTENTS',
             'key'=>'contents',
@@ -394,6 +382,19 @@ return [
                 //     'can' => ['browse-contents'],
                 //     'active' => ['combo-offers', 'combo-offers*', 'regex:@^content/[0-9]+$@'],
                 // ],
+            ],
+        ],
+        [
+            'text'    => 'Sliders',
+            'icon'    => 'fas fa-fw fa-list',
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Sliders',
+                    'url'  => 'admin/sliders',
+                    'can' => ['browse-sliders'],
+                    'active' => ['sliders', 'sliders*', 'regex:@^content/[0-9]+$@'],
+                ],
             ],
         ],
         [

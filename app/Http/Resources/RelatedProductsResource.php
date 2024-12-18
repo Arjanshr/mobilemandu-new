@@ -18,7 +18,7 @@ class RelatedProductsResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "slug" => $this->slug,
-            "rating" => 4.3,
+            "rating" => $this->getAverageRating(),
             "discounted_amount" => $this->price,
             "original_amount" => $this->price,
             "added_to_cart" => false,
