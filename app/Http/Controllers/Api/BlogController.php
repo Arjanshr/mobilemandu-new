@@ -3,62 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\BlogRequest;
-use Illuminate\Support\Facades\File;
+use App\Http\Resources\BlogDetailResource;
+use App\Http\Resources\BlogResource;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 
-class BlogController extends Controller
+class BlogController extends BaseController
 {
-    public function index()
+    public function blogs()
     {
-        $blogs = Blog::paginate(100);
-        return view('admin.blog.index', compact('blogs'));
+        $blogs =  Blog::published()->orderBy('id', 'DESC')->get();
+        return $this->sendResponse(BlogResource::collection($blogs), 'Blogs retrieved successfully.');
     }
 
-    public function create()
+    public function blogDetails($blog_slug)
     {
-        return view('admin.blog.form');
-    }
-
-    public function insert(BlogRequest $request)
-    {
-        $blog = $request->validated();
-        $blog['image'] = $request->hasFile('image') ? $request->validated()['image']->file_name : null;
-        Blog::create($blog);
-        toastr()->success('Blog Created Successfully!');
-        return redirect()->route('blogs');
-    }
-
-    public function show(Blog $blog)
-    {
-        return view('admin.blog.show', compact('blog'));
-    }
-
-    public function edit(Blog $blog)
-    {
-        return view('admin.blog.form', compact('blog'));
-    }
-
-    public function update(Blog $blog, BlogRequest $request)
-    {
-        $blog->name = $request->name;
-        if ($request->hasFile('image')) {
-            if (File::exists(storage_path("app/public/blogs/$blog->image")))
-                File::delete(storage_path("app/public/blogs/$blog->image"));
-            $blog->image = $request->validated()['image']->file_name;
-        }
-        $blog->save();
-        toastr()->success('Blog Edited Successfully!');
-        return redirect()->route('blogs');
-    }
-
-    public function delete(Blog $blog)
-    {
-        if (File::exists(storage_path("app/public/blogs/$blog->image")))
-            File::delete(storage_path("app/public/blogs/$blog->image"));
-        $blog->delete();
-        toastr()->success('Blog Deleted Successfully!');
-        return redirect()->route('blogs');
+        $blog = Blog::published()->where('slug', $blog_slug)->first();
+        if ($blog)
+            return $this->sendResponse(BlogDetailResource::make($blog), 'Blog details retrieved successfully.');
+        return $this->sendError('Cannot find the blog', 'No such blog', 404);
     }
 }
