@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CampaignController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -92,6 +93,10 @@ Route::prefix('v1')->group(function () {
 
         //Sliders
         Route::get('sliders', [SliderController::class, 'sliders']);
+        
+        //Blogs
+        Route::get('blogs', [BlogController::class, 'blogs']);
+        Route::get('blogs/{blog}', [BlogController::class, 'blogDetails']);
 
     });
 
