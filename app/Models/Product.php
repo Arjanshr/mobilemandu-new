@@ -105,4 +105,23 @@ class Product extends Model implements HasMedia
     {
         return $query->where('status', 'publish');
     }
+
+    public function isPopular()
+    {
+
+        if(PopularProduct::find($this->id)) return true;
+        return false;
+    }
+
+    public function isNew()
+    {
+
+        if(NewArraival::find($this->id)) return true;
+        return false;
+    }
+
+    public function isCampaignProduct()
+    {
+        return $this->campaigns()->get();
+    }
 }

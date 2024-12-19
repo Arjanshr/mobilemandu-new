@@ -25,7 +25,12 @@ class ContentResource extends JsonResource
             "added_to_wishlist" => false,
             "image_link" => $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
             "offer" => null,
-            "status" => $this->product->status
+            "status" => $this->product->status,
+            "tags"=>[
+                "new"=> $this->product->isPopular(),
+                "popular"=> $this->product->isPopular(),
+                "campaign"=> $this->product->isCampaignProduct()->first()?$this->product->isCampaignProduct()->first()->name:false,
+            ]
         ];
     }
 }

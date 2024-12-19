@@ -40,6 +40,11 @@ class ProductDetailResource extends JsonResource
             "images" => $image_urls,
             "total_reviews" => $this->reviews()->count(),
             "rating_summary" =>  $rating_summary,
+            "tags"=>[
+                "new"=> $this->isPopular(),
+                "popular"=> $this->isPopular(),
+                "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
+            ]
         ];
     }
 }

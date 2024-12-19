@@ -26,7 +26,12 @@ class CampaignProductResource extends JsonResource
             "added_to_wishlist" => false,
             "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
             "offer" => null,
-            "status" => $this->status
+            "status" => $this->status,
+            "tags"=>[
+                "new"=> $this->isPopular(),
+                "popular"=> $this->isPopular(),
+                "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
+            ]
         ];
     }
 }
