@@ -18,7 +18,7 @@ class BlogDetailResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             "content" => $this->content,
-            "imageLink" => $this->image?asset('storage/blogss/' . $this->image):asset('images/default.png'),
+            "imageLink" => $this->image?asset('storage/blogs/' . $this->image):asset('images/default.png'),
             'date'=> $this->created_at,
             'date_readable' => $this->created_at->diffForHumans()
         ];
