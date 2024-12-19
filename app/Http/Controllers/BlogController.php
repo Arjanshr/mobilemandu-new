@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Enums\BrandType;
 use App\Http\Requests\BlogRequest;
-use Illuminate\Support\Facades\File;
 use App\Models\Blog;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class BlogController extends Controller
 {
@@ -42,7 +41,9 @@ class BlogController extends Controller
 
     public function update(Blog $blog, BlogRequest $request)
     {
-        $blog->name = $request->name;
+        $blog->title = $request->title;
+        $blog->content = $request->content;
+        $blog->status = $request->status;
         if ($request->hasFile('image')) {
             if (File::exists(storage_path("app/public/blogs/$blog->image")))
                 File::delete(storage_path("app/public/blogs/$blog->image"));

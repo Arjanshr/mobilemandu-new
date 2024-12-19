@@ -398,6 +398,19 @@ return [
             ],
         ],
         [
+            'text'    => 'Blogs',
+            'icon'    => 'fas fa-fw fa-list',
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Blogs',
+                    'url'  => 'admin/blogs',
+                    'can' => ['browse-blogs'],
+                    'active' => ['blogs', 'blogs*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
             'header' => 'Campaigns',
             'can' => ['browse-campaigns'],
         ],

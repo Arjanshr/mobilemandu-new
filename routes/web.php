@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\CategoryController;
@@ -207,4 +208,17 @@ Route::middleware([
         Route::patch('/sliders/edit/{slider}', [SliderController::class, 'update'])->name('slider.update');
     });
     Route::delete('/sliders/delete/{slider}', [SliderController::class, 'delete'])->name('slider.delete')->middleware('can:delete-sliders');
+    
+    //Blogs routes
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blogs')->middleware('can:browse-blogs');
+    Route::middleware('can:add-blogs')->group(function () {
+        Route::get('/blogs/create', [BlogController::class, 'create'])->name('blog.create');
+        Route::post('/blogs/insert', [BlogController::class, 'insert'])->name('blog.insert');
+    });
+    Route::get('/blogs/{blog}', [BlogController::class, 'show'])->name('blog.show')->middleware('can:read-blogs');
+    Route::middleware('can:edit-blogs')->group(function () {
+        Route::get('/blogs/edit/{blog}', [BlogController::class, 'edit'])->name('blog.edit');
+        Route::patch('/blogs/edit/{blog}', [BlogController::class, 'update'])->name('blog.update');
+    });
+    Route::delete('/blogs/delete/{blog}', [BlogController::class, 'delete'])->name('blog.delete')->middleware('can:delete-blogs');
 });
