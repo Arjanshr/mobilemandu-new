@@ -71,6 +71,7 @@ class CampaignsController extends Controller
         $campaign = Campaign::with('products')->find($id);
         $current_products_ids = $campaign->products->pluck('id')->toArray();
         $sync_values = [];
+        if($request->products)
         foreach ($request->products as $product_id) {
             if (!in_array($product_id, $current_products_ids)) {
                 $product = Product::find($product_id);
