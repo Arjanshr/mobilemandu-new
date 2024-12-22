@@ -11,7 +11,7 @@ class BrandController extends BaseController
 {
     public function brands()
     {
-        $brands =  Brand::get();
+        $brands =  Brand::orderBy('name')->get();
         return $this->sendResponse(BrandResource::collection($brands), 'Brands retrieved successfully.');
     }
     public function details($brand_id_or_slug)
