@@ -28,7 +28,7 @@ class ContentResource extends JsonResource
             "status" => $this->product->status,
             "tags"=>[
                 "new"=> $this->product->isPopular(),
-                "popular"=> $this->product->isPopular(),
+                "popular"=> $this->product->isNew(),
                 "campaign"=> $this->product->isCampaignProduct()->first()?$this->product->isCampaignProduct()->first()->name:false,
             ]
         ];
