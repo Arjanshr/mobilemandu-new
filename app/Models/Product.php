@@ -109,14 +109,14 @@ class Product extends Model implements HasMedia
     public function isPopular()
     {
 
-        if(PopularProduct::find($this->id)) return true;
+        if(PopularProduct::where('product_id',$this->id)->first()) return true;
         return false;
     }
 
     public function isNew()
     {
 
-        if(NewArraival::find($this->id)) return true;
+        if(NewArraival::where('product_id',$this->id)->first()) return true;
         return false;
     }
 
