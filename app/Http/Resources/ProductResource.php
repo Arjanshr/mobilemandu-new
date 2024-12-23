@@ -27,7 +27,7 @@ class ProductResource extends JsonResource
             "offer" => null,
             "status" => $this->status,
             "tags"=>[
-                "new"=> $this->isPopular(),
+                "new"=> $this->isNew(),
                 "popular"=> $this->isPopular(),
                 "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
             ]

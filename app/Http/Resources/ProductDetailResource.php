@@ -41,7 +41,7 @@ class ProductDetailResource extends JsonResource
             "total_reviews" => $this->reviews()->count(),
             "rating_summary" =>  $rating_summary,
             "tags"=>[
-                "new"=> $this->isPopular(),
+                "new"=> $this->isNew(),
                 "popular"=> $this->isPopular(),
                 "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
             ]
