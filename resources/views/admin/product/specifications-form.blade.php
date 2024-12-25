@@ -27,23 +27,24 @@
                                 @endif
                                 <div class="card-body row">
                                     <!-- Name -->
+                                    @foreach($specifications as $specification)
                                     <div class="form-group col-sm-6">
                                         <label for="name">Name*</label>
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Name"
-                                            value="{{ isset($product_specification) ? $product_specification->specification->name : old('name') }}" required>
+                                        <input type="text" class="form-control" id="name" placeholder="Name"
+                                            value="{{$specification->name}}" readonly required>
                                         @error('name')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <div class="form-group col-sm-6">
                                         <label for="name">Value*</label>
-                                        <input type="text" class="form-control" id="value" name="value" placeholder="Value"
-                                            value="{{ isset($product_specification) ? $product_specification->value : old('value') }}" required>
+                                        <input type="text" class="form-control" id="value" name="value[{{$specification->id}}]" placeholder="Value"
+                                            value="{{ isset($product_specifications[$specification->id]) ? $product_specifications[$specification->id] : old('value') }}" required>
                                         @error('value')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                        
+                                    @endforeach
                                     <div class="form-group col-sm-12">
                                         <input id="submit" type="submit" value="{{ isset($product_specification) ? 'Edit' : 'Create' }}"
                                             class="btn btn-primary" />

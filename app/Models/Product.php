@@ -108,7 +108,6 @@ class Product extends Model implements HasMedia
 
     public function isPopular()
     {
-
         if(PopularProduct::where('product_id',$this->id)->count()>0) return true;
         return false;
     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\CategoryType;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
+use App\Models\Specification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class CategoryController extends Controller
@@ -61,12 +63,12 @@ class CategoryController extends Controller
     {
         if ($this->checkIfHasSubCategories($category))
             return redirect()->route('categories')
-            ->withError('Category cannot be deleted!')
-            ->withWarning('Delete all the sub categories of this category first');
+                ->withError('Category cannot be deleted!')
+                ->withWarning('Delete all the sub categories of this category first');
         if ($category->checkIfHasItems())
             return redirect()->route('categories')
-            ->withError('Category cannot be deleted!')
-            ->withWarning('Delete all the items of this category first');
+                ->withError('Category cannot be deleted!')
+                ->withWarning('Delete all the items of this category first');
         $category->delete();
         toastr()->success('Category Created Successfully!');
         return redirect()->route('categories');
@@ -74,9 +76,37 @@ class CategoryController extends Controller
 
     private function  checkIfHasSubCategories($category)
     {
-        if($category->getAllChildrenIds()->count()>0) return true;
+        if ($category->getAllChildrenIds()->count() > 0) return true;
         return false;
     }
 
+    public function categorySpecifications(Category $category)
+    {
+        $category_specifications = $category->specifications;
+        return view('admin.category.category-specifications.index', compact('category', 'category_specifications'));
+    }
+    public function createCategorySpecifications(Category $category)
+    {
+        return view('admin.category.category-specifications.form', compact('category'));
+    }
+
+    public function insertCategorySpecifications(Request $request, Category $category)
+    {
+        $validated = $request->validate([
+            'specification' => 'required',
+        ]);
+        $specification = Specification::firstOrCreate([
+            'name' =>  $request->specification
+        ]);
+        $category->specifications()->attach(['specification_id'=>$specification->id]);
+        toastr()->success('Specification Added Successfully!');
+        return redirect()->route('category-specifications', $category->id);
+    }
     
+    public function deleteCategorySpecifications(Category $category, $category_specifications)
+    {
+        $category->specifications()->detach(['specification_id'=>$category_specifications]);
+        toastr()->success('Specification Deleted Successfully!');
+        return redirect()->route('category-specifications', $category->id);
+    }
 }

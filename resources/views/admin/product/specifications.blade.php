@@ -58,12 +58,12 @@
                                                             {{ $product_specification->value }}
                                                         </td>
                                                         <td>
-                                                            @can('edit-product-specifications')
+                                                            {{-- @can('edit-product-specifications')
                                                                 <a href="{{ route('product.specification.edit', $product_specification->id) }}"
                                                                     class="btn btn-sm btn-success" title="Edit">
                                                                     <i class="fa fa-pen"></i>
                                                                 </a>
-                                                            @endcan
+                                                            @endcan --}}
                                                             @can('delete-products')
                                                                 <form method="post"
                                                                     action="{{ route('product.specification.delete', $product_specification->id) }}"

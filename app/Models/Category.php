@@ -102,4 +102,9 @@ class Category extends Model
         return LogOptions::defaults()
             ->logFillable();
     }
+
+    public function specifications()
+    {
+        return $this->belongsToMany(Specification::class);
+    }
 }

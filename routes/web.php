@@ -117,6 +117,14 @@ Route::middleware([
         Route::patch('/categories/edit/{category}', [CategoryController::class, 'update'])->name('category.update');
     });
     Route::delete('/categories/delete/{category}', [CategoryController::class, 'delete'])->name('category.delete')->middleware('can:delete-categories');
+    
+    //Category Specifications routes
+    Route::get('/category-specifications/{category}', [CategoryController::class, 'categorySpecifications'])->name('category-specifications')->middleware('can:browse-category-specifications');
+    Route::middleware('can:add-category-specifications')->group(function () {
+        Route::get('/category-specifications/create/{category}', [CategoryController::class, 'createCategorySpecifications'])->name('category-specification.create');
+        Route::post('/category-specifications/insert/{category}', [CategoryController::class, 'insertCategorySpecifications'])->name('category-specification.insert');
+    });
+    Route::delete('/category-specifications/delete/{category}/{category_specification_id}', [CategoryController::class, 'deleteCategorySpecifications'])->name('category-specification.delete')->middleware('can:delete-category-specifications');
 
     //Brand routes
     Route::get('/brands', [BrandController::class, 'index'])->name('brands')->middleware('can:browse-brands');

@@ -11,9 +11,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        @can('add-categories')
+                        @can('add-category_specifications')
                             <div class="card-header">
-                                <a href="{{ route('category.create') }}" class="btn btn-success">Create Category</a>
+                                <a href="{{ route('category-specification.create',$category->id) }}" class="btn btn-success">Create Category Specification</a>
                             </div>
                         @endcan
                         <div class="card-body">
@@ -27,29 +27,16 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
-                                                    <th>Parent</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($categories as $category)
+                                                @foreach ($category_specifications as $category_specification)
                                                     <tr>
                                                         <td width="20px">{{ $loop->iteration }}</td>
                                                         <td>
-                                                            @can('read-categories')
-                                                                <a href="{{ route('category.show', $category->id) }}"
-                                                                    class="btn btn-sm btn-primary" title="View Details">
-                                                                    <i class="fa fa-eye"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-categories')
-                                                                <a href="{{ route('category.edit', $category->id) }}"
-                                                                    class="btn btn-sm btn-success" title="Edit">
-                                                                    <i class="fa fa-pen"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('delete-categories')
+                                                            @can('delete-category_specifications')
                                                                 <form method="post"
-                                                                    action="{{ route('category.delete', $category->id) }}"
+                                                                    action="{{ route('category-specification.delete', [$category->id, $category_specification->id]) }}"
                                                                     style="display: initial;">
                                                                     @csrf
                                                                     @method('delete')
@@ -59,15 +46,8 @@
                                                                     </button>
                                                                 </form>
                                                             @endcan
-                                                            @can('browse-category-specifications')
-                                                                <a href="{{ route('category-specifications', $category->id) }}"
-                                                                    class="btn btn-sm btn-warning" title="Manage Category Specification List">
-                                                                    <i class="fa fa-list"></i>
-                                                                </a>
-                                                            @endcan
                                                         </td>
-                                                        <td>{{ $category->name }}</td>
-                                                        <td>{!! $category->getParentTree() !!}</td>
+                                                        <td>{{ $category_specification->name }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -76,13 +56,11 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
-                                                    <th>Parent</th>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                     </div>
                                 </div>
-                                {{ $categories->links() }}
                             </div>
                         </div>
 

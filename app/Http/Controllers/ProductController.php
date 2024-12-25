@@ -20,7 +20,7 @@ class ProductController extends Controller
     {
         $selected_brand = $request->brand_id ?? null;
         $selected_categories = $request->category_id ?? [];
-        $query = $request->get('query')??null;
+        $query = $request->get('query') ?? null;
         $products = Product::with('images')
             ->orderBy('id', 'DESC');
         if ($selected_brand != null) {
@@ -32,18 +32,16 @@ class ProductController extends Controller
             });
         }
         if (isset($request->query) && $request->query != '') {
-            
+
             $products = $products->where(function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->get('query') . '%')
                     ->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
-        }else{
-
         }
         $products = $products->paginate(10);
         $categories = Category::get();
         $brands = Brand::get();
-        return view('admin.product.index', compact('products', 'categories', 'brands', 'selected_brand', 'selected_categories','query'));
+        return view('admin.product.index', compact('products', 'categories', 'brands', 'selected_brand', 'selected_categories', 'query'));
     }
 
     public function create()
@@ -100,19 +98,32 @@ class ProductController extends Controller
 
     public function createSpecifications(Product $product)
     {
-        return view('admin.product.specifications-form', compact('product'));
+        $specifications = $product->categories()->first()->specifications;
+        $product_specifications = [];
+        foreach($product->specifications()->get() as $p_spec)
+        {
+            $product_specifications[$p_spec->specification_id] = $p_spec->value;
+        }
+        // return $product_specifications;
+        return view('admin.product.specifications-form', compact('product', 'specifications','product_specifications'));
     }
 
     public function insertSpecifications(Product $product, Request $request)
     {
-        $product_specification = new ProductSpecification();
-        $specification = Specification::firstOrCreate([
-            'name' =>  $request->name
+        $validated = $request->validate([
+            'value' => 'required|array',
         ]);
-        $product_specification->product_id = $product->id;
-        $product_specification->specification_id = $specification->id;
-        $product_specification->value = $request->value;
-        $product_specification->save();
+        foreach ($request->value as $specification_id => $value) {
+            $product_specification = ProductSpecification::where('product_id', $product->id)
+                ->where('specification_id', $specification_id)
+                ->first();
+            if (!$product_specification)
+                $product_specification = new ProductSpecification();
+            $product_specification->product_id = $product->id;
+            $product_specification->specification_id = $specification_id;
+            $product_specification->value = $value;
+            $product_specification->save();
+        }
         toastr()->success('Product Created Successfully!');
         return redirect()->route('product.specifications', $product->id);
     }
