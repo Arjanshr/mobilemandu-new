@@ -56,7 +56,7 @@ class ProductController extends Controller
         $product = Product::create($data);
         $product->categories()->sync($request->category_id);
         toastr()->success('Product Created Successfully!');
-        return redirect()->route('products');
+        return redirect()->route('product.specification.create',$product->id);
     }
 
     public function show(Product $product)
@@ -125,7 +125,7 @@ class ProductController extends Controller
             $product_specification->save();
         }
         toastr()->success('Product Created Successfully!');
-        return redirect()->route('product.specifications', $product->id);
+        return redirect()->route('product.feature.create', $product->id);
     }
 
     public function manageSpecifications(Product $product)
@@ -178,7 +178,7 @@ class ProductController extends Controller
         $feature->product_id = $product->id;
         $feature->save();
         toastr()->success('Product Feature Created Successfully!');
-        return redirect()->route('product.features', $product->id);
+        return redirect()->route('product.images', $product->id);
     }
 
     public function manageFeatures(Product $product)
@@ -236,7 +236,6 @@ class ProductController extends Controller
     public function updateImages(Product $product, Request $request)
     {
         $media = $product->getMedia()->where('file_name', $request->name)->first();
-        // return $media;
         $media->order_column = $request->count;
         $media->save();
     }
