@@ -56,7 +56,7 @@ class ProductController extends Controller
         $product = Product::create($data);
         $product->categories()->sync($request->category_id);
         toastr()->success('Product Created Successfully!');
-        return redirect()->route('product.specification.create',$product->id);
+        return redirect()->route('product.specification.create', $product->id);
     }
 
     public function show(Product $product)
@@ -100,12 +100,11 @@ class ProductController extends Controller
     {
         $specifications = $product->categories()->first()->specifications;
         $product_specifications = [];
-        foreach($product->specifications()->get() as $p_spec)
-        {
+        foreach ($product->specifications()->get() as $p_spec) {
             $product_specifications[$p_spec->specification_id] = $p_spec->value;
         }
         // return $product_specifications;
-        return view('admin.product.specifications-form', compact('product', 'specifications','product_specifications'));
+        return view('admin.product.specifications-form', compact('product', 'specifications', 'product_specifications'));
     }
 
     public function insertSpecifications(Product $product, Request $request)
@@ -114,15 +113,17 @@ class ProductController extends Controller
             'value' => 'required|array',
         ]);
         foreach ($request->value as $specification_id => $value) {
-            $product_specification = ProductSpecification::where('product_id', $product->id)
-                ->where('specification_id', $specification_id)
-                ->first();
-            if (!$product_specification)
-                $product_specification = new ProductSpecification();
-            $product_specification->product_id = $product->id;
-            $product_specification->specification_id = $specification_id;
-            $product_specification->value = $value;
-            $product_specification->save();
+            if ($value != null && $value != '') {
+                $product_specification = ProductSpecification::where('product_id', $product->id)
+                    ->where('specification_id', $specification_id)
+                    ->first();
+                if (!$product_specification)
+                    $product_specification = new ProductSpecification();
+                $product_specification->product_id = $product->id;
+                $product_specification->specification_id = $specification_id;
+                $product_specification->value = $value;
+                $product_specification->save();
+            }
         }
         toastr()->success('Product Created Successfully!');
         return redirect()->route('product.feature.create', $product->id);

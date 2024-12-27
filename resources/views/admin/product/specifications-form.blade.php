@@ -31,7 +31,7 @@
                                     <div class="form-group col-sm-6">
                                         <label for="name">Name*</label>
                                         <input type="text" class="form-control" id="name" placeholder="Name"
-                                            value="{{$specification->name}}" readonly required>
+                                            value="{{$specification->name}}" readonly>
                                         @error('name')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -39,7 +39,7 @@
                                     <div class="form-group col-sm-6">
                                         <label for="name">Value*</label>
                                         <input type="text" class="form-control" id="value" name="value[{{$specification->id}}]" placeholder="Value"
-                                            value="{{ isset($product_specifications[$specification->id]) ? $product_specifications[$specification->id] : old('value') }}" required>
+                                            value="{{ isset($product_specifications[$specification->id]) ? $product_specifications[$specification->id] : old('value') }}">
                                         @error('value')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
