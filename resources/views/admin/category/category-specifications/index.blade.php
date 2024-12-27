@@ -11,7 +11,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        @can('add-category_specifications')
+                        @can('add-category-specifications')
                             <div class="card-header">
                                 <a href="{{ route('category-specification.create',$category->id) }}" class="btn btn-success">Create Category Specification</a>
                             </div>
