@@ -34,7 +34,7 @@
                                                     <tr>
                                                         <td width="20px">{{ $loop->iteration }}</td>
                                                         <td>
-                                                            @can('delete-category_specifications')
+                                                            @can('delete-category-specifications')
                                                                 <form method="post"
                                                                     action="{{ route('category-specification.delete', [$category->id, $category_specification->id]) }}"
                                                                     style="display: initial;">
