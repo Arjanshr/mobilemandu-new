@@ -25,6 +25,7 @@
                                             </form>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -32,7 +33,9 @@
                     </div>
 
                 </div>
-
+                <div class="col-sm-12">
+                    <a href="{{route('products')}}" class="btn btn-primary"> Done</a>
+                </div>
             </div>
 
         </div>
