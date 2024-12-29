@@ -17,6 +17,18 @@
                                     <div class="col-md-6">
                                         <a href="{{ route('product.feature.create',$product->id) }}" class="btn btn-success">Add Feature</a>
                                     </div>
+                                    <div class="col-md-6">
+                                        <form method="post"
+                                            action="{{ route('product.features.delete.all', $product->id) }}"
+                                            style="display: initial;">
+                                            @csrf
+                                            @method('delete')
+                                            <button class="deleteAll btn btn-danger btn-sm" type="submit" title="Delete"
+                                                onclick="">
+                                                Delete All Features
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         @endcan

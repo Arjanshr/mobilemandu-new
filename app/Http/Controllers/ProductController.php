@@ -208,6 +208,13 @@ class ProductController extends Controller
         return redirect()->route('product.features', $feature->product_id);
     }
 
+    public function deleteAllFeatures(Product $product)
+    {
+        $product->features()->delete();
+        toastr()->success('Product Features Deleted Successfully!');
+        return redirect()->route('product.features', $product->id);
+    }
+
     public function manageImages(Product $product)
     {
         return view('admin.product.images', compact('product'));

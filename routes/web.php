@@ -158,13 +158,14 @@ Route::middleware([
         Route::patch('/products/specifications/edit/{product_specification}', [ProductController::class, 'updateSpecifications'])->name('product.specification.update');
         Route::delete('/products/specifications/delete/{product_specification}', [ProductController::class, 'deleteSpecifications'])->name('product.specification.delete');
         Route::delete('/products/specifications/delete_all/{product}', [ProductController::class, 'deleteAllSpecifications'])->name('product.specification.delete.all');
-
+        
         Route::get('/products/features/{product}', [ProductController::class, 'manageFeatures'])->name('product.features');
         Route::get('/products/features/create/{product}', [ProductController::class, 'createFeatures'])->name('product.feature.create');
         Route::post('/products/features/insert/{product}', [ProductController::class, 'insertFeatures'])->name('product.feature.insert');
         Route::get('/products/features/edit/{feature}', [ProductController::class, 'editFeatures'])->name('product.feature.edit');
         Route::patch('/products/features/edit/{feature}', [ProductController::class, 'updateFeatures'])->name('product.feature.update');
         Route::delete('/products/features/delete/{feature}', [ProductController::class, 'deleteFeatures'])->name('product.feature.delete');
+        Route::delete('/products/specifications/delete_all/{feature}', [ProductController::class, 'deleteAllFeaturess'])->name('product.features.delete.all');
 
         Route::get('/products/images/link-images', [ProductController::class, 'linkImages']);
         Route::get('/products/images/{product}', [ProductController::class, 'manageImages'])->name('product.images');
