@@ -165,7 +165,7 @@ Route::middleware([
         Route::get('/products/features/edit/{feature}', [ProductController::class, 'editFeatures'])->name('product.feature.edit');
         Route::patch('/products/features/edit/{feature}', [ProductController::class, 'updateFeatures'])->name('product.feature.update');
         Route::delete('/products/features/delete/{feature}', [ProductController::class, 'deleteFeatures'])->name('product.feature.delete');
-        Route::delete('/products/specifications/delete_all/{feature}', [ProductController::class, 'deleteAllFeaturess'])->name('product.features.delete.all');
+        Route::delete('/products/features/delete_all/{product}', [ProductController::class, 'deleteAllFeatures'])->name('product.features.delete.all');
 
         Route::get('/products/images/link-images', [ProductController::class, 'linkImages']);
         Route::get('/products/images/{product}', [ProductController::class, 'manageImages'])->name('product.images');
