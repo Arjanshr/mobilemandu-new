@@ -38,7 +38,7 @@ class AuthController extends BaseController
         if ($request->hasFile('photo')) {
             $image_name = rand(0, 99999) . time() . '.' . $request->photo->extension();
             $request->photo->move(storage_path('app/public/profile-photos/'), $image_name);
-            $input['profile_photo_path'] = 'profile-photos/'.$image_name;
+            $input['profile_photo_path'] = 'profile-photos/' . $image_name;
         }
         $user = User::create($input)->assignRole('customer');
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
@@ -54,15 +54,20 @@ class AuthController extends BaseController
      */
     public function login(Request $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-            $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-            $success['name'] =  $user->name;
-
-            return $this->sendResponse($success, 'User login successfully.');
-        } else {
+        $selected_user = User::where('email', $request->email)->first();
+        if (!$selected_user)
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+        if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $user = Auth::user();
+                $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+                $success['name'] =  $user->name;
+                return $this->sendResponse($success, 'User login successfully.');
+            } else {
+                return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+            }
         }
+        return $this->sendError('This email has been registered via social login. Please login using your social login links...', ['error' => 'Unauthorised']);
     }
 
     public function logout()
