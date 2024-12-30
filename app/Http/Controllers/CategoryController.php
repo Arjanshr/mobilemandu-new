@@ -100,7 +100,7 @@ class CategoryController extends Controller
         ]);
         $category->specifications()->attach(['specification_id'=>$specification->id]);
         toastr()->success('Specification Added Successfully!');
-        return redirect()->route('category-specifications', $category->id);
+        return redirect()->route('category-specification.create', $category->id);
     }
     
     public function deleteCategorySpecifications(Category $category, $category_specifications)

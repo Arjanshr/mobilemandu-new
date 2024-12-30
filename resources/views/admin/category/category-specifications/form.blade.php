@@ -39,10 +39,13 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="form-group col-sm-12">
+                                    <div class="form-group col-sm-10">
                                         <input id="submit" type="submit"
                                             value="{{ isset($category_specification) ? 'Edit' : 'Create' }}"
                                             class="btn btn-primary" />
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <a href="{{route('category-specifications',$category->id)}}" class="btn btn-danger">Exit</a>
                                     </div>
                             </form>
                         </div>
