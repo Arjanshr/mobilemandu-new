@@ -205,7 +205,7 @@ class ProductController extends BaseController
                     ->havingRaw('AVG(rating) >= ? AND AVG(rating) <= ?', [$min_rating, $max_rating]);
             });
         }
-        if ($products->count() <= 14) {
+        if ($products->count() <= 0) {
             $products = $products->orWhere(function ($query) use ($request) {
                 $query->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
