@@ -166,7 +166,6 @@ class ProductController extends BaseController
         $products = Product::where('status', 'publish');
 
         if (isset($request->query) && $request->query != '') {
-            // return Category::get();
             $category_ids = Category::where('name', 'like', '%' . $request->get('query') . '%')->pluck('id');
 
             $products = $products->whereHas('categories', function ($query) use ($category_ids) {
@@ -175,7 +174,6 @@ class ProductController extends BaseController
 
             $products = $products->orWhere(function ($query) use ($request) {
                 $query->orWhere('name', 'like', '%' . $request->get('query') . '%');
-                // ->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
         }
 
@@ -227,9 +225,19 @@ class ProductController extends BaseController
     {
         $products = Product::where('status', 'publish');
         if (isset($request->query) && $request->query != '') {
-            $products = $products->where('name', 'like', '%' . $request->get('query') . '%');
-            if ($products->count() <= 0) {
-                $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+            if (isset($request->query) && $request->query != '') {
+                $category_ids = Category::where('name', 'like', '%' . $request->get('query') . '%')->pluck('id');
+
+                $products = $products->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('id', $category_ids);
+                });
+
+                $products = $products->orWhere(function ($query) use ($request) {
+                    $query->orWhere('name', 'like', '%' . $request->get('query') . '%');
+                });
+                if ($products->count() <= 0) {
+                    $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+                }
             }
         }
 
@@ -242,10 +250,19 @@ class ProductController extends BaseController
     {
         $products = Product::where('status', 'publish');
         if (isset($request->query) && $request->query != '') {
-            $products = $products->where('name', 'like', '%' . $request->get('query') . '%');
-            // ->orWhere('description', 'like', '%' . $request->get('query') . '%');
-            if ($products->count() <= 0) {
-                $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+            if (isset($request->query) && $request->query != '') {
+                $category_ids = Category::where('name', 'like', '%' . $request->get('query') . '%')->pluck('id');
+
+                $products = $products->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('id', $category_ids);
+                });
+
+                $products = $products->orWhere(function ($query) use ($request) {
+                    $query->orWhere('name', 'like', '%' . $request->get('query') . '%');
+                });
+                if ($products->count() <= 0) {
+                    $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+                }
             }
         }
         $products = $products->get();
@@ -263,10 +280,19 @@ class ProductController extends BaseController
     {
         $products = Product::where('status', 'publish');
         if (isset($request->query) && $request->query != '') {
-            $products = $products->where('name', 'like', '%' . $request->get('query') . '%');
-            // ->orWhere('description', 'like', '%' . $request->get('query') . '%');
-            if ($products->count() <= 0) {
-                $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+            if (isset($request->query) && $request->query != '') {
+                $category_ids = Category::where('name', 'like', '%' . $request->get('query') . '%')->pluck('id');
+
+                $products = $products->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('id', $category_ids);
+                });
+
+                $products = $products->orWhere(function ($query) use ($request) {
+                    $query->orWhere('name', 'like', '%' . $request->get('query') . '%');
+                });
+                if ($products->count() <= 0) {
+                    $products = $products->orWhere('description', 'like', '%' . $request->get('query') . '%');
+                }
             }
         }
         $products = $products->select(DB::raw("MIN(price) AS min_price, MAX(price) AS max_price"))->get();
