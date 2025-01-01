@@ -25,7 +25,6 @@ class SocialiteController extends Controller
         $this->validateProvider($request);
 
         $response = Socialite::driver($provider)->stateless()->user();
-        dd($response);
         $user = User::firstOrCreate(
             [$provider . '_id' => $response->getId()],
         );
