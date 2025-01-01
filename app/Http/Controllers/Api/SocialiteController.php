@@ -40,17 +40,36 @@ class SocialiteController extends BaseController
     {
         $providers['provider'] = $provider;
         $this->validateProvider($providers);
-
-        $user = User::firstOrCreate(
-            [$provider . '_id' => $request->provider_id],
-        )->assignRole('customer');
-
-        if ($user->wasRecentlyCreated) {
-            $data['email'] = $request->email ?? null;
-            $data['name'] = $request->name ?? $request->nickname;
-
-            event(new Registered($user));
+        if ($request->email && ($request->email != '' || $request->email != null)) {
+            $user = User::firstOrCreate(
+                ['email' => $request->email],
+            )->assignRole('customer');
+            if ($user->wasRecentlyCreated) {
+                $data[$provider . '_id'] = $request->provider_id;
+                $data['name'] = $request->name ?? $request->nickname;
+                event(new Registered($user));
+            }
+        } elseif ($request->phone && ($request->phone != '' || $request->phone != null)) {
+            $user = User::firstOrCreate(
+                ['phone' => $request->phone],
+            )->assignRole('customer');
+            if ($user->wasRecentlyCreated) {
+                $data[$provider . '_id'] = $request->provider_id;
+                $data['name'] = $request->name ?? $request->nickname;
+                event(new Registered($user));
+            }
+        } else {
+            $user = User::firstOrCreate(
+                [$provider . '_id' => $request->provider_id],
+            )->assignRole('customer');
+            if ($user->wasRecentlyCreated) {
+                $data['email'] = $request->email ?? null;
+                $data['name'] = $request->name ?? $request->nickname;
+                event(new Registered($user));
+            }
         }
+
+
         if ($request->avatar_url)
             $data['avatar'] = $request->avatar_url;
         $user->update($data);

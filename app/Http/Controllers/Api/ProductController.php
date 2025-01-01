@@ -167,8 +167,8 @@ class ProductController extends BaseController
 
         if (isset($request->query) && $request->query != '') {
             $products = $products->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->get('query') . '%')
-                    ->orWhere('description', 'like', '%' . $request->get('query') . '%');
+                $query->where('name', 'like', '%' . $request->get('query') . '%');
+                // ->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
         }
 
@@ -205,11 +205,14 @@ class ProductController extends BaseController
                     ->havingRaw('AVG(rating) >= ? AND AVG(rating) <= ?', [$min_rating, $max_rating]);
             });
         }
+        if ($products->count() <= 14) {
+            $products = $products->orWhere(function ($query) use ($request) {
+                $query->orWhere('description', 'like', '%' . $request->get('query') . '%');
+            });
+        }
 
         // Fetch products with pagination
-        $products = $products->orderBy('id','DESC')->paginate($paginate);
-
-
+        $products = $products->orderBy('id', 'DESC')->paginate($paginate);
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
