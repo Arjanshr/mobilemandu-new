@@ -166,8 +166,15 @@ class ProductController extends BaseController
         $products = Product::where('status', 'publish');
 
         if (isset($request->query) && $request->query != '') {
-            $products = $products->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->get('query') . '%');
+            // return Category::get();
+            $category_ids = Category::where('name', 'like', '%' . $request->get('query') . '%')->pluck('id');
+
+            $products = $products->whereHas('categories', function ($query) use ($category_ids) {
+                $query->whereIn('id', $category_ids);
+            });
+
+            $products = $products->orWhere(function ($query) use ($request) {
+                $query->orWhere('name', 'like', '%' . $request->get('query') . '%');
                 // ->orWhere('description', 'like', '%' . $request->get('query') . '%');
             });
         }
