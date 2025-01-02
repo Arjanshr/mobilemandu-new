@@ -8,7 +8,7 @@ class CreateProductSpecificationsTable extends Migration
 {
     public function up()
     {
-        Schema::create('product_specifications', function (Blueprint $table) {
+        Schema::create('product_specification', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('specification_id');
@@ -21,6 +21,6 @@ class CreateProductSpecificationsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('product_specifications');
+        Schema::dropIfExists('product_specification');
     }
 }

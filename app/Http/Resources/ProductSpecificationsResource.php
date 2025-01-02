@@ -15,8 +15,8 @@ class ProductSpecificationsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "key" => $this->specification->name,
-            "value" => $this->value,
+            "key" => $this->name,
+            "value" => $this->pivot->value,
         ];
     }
 }

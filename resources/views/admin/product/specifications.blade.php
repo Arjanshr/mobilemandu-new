@@ -52,10 +52,10 @@
                                                     <tr>
                                                         <td width="20px">{{ $loop->iteration }}</td>
                                                         <td>
-                                                            {{ $product_specification->specification->name }}
+                                                            {{ $product_specification->name }}
                                                         </td>
                                                         <td>
-                                                            {{ $product_specification->value }}
+                                                            {{ $product_specification->pivot->value }}
                                                         </td>
                                                         <td>
                                                             {{-- @can('edit-product-specifications')
@@ -66,7 +66,7 @@
                                                             @endcan --}}
                                                             @can('delete-products')
                                                                 <form method="post"
-                                                                    action="{{ route('product.specification.delete', $product_specification->id) }}"
+                                                                    action="{{ route('product.specification.delete', [$product_specification->pivot->product_id,$product_specification->pivot->specification_id]) }}"
                                                                     style="display: initial;">
                                                                     @csrf
                                                                     @method('delete')

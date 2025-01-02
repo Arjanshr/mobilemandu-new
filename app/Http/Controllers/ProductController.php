@@ -101,9 +101,8 @@ class ProductController extends Controller
         $specifications = $product->categories()->first()->specifications;
         $product_specifications = [];
         foreach ($product->specifications()->get() as $p_spec) {
-            $product_specifications[$p_spec->specification_id] = $p_spec->value;
+            $product_specifications[$p_spec->pivot->specification_id] = $p_spec->pivot->value;
         }
-        // return $product_specifications;
         return view('admin.product.specifications-form', compact('product', 'specifications', 'product_specifications'));
     }
 
@@ -131,7 +130,9 @@ class ProductController extends Controller
 
     public function manageSpecifications(Product $product)
     {
-        $product_specifications = ProductSpecification::where('product_id', $product->id)->with('specification')->get();
+        $product_specifications = $product->specifications()->get();
+        // $product_specifications = ProductSpecification::where('product_id', $product->id)->with('specification')->get();
+        // return $product_specifications;
         return view('admin.product.specifications', compact('product_specifications', 'product'));
     }
 
@@ -154,15 +155,15 @@ class ProductController extends Controller
         return redirect()->route('product.specifications', $product_specification->product->id);
     }
 
-    public function deleteSpecifications(ProductSpecification $product_specification)
+    public function deleteSpecifications(Product $product, Specification $specification)
     {
-        $product_specification->delete();
+        $product->specifications()->detach($specification->id);
         toastr()->success('Product Specification Deleted Successfully!');
-        return redirect()->route('product.specifications', $product_specification->product_id);
+        return redirect()->route('product.specifications', $product->id);
     }
     public function deleteAllSpecifications(Product $product)
     {
-        $product->specifications()->delete();
+        $product->specifications()->detach();
         toastr()->success('Product Specification Deleted Successfully!');
         return redirect()->route('product.specifications', $product->id);
     }

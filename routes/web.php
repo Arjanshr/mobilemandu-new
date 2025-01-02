@@ -156,7 +156,7 @@ Route::middleware([
         Route::post('/products/specifications/insert/{product}', [ProductController::class, 'insertSpecifications'])->name('product.specification.insert');
         Route::get('/products/specifications/edit/{product_specification}', [ProductController::class, 'editSpecifications'])->name('product.specification.edit');
         Route::patch('/products/specifications/edit/{product_specification}', [ProductController::class, 'updateSpecifications'])->name('product.specification.update');
-        Route::delete('/products/specifications/delete/{product_specification}', [ProductController::class, 'deleteSpecifications'])->name('product.specification.delete');
+        Route::delete('/products/specifications/delete/{product}/{specification}', [ProductController::class, 'deleteSpecifications'])->name('product.specification.delete');
         Route::delete('/products/specifications/delete_all/{product}', [ProductController::class, 'deleteAllSpecifications'])->name('product.specification.delete.all');
         
         Route::get('/products/features/{product}', [ProductController::class, 'manageFeatures'])->name('product.features');

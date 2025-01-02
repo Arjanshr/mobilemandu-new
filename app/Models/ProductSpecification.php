@@ -10,6 +10,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class ProductSpecification extends Model
 {
     use HasFactory, LogsActivity;
+
+    protected $table = 'product_specification';
     protected $fillable = [
         'product_id',
         'specification_id',
