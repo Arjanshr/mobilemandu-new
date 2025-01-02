@@ -29,6 +29,7 @@ class UserRequest extends FormRequest
             'gender' => ['required', 'in:male,female'],
             'dob' => ['nullable', 'date'],
             'password'=>['nullable','min:6'],
+            'photo' => ['required', 'mimes:jpeg,png,jpg,gif,svg,ico,pdf', 'max:2048'],
         ];
     }
 }
