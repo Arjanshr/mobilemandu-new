@@ -64,7 +64,7 @@ class AuthController extends BaseController
                 $success['name'] =  $user->name;
                 return $this->sendResponse($success, 'User login successfully.');
             } else {
-                return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+                return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
             }
         }
         return $this->sendError('This email has been registered via social login. Please login using your social login links...', ['error' => 'Unauthorised']);
