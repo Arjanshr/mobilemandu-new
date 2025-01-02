@@ -98,6 +98,8 @@ Route::prefix('v1')->group(function () {
         Route::get('blogs', [BlogController::class, 'blogs']);
         Route::get('blogs/{blog}', [BlogController::class, 'blogDetails']);
 
+        //Spec Compare        
+        Route::get('compare-specifications', [ProductController::class, 'specCompare']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

@@ -354,9 +354,40 @@ class ProductController extends BaseController
         }
         return $this->sendResponse(RelatedProductsResource::collection($related_products), 'Related products retrieved successfully.');
     }
+
     public function questionsAndAnswers(Product $product, $count = 8)
     {
         $q_n_a = QuestionsAndAnswer::where('product_id', $product->id)->get()->take($count);
         return $this->sendResponse(QuestionsAndAnswersResource::collection($q_n_a), 'Q and A retrieved successfully.');
+    }
+
+    public function specCompare(Request $request)
+    {
+        $product_ids = $request->product_id;
+        $products = Product::with(['specifications'])->whereIn('id', $product_ids)->get();
+        $comparison_data = [];
+
+        // Loop through products and their specifications
+        foreach ($products as $product) {
+            foreach ($product->specifications as $specification) {
+                // Initialize the specification array if it doesn't exist
+                if (!isset($comparison_data[$specification->name])) {
+                    $comparison_data[$specification->name] = [];
+                }
+
+                // Add the product's specification value
+                $comparison_data[$specification->name][$product->id] = $specification->pivot->value;
+            }
+        }
+
+        // Ensure all products are listed even if some lack specific specifications
+        foreach ($comparison_data as $specification_name => &$values) {
+            foreach ($product_ids as $product_id) {
+                $values[$product_id] = $values[$product_id] ?? 'N/A'; // Default to 'N/A' if value is missing
+            }
+        }
+
+
+        return $this->sendResponse($comparison_data,"Comparision data fetched successfully");
     }
 }
