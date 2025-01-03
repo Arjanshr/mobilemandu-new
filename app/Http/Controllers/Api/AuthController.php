@@ -20,7 +20,7 @@ class AuthController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|string|unique:users,phone',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'password_confirmation' => 'required|same:password',
@@ -54,18 +54,34 @@ class AuthController extends BaseController
      */
     public function login(Request $request)
     {
-        $selected_user = User::where('email', $request->email)->first();
-        if (!$selected_user)
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
-        if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                $user = Auth::user();
-                $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-                $success['name'] =  $user->name;
-                return $this->sendResponse($success, 'User login successfully.');
-            } else {
+        if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
+            $selected_user = User::where('email', $request->email)->first();
+            if (!$selected_user)
                 return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+            if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
+                if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                    $user = Auth::user();
+                    $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+                    $success['name'] =  $user->name;
+                    return $this->sendResponse($success, 'User login successfully.');
+                } else {
+                    return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                }
             }
+        }else{
+            $selected_user = User::where('phone', $request->email)->first();
+            if (!$selected_user)
+                return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+            if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
+                if (Auth::attempt(['phone' => $request->email, 'password' => $request->password])) {
+                    $user = Auth::user();
+                    $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+                    $success['name'] =  $user->name;
+                    return $this->sendResponse($success, 'User login successfully.');
+                } else {
+                    return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                }
+            } 
         }
         return $this->sendError('This email has been registered via social login. Please login using your social login links...', ['error' => 'Unauthorised']);
     }
