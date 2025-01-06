@@ -312,7 +312,9 @@ class ProductController extends BaseController
         if (!$product) {
             $product  = Product::find($product_id_or_slug);
         }
-        return $this->sendResponse(ProductDetailResource::make($product), 'Product detail retrieved successfully.');
+        if ($product)
+            return $this->sendResponse(ProductDetailResource::make($product), 'Product detail retrieved successfully.');
+        return $this->sendError('No such product');
     }
 
     public function productFeatures(Product $product)
@@ -388,6 +390,6 @@ class ProductController extends BaseController
         }
 
 
-        return $this->sendResponse($comparison_data,"Comparision data fetched successfully");
+        return $this->sendResponse($comparison_data, "Comparision data fetched successfully");
     }
 }

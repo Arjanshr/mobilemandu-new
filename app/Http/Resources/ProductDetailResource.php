@@ -15,7 +15,7 @@ class ProductDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         $image_urls = [];
-        if ($this->getMedia()->count() > 0) {
+        if ($this->getMedia()&&$this->getMedia()->count() > 0) {
             foreach ($this->getMedia() as $image) {
                 $image_urls[] = $image->getUrl();
             }
