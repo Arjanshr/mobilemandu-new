@@ -93,6 +93,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Price</th>
                                                     <th>Category</th>
                                                     <th>Brand</th>
                                                     <th>Image</th>
@@ -149,6 +150,7 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $product->name }}</td>
+                                                        <td>{{ $product->price }}</td>
                                                         <td>
                                                             @foreach ($product->categories as $category)
                                                                 {{ $category->name }}{{ !$loop->last ? ',' : '' }}
@@ -170,6 +172,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Price</th>
                                                     <th>Category</th>
                                                     <th>Brand</th>
                                                     <th>Image</th>
