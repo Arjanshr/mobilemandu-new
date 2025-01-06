@@ -18,6 +18,7 @@
                                     <div class="col-md-6">
                                         <a href="{{ route('product.create') }}" class="btn btn-success">Create Product</a>
                                     </div>
+                                    @can('import-products')
                                     <div class="col-md-6">
                                         <form action="{{ route('product.import') }}" method="post"
                                             enctype="multipart/form-data">
@@ -26,6 +27,7 @@
                                             <button type="submit" class="btn btn-primary">Import</button>
                                         </form>
                                     </div>
+                                    @endcan
                                     <div class="col-md-12">
                                         <form>
                                             <div class="row">
@@ -150,7 +152,7 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $product->name }}</td>
-                                                        <td>{{ $product->price }}</td>
+                                                        <td>Rs {{ $product->price }}</td>
                                                         <td>
                                                             @foreach ($product->categories as $category)
                                                                 {{ $category->name }}{{ !$loop->last ? ',' : '' }}
