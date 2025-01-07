@@ -40,6 +40,7 @@ class ProductDetailResource extends JsonResource
             "images" => $image_urls,
             "total_reviews" => $this->reviews()->count(),
             "rating_summary" =>  $rating_summary,
+            "category_id" =>  $this->categories()->first()->id,
             "tags"=>[
                 "new"=> $this->isNew(),
                 "popular"=> $this->isPopular(),
