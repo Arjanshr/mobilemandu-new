@@ -26,7 +26,7 @@
             <!--  Image -->
             <div class="form-group col-sm-6">
                 <label for="image">Image*</label>
-                <input type="file" class="form-control" name="image" {{isset($brand)?'required':''}}/>
+                <input type="file" class="form-control" name="image" {{isset($brand)?'':'required'}}/>
                 @if (isset($brand) && $brand->image)
                     <img src="{{ asset('storage/brands/' . $brand->image) }}"class="img-fluid img-thumbnail"
                         style="height:100px" />
