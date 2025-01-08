@@ -48,6 +48,7 @@ class CategoryController extends Controller
         // return $request;
         $category->name = $request->name;
         $category->parent_id = $request->parent_id;
+        $category->description = $request->description;
         $category->status = $request->status;
         if ($request->hasFile('image')) {
             if (File::exists(storage_path("app/public/categories/$category->image")))

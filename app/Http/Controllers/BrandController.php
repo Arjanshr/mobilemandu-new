@@ -42,6 +42,7 @@ class BrandController extends Controller
     public function update(Brand $brand, BrandRequest $request)
     {
         $brand->name = $request->name;
+        $brand->description = $request->description;
         if ($request->hasFile('image')) {
             if (File::exists(storage_path("app/public/brands/$brand->image")))
                 File::delete(storage_path("app/public/brands/$brand->image"));

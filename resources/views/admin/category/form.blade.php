@@ -40,4 +40,15 @@
             $('#role').select2();
         });
     </script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.1.0/classic/ckeditor.js"></script>
+    <script>
+        ClassicEditor.create(document.querySelector('#description'), {
+                ckfinder: {
+                    uploadUrl: '{{ route('category.create', ['_token' => csrf_token()]) }}'
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
 @stop

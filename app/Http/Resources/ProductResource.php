@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
             "added_to_wishlist" => false,
             "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
             "offer" => null,
+            "alt_text" => $this->alt_text,
             "status" => $this->status,
             "tags"=>[
                 "new"=> $this->isNew(),

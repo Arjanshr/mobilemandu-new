@@ -52,18 +52,6 @@
             <!-- Categories-->
             <div class="form-group col-sm-4">
                 <label for="category_id">Categories</label><br />
-                {{-- <select id='category' name="category_id" class="form-control">
-                    <option value="">Select a category</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}"
-                            {{ (isset($product) && $product->category_id == $category->id) || old('category_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                            @if ($category->getParentTree() != '')
-                                ({!! $category->getParentTree() !!})
-                            @endif
-                        </option>
-                    @endforeach
-                </select> --}}
                 <select name="category_id[]" id="categories" class="form-control" multiple required>
                     <option value="">--select--</option>
                     @if (isset($categories))
@@ -86,6 +74,15 @@
                 <input type="text" class="form-control" id="price" name="price" placeholder="Price"
                     value="{{ isset($product) ? $product->price : old('price') }}" wire:model="price" required>
                 @error('price')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <!-- Alt Text -->
+            <div class="form-group col-sm-4">
+                <label for="alt_text">Alt Text*</label>
+                <input type="text" class="form-control" id="alt_text" name="alt_text" placeholder="alt_text"
+                    value="{{ isset($product) ? $product->alt_text : old('alt_text') }}" wire:model="alt_text" required>
+                @error('alt_text')
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>

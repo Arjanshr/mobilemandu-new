@@ -110,6 +110,9 @@
         $(document).ready(function() {
             $('#example2').DataTable();
             $('.dataTables_length').addClass('bs-select');
-        })
+        });
+        $(document).ready(function() {
+            $('#descrip').select2();
+        });
     </script>
 @stop

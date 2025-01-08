@@ -17,6 +17,7 @@ class BrandResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            "description" => $this->description,
             "slug" => $this->slug,
             "imageLink" => $this->image?asset('storage/brands/' . $this->image):asset('images/default.png'),
         ];

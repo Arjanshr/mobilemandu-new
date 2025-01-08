@@ -18,7 +18,8 @@ class Category extends Model
         'name',
         'parent_id',
         'status',
-        'image'
+        'image',
+        'description',
     ];
 
     public function products()

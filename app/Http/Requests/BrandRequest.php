@@ -23,6 +23,7 @@ class BrandRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255',
+            'description'=>'required|string'
         ];
 
         // Add the required validation for image only during creation

@@ -14,6 +14,7 @@ class Brand extends Model
     use HasFactory, LogsActivity, HasSlug;
     protected $fillable = [
         'name',
+        'description',
         'image'
     ];
 

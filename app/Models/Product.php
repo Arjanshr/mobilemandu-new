@@ -19,7 +19,8 @@ class Product extends Model implements HasMedia
         'name',
         'description',
         'price',
-        'status'
+        'status',
+        'alt_text'
     ];
 
     public function categories()

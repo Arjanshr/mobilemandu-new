@@ -31,7 +31,8 @@ class ProductRequest extends FormRequest
             'description'=>['nullable','string'],
             'price'=>['nullable','numeric'],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
-            'status'=>['required',new Enum(ProductStatus::class)]
+            'status'=>['required',new Enum(ProductStatus::class)],
+            'alt_text'=>['nullable','string']
         ];
     }
 

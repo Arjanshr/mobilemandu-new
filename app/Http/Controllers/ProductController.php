@@ -76,6 +76,7 @@ class ProductController extends Controller
         $product->description = $request->description;
         $product->price = $request->price;
         $product->status = $request->status;
+        $product->alt_text = $request->alt_text;
         $product->save();
         $product->categories()->sync($request->category_id);
         toastr()->success('Product Edited Successfully!');

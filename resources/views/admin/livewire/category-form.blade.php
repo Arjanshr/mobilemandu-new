@@ -15,7 +15,7 @@
         @endif
         <div class="card-body row">
             <!-- Name -->
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-6">
                 <label for="name">Name*</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="Name"
                     value="{{ isset($category) ? $category->name : old('name') }}" required>
@@ -25,7 +25,7 @@
             </div>
 
             <!-- Parent Category-->
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-6">
                 <label for="parent_id">Parent Category</label>
                 <select id='parent_id' name="parent_id" class="form-control">
                     <option value="">Select a parent category</option>
@@ -43,9 +43,16 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>
-
+            <!-- Description -->
+            <div class="form-group col-sm-12">
+                <label for="description">Description</label>
+                <textarea id="description" name="description">{{ isset($category) ? $category->description : old('description') }}</textarea>
+                @error('description')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
             <!-- Status -->
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-6">
                 <label for="status">Status*</label>
                 <select id='status' name="status" class="form-control" required>
                     <option value="">Select a status</option>
@@ -63,7 +70,7 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
             </div>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-6">
                 <label for="image">Image</label>
                 <input type="file" class="form-control" name="image"/>
                 @if (isset($category) && $category->image)

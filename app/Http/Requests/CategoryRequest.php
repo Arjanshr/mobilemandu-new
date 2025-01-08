@@ -29,7 +29,8 @@ class CategoryRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'parent_id'=>['nullable','numeric'],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
-            'status'=>['required', new Enum(CategoryStatus::class)]
+            'status'=>['required', new Enum(CategoryStatus::class)],
+            'description'=>'required|string'
         ];
     }
 
