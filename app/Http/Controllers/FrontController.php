@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Area;
+use App\Models\City;
 use App\Models\NcmBranch;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Response;
@@ -17,7 +19,7 @@ class FrontController extends Controller
 
     public function test()
     {
-        // NcmBranch::getQuery()->delete();
+        // return NcmBra    nch::get();
         // $response = json_decode(Http::get('https://portal.nepalcanmove.com/api/v1/branchlist')->json()['data']);
         // // return count($response);
         // foreach($response as $data){
@@ -44,7 +46,22 @@ class FrontController extends Controller
         //     }
         //     $ncm->save();
         // }
-
-        return NcmBranch::get();
+        // return Area::get();
+        $data = [];
+        foreach (NcmBranch::get() as $index => $ncm_district) {
+            $city = City::where('name', $ncm_district->district)->first();
+            foreach (explode(',', $ncm_district->areas_covered) as $area_name) {
+                if ($area_name && $area_name != ''&&$area_name!=null) {
+                    $area = new Area();
+                    $area->name= $area_name;
+                    $area->city_id= $city->id;
+                    $area->shipping_price= $ncm_district->branch_delivery_fee;
+                    $area->save();
+                }
+            }
+            // Area::create($data);
+        }
+        // return $data;
+        return Area::get();
     }
 }

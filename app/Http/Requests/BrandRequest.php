@@ -21,10 +21,18 @@ class BrandRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name'=>['required'],
-            'image'=>['required','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
+        $rules = [
+            'name' => 'required|string|max:255',
         ];
+
+        // Add the required validation for image only during creation
+        if ($this->isMethod('post')) {
+            $rules['image'] = 'required|image|mimes:jpeg,png,jpg,gif|max:2048'; // Add your preferred rules for the image
+        } else {
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'; // Make image optional during update
+        }
+
+        return $rules;
     }
 
     protected function passedValidation()

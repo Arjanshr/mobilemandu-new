@@ -15,6 +15,9 @@
                             <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                 <div class="row">
                                     <div class="col-sm-12">
+                                        <span class="text-warning">Recommended Image Size: </span><span class="text-danger">1000px x 1000px</span><br/>
+                                        <span class="text-warning">Recommended Aspect Ratio: </span><span class="text-danger">1:1(Square)</span><br/>
+                                        <span class="text-warning">Recommended Formats: </span><span class="text-danger">JPEG, PNG</span>
                                         <div id="dropzone">
                                             <form action="{{ route('product.image.insert', $product->id) }}" method="POST"
                                                 class="dropzone" id="file-upload" enctype="multipart/form-data">
