@@ -25,11 +25,11 @@ class UserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable','string', ],
-            'gender' => ['required', 'in:male,female'],
+            'phone' => ['nullable','string' ],
+            'gender' => ['nullable', 'in:male,female'],
             'dob' => ['nullable', 'date'],
             'password'=>['nullable','min:6'],
-            'photo' => ['required', 'mimes:jpeg,png,jpg,gif,svg,ico,pdf', 'max:2048'],
+            'photo' => ['nullable', 'mimes:jpeg,png,jpg,gif,svg,ico,pdf', 'max:2048'],
         ];
     }
 }
