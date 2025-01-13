@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', $product->name ??'Products')
+@section('title', $product->name ?? 'Products')
 
 @section('content_header')
     <h1>{{ $product->name }}</h1>
@@ -58,7 +58,7 @@
 
                         <div class="card-body clearfix">
                             <blockquote>
-                                {{ $product->brand?$product->brand->name:'NA' }}
+                                {{ $product->brand ? $product->brand->name : 'NA' }}
                             </blockquote>
                         </div>
 
@@ -117,9 +117,11 @@
                         <div class="card-body">
                             <blockquote>
                                 @foreach ($product->specifications as $specification)
-                                    <p>
-                                        {!! $specification->specification->name !!}:{!! $specification->value !!}
-                                    </p>
+                                    @if ($specification->specification)
+                                        <p>
+                                            {!! $specification->specification->name !!}:{!! $specification->value !!}
+                                        </p>
+                                    @endif
                                 @endforeach
                             </blockquote>
                         </div>
