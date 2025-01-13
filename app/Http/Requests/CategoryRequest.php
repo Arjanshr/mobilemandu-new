@@ -30,7 +30,7 @@ class CategoryRequest extends FormRequest
             'parent_id'=>['nullable','numeric'],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
             'status'=>['required', new Enum(CategoryStatus::class)],
-            'description'=>['nullable|string']
+            'description'=>['nullable','string']
         ];
     }
 
