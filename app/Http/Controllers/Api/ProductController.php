@@ -308,7 +308,7 @@ class ProductController extends BaseController
 
     public function productDetails($product_id_or_slug)
     {
-        $product = Product::where('slug', $product_id_or_slug)->first();
+        $product = Product::where('status','publish')->where('slug', $product_id_or_slug)->first();
         if (!$product) {
             $product  = Product::find($product_id_or_slug);
         }
