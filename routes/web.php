@@ -117,7 +117,7 @@ Route::middleware([
         Route::patch('/categories/edit/{category}', [CategoryController::class, 'update'])->name('category.update');
     });
     Route::delete('/categories/delete/{category}', [CategoryController::class, 'delete'])->name('category.delete')->middleware('can:delete-categories');
-    
+
     //Category Specifications routes
     Route::get('/category-specifications/{category}', [CategoryController::class, 'categorySpecifications'])->name('category-specifications')->middleware('can:browse-category-specifications');
     Route::middleware('can:add-category-specifications')->group(function () {
@@ -158,7 +158,7 @@ Route::middleware([
         Route::patch('/products/specifications/edit/{product_specification}', [ProductController::class, 'updateSpecifications'])->name('product.specification.update');
         Route::delete('/products/specifications/delete/{product}/{specification}', [ProductController::class, 'deleteSpecifications'])->name('product.specification.delete');
         Route::delete('/products/specifications/delete_all/{product}', [ProductController::class, 'deleteAllSpecifications'])->name('product.specification.delete.all');
-        
+
         Route::get('/products/features/{product}', [ProductController::class, 'manageFeatures'])->name('product.features');
         Route::get('/products/features/create/{product}', [ProductController::class, 'createFeatures'])->name('product.feature.create');
         Route::post('/products/features/insert/{product}', [ProductController::class, 'insertFeatures'])->name('product.feature.insert');
@@ -172,6 +172,19 @@ Route::middleware([
         Route::post('/products/images/insert/{product}', [ProductController::class, 'insertImages'])->name('product.image.insert');
         Route::patch('/products/images/edit/{product}', [ProductController::class, 'updateImages'])->name('product.image.update');
         Route::delete('/products/images/delete/{product}', [ProductController::class, 'deleteImages'])->name('product.image.delete');
+
+        Route::get('/products/variants/{product}', [ProductController::class, 'manageVariants'])->name('product.variants');
+        Route::get('/products/variants/create/{product}', [ProductController::class, 'createVariants'])->name('product.variant.create');
+        Route::post('/products/variants/insert/{product}', [ProductController::class, 'insertVariants'])->name('product.variant.insert');
+        // Edit Variant
+        Route::get('/products/{product}/variants/{variant}/edit', [ProductController::class, 'editVariants'])->name('product.variant.edit');
+
+        // Update Variant
+        Route::put('/products/{product}/variants/{variant}', [ProductController::class, 'updateVariants'])->name('product.variant.update');
+
+        // Delete Variant
+        Route::delete('/products/{product}/variants/{variant}', [ProductController::class, 'deleteVariants'])->name('product.variant.delete');
+        Route::delete('/products/variants/delete_all/{product}', [ProductController::class, 'deleteAllVariants'])->name('product.variant.delete.all');
     });
     Route::delete('/products/delete/{product}', [ProductController::class, 'delete'])->name('product.delete')->middleware('can:delete-products');
 
@@ -194,16 +207,16 @@ Route::middleware([
     Route::delete('/contents/{content_type}/delete/{content_id}', [ContentController::class, 'delete'])->name('content.delete')->middleware('can:delete-contents');
 
     //Campaign Routes
-    Route::get('/campaigns', [CampaignsController::class,'index'])->name('campaigns')->middleware('can:browse-campaigns');
-	Route::get('/campaigns/create', [CampaignsController::class,'create'])->name('campaigns.create')->middleware('can:add-campaigns');
-	Route::post('/campaigns/create', [CampaignsController::class,'insert'])->name('campaigns.insert')->middleware('can:add-campaigns');
-	Route::get('/campaigns/edit/{campaign}', [CampaignsController::class,'edit'])->name('campaigns.edit')->middleware('can:edit-campaigns');
+    Route::get('/campaigns', [CampaignsController::class, 'index'])->name('campaigns')->middleware('can:browse-campaigns');
+    Route::get('/campaigns/create', [CampaignsController::class, 'create'])->name('campaigns.create')->middleware('can:add-campaigns');
+    Route::post('/campaigns/create', [CampaignsController::class, 'insert'])->name('campaigns.insert')->middleware('can:add-campaigns');
+    Route::get('/campaigns/edit/{campaign}', [CampaignsController::class, 'edit'])->name('campaigns.edit')->middleware('can:edit-campaigns');
     Route::patch('/campaigns/edit/{campaign}', [CampaignsController::class, 'update'])->name('campaigns.update')->middleware('can:edit-campaigns');
-    Route::get('/campaigns/products/{campaign}', [CampaignsController::class,'products'])->name('campaigns.products')->middleware('can:read-campaigns');
-	Route::post('/campaigns/products/{campaign}', [CampaignsController::class,'productsAction'])->name('campaigns.products.action')->middleware('can:read-campaigns');
-	Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class,'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
-	Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class,'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
-    Route::post('/update-discount',[CampaignsController::class,'updateDiscount']);
+    Route::get('/campaigns/products/{campaign}', [CampaignsController::class, 'products'])->name('campaigns.products')->middleware('can:read-campaigns');
+    Route::post('/campaigns/products/{campaign}', [CampaignsController::class, 'productsAction'])->name('campaigns.products.action')->middleware('can:read-campaigns');
+    Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class, 'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
+    Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class, 'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
+    Route::post('/update-discount', [CampaignsController::class, 'updateDiscount']);
 
     //Sliders routes
     Route::get('/sliders', [SliderController::class, 'index'])->name('sliders')->middleware('can:browse-sliders');
@@ -217,7 +230,7 @@ Route::middleware([
         Route::patch('/sliders/edit/{slider}', [SliderController::class, 'update'])->name('slider.update');
     });
     Route::delete('/sliders/delete/{slider}', [SliderController::class, 'delete'])->name('slider.delete')->middleware('can:delete-sliders');
-    
+
     //Blogs routes
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs')->middleware('can:browse-blogs');
     Route::middleware('can:add-blogs')->group(function () {

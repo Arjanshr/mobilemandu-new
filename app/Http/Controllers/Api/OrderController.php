@@ -23,7 +23,7 @@ class OrderController extends BaseController
         $shipping_address .= "<br/>Phone: $request->phone_number";
         $shipping_address .= "<br/>Email: $request->email";
         $area = Area::find($request->area_id);
-        $shipping_address .= "<br/><br/> $area->name" . "(" . (ucfirst($request->address_type)) . ")";
+        $shipping_address .= "<br/><br/>" .$area!=null?$area->name:'' . "(" . (ucfirst($request->address_type)) . ")";
         $shipping_address .= "<br/> $request->location";
         $city = City::find($request->city_id);
         $province = Province::find($request->province_id);
@@ -72,7 +72,6 @@ class OrderController extends BaseController
         } else {
             $address = Address::find($request->address_id);
         }
-
         $order = new Order();
         $order->user_id =  $customer->id;
         $order->address_id =  $address->id;
@@ -89,6 +88,7 @@ class OrderController extends BaseController
             $order_item = new OrderItem();
             $order_item->order_id = $order->id;
             $order_item->product_id = $item['id'];
+            $order_item->variant_id = $item['variant_id'] ?? null;
             $order_item->quantity = $item['quantity'];
             $order_item->price = $item['rate'];
             $order_item->discount = $item['discount'];
@@ -105,19 +105,19 @@ class OrderController extends BaseController
 
     public function getCities($province_id = null)
     {
-        if(!$province_id){
+        if (!$province_id) {
             $cities = City::get();
-        }else{
-            $cities = City::where('province_id',$province_id)->get();
+        } else {
+            $cities = City::where('province_id', $province_id)->get();
         }
         return $this->sendResponse(ProvinceResource::collection($cities), 'Cities Retrived successfully.');
     }
     public function getAreas($city_id = null)
     {
-        if(!$city_id){
+        if (!$city_id) {
             $areas = Area::get();
-        }else{
-            $areas = Area::where('city_id',$city_id)->get();
+        } else {
+            $areas = Area::where('city_id', $city_id)->get();
         }
         return $this->sendResponse(ProvinceResource::collection($areas), 'Cities Retrived successfully.');
     }

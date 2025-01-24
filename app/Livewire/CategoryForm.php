@@ -25,13 +25,16 @@ class CategoryForm extends Component
             $children = $this->category->getAllChildrenIds();
             $this->parent_categories = Category::where('status', 1)
                 ->where('id', '!=', $this->category->id)
+                ->where('parent_id',null)
                 ->whereNotIn('id', $children)
                 ->get();
 
             $this->category_type = strtolower($this->category->type);
             if (!$this->validateCategory($this->category)) $this->type_disabled = true;
         } else {
-            $this->parent_categories = Category::where('status', 1)->get();
+            $this->parent_categories = Category::where('status', 1)
+            ->where('parent_id',null)
+            ->get();
         }
     }
 

@@ -10,21 +10,44 @@ class ProductDetailResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
+     * @param  Request  $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
+        // Prepare image URLs
         $image_urls = [];
-        if ($this->getMedia()&&$this->getMedia()->count() > 0) {
+        if ($this->getMedia() && $this->getMedia()->count() > 0) {
             foreach ($this->getMedia() as $image) {
                 $image_urls[] = $image->getUrl();
             }
         }
-        $rating_summary['Five'] = $this->reviews()->where('rating',5)->count();
-        $rating_summary['Four'] = $this->reviews()->where('rating',4)->count();;
-        $rating_summary['Three'] = $this->reviews()->where('rating',3)->count();;
-        $rating_summary['Two'] = $this->reviews()->where('rating',2)->count();;
-        $rating_summary['One'] = $this->reviews()->where('rating',1)->count();;
+
+        // Prepare rating summary
+        $rating_summary = [
+            'Five' => $this->reviews()->where('rating', 5)->count(),
+            'Four' => $this->reviews()->where('rating', 4)->count(),
+            'Three' => $this->reviews()->where('rating', 3)->count(),
+            'Two' => $this->reviews()->where('rating', 2)->count(),
+            'One' => $this->reviews()->where('rating', 1)->count(),
+        ];
+
+        // Prepare variants
+        $variants = $this->variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'price' => $variant->price,
+                'stock_quantity' => $variant->stock_quantity,
+                'options' => $variant->variant_options->map(function ($option) {
+                    return [
+                        'specification_name' => $option->specification->name,
+                        'value' => $option->value,
+                    ];
+                }),
+            ];
+        });
+
         return [
             "id" => $this->id,
             "name" => $this->name,
@@ -39,14 +62,15 @@ class ProductDetailResource extends JsonResource
             "status" => $this->status,
             "images" => $image_urls,
             "total_reviews" => $this->reviews()->count(),
-            "rating_summary" =>  $rating_summary,
-            "category_id" =>  $this->categories()->first()->id,
-            "alt_text" =>  $this->alt_text,
-            "tags"=>[
-                "new"=> $this->isNew(),
-                "popular"=> $this->isPopular(),
-                "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
-            ]
+            "rating_summary" => $rating_summary,
+            "category_id" => $this->categories()->first()?->id,
+            "alt_text" => $this->alt_text,
+            "tags" => [
+                "new" => $this->isNew(),
+                "popular" => $this->isPopular(),
+                "campaign" => $this->isCampaignProduct()->first()?->name,
+            ],
+            "variants" => $variants, // Include variants here
         ];
     }
 }

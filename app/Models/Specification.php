@@ -27,7 +27,17 @@ class Specification extends Model
 
     public function getNameAttribute($value)
     {
-        // return $value;
         return str_contains($value, 'Undefined')?null:$value;
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_specification')
+            ->withPivot('is_variant');
+    }
+
+    public function productVariantOptions()
+    {
+        return $this->hasMany(ProductVariantOption::class);
     }
 }

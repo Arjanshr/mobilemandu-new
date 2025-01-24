@@ -67,7 +67,7 @@
                                     @foreach ($order->order_items as $item)
                                         <tr>
                                             <td class="no">{{ $loop->iteration }}</td>
-                                            <td class="desc">({{ $item->product->name }}){{ $item->product->model }}</td>
+                                            <td class="desc">({{ $item->product->name }}){{ $item->variant ? $item->variant->sku : 'No Variant' }}</td>
                                             <td class="unit">{{ $item->quantity }}</td>
                                             <td class="rate">{{ $item->price }}</td>
                                             <td class="total">{{ $item->quantity * $item->price }}</td>

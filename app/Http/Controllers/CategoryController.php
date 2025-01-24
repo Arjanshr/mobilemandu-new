@@ -19,7 +19,8 @@ class CategoryController extends Controller
 
     public function create()
     {
-        $parent_categories = Category::where('status', 1)->get();
+        $parent_categories = Category::where('status', 1)->where('parent_id', null)->get();
+        // return $parent_categories;
         return view('admin.category.form', compact('parent_categories'));
     }
 
@@ -95,18 +96,19 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'specification' => 'required',
+            ' $request->specification' => 'nullable',
         ]);
         $specification = Specification::firstOrCreate([
             'name' =>  $request->specification
         ]);
-        $category->specifications()->attach(['specification_id'=>$specification->id]);
+        $category->specifications()->attach($specification,['is_variant' => $request->is_variant ? 1 : 0]);
         toastr()->success('Specification Added Successfully!');
         return redirect()->route('category-specification.create', $category->id);
     }
-    
+
     public function deleteCategorySpecifications(Category $category, $category_specifications)
     {
-        $category->specifications()->detach(['specification_id'=>$category_specifications]);
+        $category->specifications()->detach(['specification_id' => $category_specifications]);
         toastr()->success('Specification Deleted Successfully!');
         return redirect()->route('category-specifications', $category->id);
     }

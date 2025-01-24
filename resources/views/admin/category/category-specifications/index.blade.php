@@ -27,6 +27,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Is Variant</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -48,6 +49,7 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $category_specification->name }}</td>
+                                                        <td>{{ $category_specification->pivot->is_variant?'Yes':'No' }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -56,6 +58,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Is Variant</th>
                                                 </tr>
                                             </tfoot>
                                         </table>

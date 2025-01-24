@@ -254,4 +254,147 @@ class ProductController extends Controller
     {
         $product->getMedia()->where('uuid', $request->id)->first()->delete();
     }
+
+    public function createVariants(Product $product)
+    {
+        $product = Product::with(['categories.specifications' => function ($query) {
+            $query->wherePivot('is_variant', true);
+        }])->find($product->id);
+        $variant_specifications = $product->categories->first()->specifications;
+        return view('admin.product.variants-form', compact('product', 'variant_specifications'));
+    }
+
+
+
+    public function insertVariants(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'variants' => 'required|array',
+            'variants.*.price' => 'required|numeric|min:0',
+            'variants.*.stock' => 'required|integer|min:0', // Ensure stock_quantity is provided
+        ]);
+        $variants = $request['variants'];
+        foreach ($variants as $variant_data) {
+            // Generate SKU based on specifications (e.g., RAM, ROM, Color)
+            $sku = $this->generateUniqueSku($variant_data,$product);
+            // Create the variant with price, stock_quantity, and sku
+            $variant = $product->variants()->create([
+                'price' => $variant_data['price'],
+                'stock_quantity' => $variant_data['stock'], // Include stock_quantity
+                'sku' => $sku,
+            ]);
+
+            // Add variant options for each specification
+            foreach ($variant_data as $key => $value) {
+                if ($key !== 'price' && $key !== 'stock_quantity' && $key !== 'sku') {
+                    $specification = Specification::where('name', $key)->first();
+
+                    if ($specification) {
+                        $variant->variant_options()->create([
+                            'specification_id' => $specification->id,
+                            'value' => $value,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Variants created successfully.');
+    }
+
+
+    public function manageVariants(Product $product)
+    {
+        // Eager load necessary relationships
+        $product->load(['variants.variant_options.specification']);
+    
+        // Prepare the variants data in a streamlined manner
+        $variants = $product->variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'price' => $variant->price,
+                'stock' => $variant->stock_quantity,
+                'options' => $variant->variant_options->map(fn($option) => [
+                    'specification' => $option->specification->name,
+                    'value' => $option->value,
+                ])->values(), // Ensure a clean indexed array
+            ];
+        })->values(); // Ensure the result is a clean indexed array
+    
+        // Pass data to the view
+        return view('admin.product.variants', compact('product', 'variants'));
+    }
+    
+
+    private function generateUniqueSku($variant_data,$product)
+    {
+        // Define the specifications that should be included in the SKU
+        $sku_parts = [];
+        $sku_parts[0] = strtoupper($product->slug);
+    
+        // Dynamically loop through the variant data to create SKU
+        foreach ($variant_data as $key => $value) {
+            // Exclude non-specification fields like price and stock_quantity
+            if ($key !== 'price' && $key !== 'stock' && $key !== 'sku') {
+                // Format the specification part (e.g., RAM-8GB, ROM-128GB, COLOR-Black)
+                $sku_parts[] = strtoupper($key) . '-' . strtoupper($value);
+            }
+        }
+    
+        // If no valid parts are available for SKU, throw an error
+        if (empty($sku_parts)) {
+            throw new \Exception("Failed to generate SKU. Missing required specifications.");
+        }
+    
+        // Generate the SKU by joining the parts with a dash
+        return implode('-', $sku_parts);
+    }
+    
+
+
+    public function editVariants($productId, $variantId)
+    {
+        $product = Product::findOrFail($productId);
+        $variant = $product->variants()->findOrFail($variantId);
+    
+        return view('admin.product.variants_edit', compact('product', 'variant'));
+    }
+
+    public function updateVariants(Request $request, $productId, $variantId)
+    {
+        $request->validate([
+            'price' => 'required|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+        ]);
+    
+        $product = Product::findOrFail($productId);
+        $variant = $product->variants()->findOrFail($variantId);
+    
+        $variant->update([
+            'price' => $request->price,
+            'stock_quantity' => $request->stock_quantity,
+        ]);
+    
+        return redirect()->route('product.variants', $productId)
+                         ->with('success', 'Variant updated successfully.');
+    }
+    
+
+    public function deleteVariants($productId, $variantId)
+    {
+        $product = Product::findOrFail($productId);
+        $variant = $product->variants()->findOrFail($variantId);
+    
+        $variant->delete();
+    
+        return redirect()->route('product.variants', $productId)
+                         ->with('success', 'Variant deleted successfully.');
+    }
+    public function deleteAllVariants(Product $product)
+    {
+        $product->specifications()->detach();
+        toastr()->success('Product Specification Deleted Successfully!');
+        return redirect()->route('product.specifications', $product->id);
+    }
 }

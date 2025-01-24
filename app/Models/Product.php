@@ -124,4 +124,9 @@ class Product extends Model implements HasMedia
     {
         return $this->campaigns()->get();
     }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
 }

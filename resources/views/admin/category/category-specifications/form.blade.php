@@ -30,7 +30,7 @@
                                 @endif
                                 <div class="card-body row">
                                     <!-- Name -->
-                                    <div class="form-group col-sm-6">
+                                    <div class="form-group col-sm-11">
                                         <label for="name">Specification Name</label>
                                         <input type="text" class="form-control" id="specification" name="specification"
                                             placeholder="Specification Name"
@@ -39,12 +39,21 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="form-group col-sm-10">
+                                    <div class="form-group col-sm-1">
+                                        <label for="is_variant">Is Variant</label>
+                                        <input type="checkbox" class="form-control" id="is_variant" name="is_variant"
+                                            placeholder="is_variant Name">
+                                           
+                                        @error('is_variant')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group col-sm-11">
                                         <input id="submit" type="submit"
                                             value="{{ isset($category_specification) ? 'Edit' : 'Create' }}"
                                             class="btn btn-primary" />
                                     </div>
-                                    <div class="form-group col-sm-2">
+                                    <div class="form-group col-sm-1">
                                         <a href="{{route('category-specifications',$category->id)}}" class="btn btn-danger">Exit</a>
                                     </div>
                             </form>

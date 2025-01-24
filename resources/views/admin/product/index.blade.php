@@ -133,6 +133,12 @@
                                                                 </a>
                                                             @endcan
                                                             @can('edit-products')
+                                                                <a href="{{ route('product.variants', $product->id) }}"
+                                                                    class="btn btn-sm btn-success" title="Manage Variants">
+                                                                    <i class="fa fa-clipboard"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('edit-products')
                                                                 <a href="{{ route('product.images', $product->id) }}"
                                                                     class="btn btn-sm btn-secondary" title="Manage Images">
                                                                     <i class="fa fa-image"></i>

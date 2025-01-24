@@ -27,7 +27,7 @@ class Category extends Model
         return $this->belongsToMany(Product::class);
     }
 
-    public function getSlugOptions() : SlugOptions
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
@@ -106,6 +106,7 @@ class Category extends Model
 
     public function specifications()
     {
-        return $this->belongsToMany(Specification::class);
+        return $this->belongsToMany(Specification::class)
+            ->withPivot('is_variant');
     }
 }
