@@ -13,9 +13,11 @@ use App\Http\Resources\ProductSpecificationsResource;
 use App\Http\Resources\QuestionsAndAnswersResource;
 use App\Http\Resources\RelatedProductsResource;
 use App\Http\Resources\ReviewsSummaryResource;
+use App\Http\Resources\VariantDetailResource;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\QuestionsAndAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -391,5 +393,16 @@ class ProductController extends BaseController
 
 
         return $this->sendResponse($comparison_data, "Comparision data fetched successfully");
+    }
+
+    public function getVariantDetails($id)
+    {
+        $variant = ProductVariant::with(['product', 'variant_options.specification'])->find($id);
+        // return $variant;
+        if (!$variant) {
+            return $this->sendError('Variant not found.', [], 404);
+        }
+    
+        return $this->sendResponse(new VariantDetailResource($variant), 'Variant details retrieved successfully.');
     }
 }

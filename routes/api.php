@@ -71,6 +71,9 @@ Route::prefix('v1')->group(function () {
         Route::get('related_products/{product}/{count?}', [ProductController::class, 'relatedProducts']);
         Route::get('questions_and_answers/{product}/{count?}', [ProductController::class, 'questionsAndAnswers']);
 
+        //Variant Detail
+        Route::get('variant/{id}', [ProductController::class, 'getVariantDetails']);
+
         //Social Logins
         Route::get('social-login-data/{provider?}', [SocialiteController::class, 'loginSocial']);
         Route::post('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial']);
