@@ -145,7 +145,7 @@ class ProductVariants extends Component
                 }
             }
         }
-    
+        toastr()->success('Variants created successfully.');
         // Flash a success message and clear the variants array
         session()->flash('success', 'Variants saved successfully!');
         $this->variants = []; // Clear the variants array after saving

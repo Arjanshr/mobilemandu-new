@@ -34,7 +34,8 @@
                                         <label for="name">Specification Name</label>
                                         <input type="text" class="form-control" id="specification" name="specification"
                                             placeholder="Specification Name"
-                                            value="{{ isset($category_specification) ? $category_specification->specification : old('specification') }}">
+                                            value="{{ isset($category_specification) ? $category_specification->name : old('specification') }}"
+                                            {{ isset($category_specification) ? 'readonly':''}}>
                                         @error('specification')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -42,7 +43,7 @@
                                     <div class="form-group col-sm-1">
                                         <label for="is_variant">Is Variant</label>
                                         <input type="checkbox" class="form-control" id="is_variant" name="is_variant"
-                                            placeholder="is_variant Name">
+                                            placeholder="is_variant Name"  {{isset($category_specification)&&($category_specification->pivot->is_variant)?'checked':''}}>
                                            
                                         @error('is_variant')
                                             <div class="alert alert-danger">{{ $message }}</div>

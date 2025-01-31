@@ -101,14 +101,36 @@ class CategoryController extends Controller
         $specification = Specification::firstOrCreate([
             'name' =>  $request->specification
         ]);
-        $category->specifications()->attach($specification,['is_variant' => $request->is_variant ? 1 : 0]);
-        toastr()->success('Specification Added Successfully!');
+        if (!$category->specifications()->where(['specification_id' => $specification->id])->first()) {
+
+            $category->specifications()->attach($specification, ['is_variant' => $request->is_variant ? 1 : 0]);
+            toastr()->success('Specification Added Successfully!');
+        }
+        toastr()->warning('Specification already exists!!!!');
         return redirect()->route('category-specification.create', $category->id);
+    }
+
+    public function editCategorySpecifications(Category $category, $category_specification_id)
+    {
+        $category_specification = $category->specifications()->where(['specification_id' => $category_specification_id])->first();
+        return view('admin.category.category-specifications.form', compact('category', 'category_specification'));
+    }
+
+    public function updateCategorySpecifications(Request $request, Category $category, $category_specification_id)
+    {
+        $validated = $request->validate([
+            'specification' => 'required',
+            ' $request->specification' => 'nullable',
+        ]);
+        $category->specifications()->updateExistingPivot($category_specification_id, ['is_variant' => $request->is_variant ? 1 : 0]);
+        toastr()->success('Specification Added Successfully!');
+        return redirect()->route('category-specifications', $category->id);
     }
 
     public function deleteCategorySpecifications(Category $category, $category_specifications)
     {
-        $category->specifications()->detach(['specification_id' => $category_specifications]);
+        // return  $category->specifications()->where(['specification_id' => $category_specifications])->first();
+        $category->specifications()->where(['specification_id' => $category_specifications])->first()->delete();
         toastr()->success('Specification Deleted Successfully!');
         return redirect()->route('category-specifications', $category->id);
     }

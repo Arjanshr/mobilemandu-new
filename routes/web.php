@@ -124,6 +124,10 @@ Route::middleware([
         Route::get('/category-specifications/create/{category}', [CategoryController::class, 'createCategorySpecifications'])->name('category-specification.create');
         Route::post('/category-specifications/insert/{category}', [CategoryController::class, 'insertCategorySpecifications'])->name('category-specification.insert');
     });
+    Route::middleware('can:edit-category-specifications')->group(function () {
+        Route::get('/category-specifications/edit/{category}/{category_specification}', [CategoryController::class, 'editCategorySpecifications'])->name('category-specification.edit');
+        Route::patch('/category-specifications/edit/{category}/{category_specification}', [CategoryController::class, 'updateCategorySpecifications'])->name('category-specification.update');
+    });
     Route::delete('/category-specifications/delete/{category}/{category_specification_id}', [CategoryController::class, 'deleteCategorySpecifications'])->name('category-specification.delete')->middleware('can:delete-category-specifications');
 
     //Brand routes

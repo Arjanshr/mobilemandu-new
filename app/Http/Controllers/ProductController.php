@@ -298,7 +298,7 @@ class ProductController extends Controller
                 }
             }
         }
-
+        toastr()->success('Variants created successfully.');
         return redirect()->back()->with('success', 'Variants created successfully.');
     }
 
@@ -375,7 +375,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock_quantity' => $request->stock_quantity,
         ]);
-    
+        toastr()->success('Variants edited successfully.');
         return redirect()->route('product.variants', $productId)
                          ->with('success', 'Variant updated successfully.');
     }

@@ -13,7 +13,8 @@
                     <div class="card">
                         @can('add-category-specifications')
                             <div class="card-header">
-                                <a href="{{ route('category-specification.create',$category->id) }}" class="btn btn-success">Create Category Specification</a>
+                                <a href="{{ route('category-specification.create', $category->id) }}"
+                                    class="btn btn-success">Create Category Specification</a>
                             </div>
                         @endcan
                         <div class="card-body">
@@ -35,6 +36,12 @@
                                                     <tr>
                                                         <td width="20px">{{ $loop->iteration }}</td>
                                                         <td>
+                                                            @can('edit-category-specifications')
+                                                                <a href="{{ route('category-specification.edit', [$category->id,$category_specification->id]) }}"
+                                                                    class="btn btn-sm btn-success" title="Edit">
+                                                                    <i class="fa fa-pen"></i>
+                                                                </a>
+                                                            @endcan
                                                             @can('delete-category-specifications')
                                                                 <form method="post"
                                                                     action="{{ route('category-specification.delete', [$category->id, $category_specification->id]) }}"
@@ -49,7 +56,7 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $category_specification->name }}</td>
-                                                        <td>{{ $category_specification->pivot->is_variant?'Yes':'No' }}</td>
+                                                        <td>{{ $category_specification->pivot->is_variant ? 'Yes' : 'No' }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

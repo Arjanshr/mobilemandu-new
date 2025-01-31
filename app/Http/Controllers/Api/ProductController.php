@@ -398,7 +398,6 @@ class ProductController extends BaseController
     public function getVariantDetails($id)
     {
         $variant = ProductVariant::with(['product', 'variant_options.specification'])->find($id);
-        // return $variant;
         if (!$variant) {
             return $this->sendError('Variant not found.', [], 404);
         }
