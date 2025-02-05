@@ -15,6 +15,7 @@ class SliderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'title' => $this->title,
             'link_url' => $this->link_url,
             "display_order" => $this->display_order,
             "imageLink" => $this->image?asset('storage/sliders/' . $this->image):asset('images/default.png'),

@@ -24,6 +24,7 @@ class SliderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'title'=>['nullable','string'],
             'link_url'=>['nullable','url'],
             'display_order'=>['required','numeric','min:1',],
             'image'=>['nullable','mimes:jpeg,png,jpg,gif,svg,ico,pdf','max:2048'],
