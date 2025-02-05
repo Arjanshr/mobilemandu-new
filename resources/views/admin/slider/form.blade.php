@@ -28,7 +28,7 @@
                                 <div class="card-body row">
                                     <div class="form-group col-sm-6">
                                         <label for="title">Slider Title</label>
-                                        <input type="number" class="form-control" id="title" name="title" placeholder="Slider Title"
+                                        <input type="text" class="form-control" id="title" name="title" placeholder="Slider Title"
                                             value="{{ isset($slider) ? $slider->title : old('title') }}">
                                         @error('title')
                                             <div class="alert alert-danger">{{ $message }}</div>
