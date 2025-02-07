@@ -27,7 +27,7 @@
     <!-- Is User Specific -->
     <div class="form-group col-sm-6">
         <label for="is_user_specific">Is User Specific?</label>
-        <input type="checkbox" id="is_user_specific" wire:model="is_user_specific">
+        <input type="checkbox" id="is_user_specific" wire:model="is_user_specific" >
     </div>
 
     <!-- User -->

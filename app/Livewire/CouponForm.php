@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire;
 
 use Livewire\Component;
@@ -17,21 +18,19 @@ class CouponForm extends Component
     public $user_id;
     public $category_id;
 
-    // Define validation rules
     protected $rules = [
-        'coupon.code' => 'required|string|unique:coupons,code,' .  ($this->coupon->id ?? 'NULL'),
+        'coupon.code' => 'required|string|unique:coupons,code,' .  'NULL', // Will handle validation later for updates
         'coupon.discount_value' => 'required|numeric',
         'coupon.discount_type' => 'required',
         'coupon.status' => 'required|boolean',
-        // Apply conditional required rules based on the checkboxes
-        'user_id' => ['nullable', Rule::requiredIf(fn() => $this->is_user_specific)],
-        'category_id' => ['nullable', Rule::requiredIf(fn() => $this->is_category_specific)],
     ];
 
     public function mount($coupon = null)
     {
+        // Ensure coupon is always an object, even if it's null
+        $this->coupon = $coupon ?? new Coupon();
+
         if ($coupon) {
-            $this->coupon = $coupon;
             $this->is_user_specific = $coupon->is_user_specific;
             $this->is_category_specific = $coupon->is_category_specific;
             $this->user_id = $coupon->user_id;
@@ -43,39 +42,38 @@ class CouponForm extends Component
         $this->categories = Category::all();
     }
 
-    // Whenever the checkbox changes, clear related IDs if unchecked
-    public function updatedIsUserSpecific($value)
+    // Adjust the rules dynamically based on conditions
+    public function getRules()
     {
-        if (!$value) {
-            $this->user_id = null; // Ensure user_id is cleared when unchecked
-        }
-    }
+        $rules = $this->rules;
 
-    public function updatedIsCategorySpecific($value)
-    {
-        if (!$value) {
-            $this->category_id = null; // Ensure category_id is cleared when unchecked
+        // Apply 'required' for user_id only if 'is_user_specific' is checked
+        if ($this->is_user_specific) {
+            $rules['user_id'] = 'required|exists:users,id';
         }
+
+        // Apply 'required' for category_id only if 'is_category_specific' is checked
+        if ($this->is_category_specific) {
+            $rules['category_id'] = 'required|exists:categories,id';
+        }
+
+        return $rules;
     }
 
     public function save()
     {
-        // Validate the form data
-        $this->validate();
+        $this->validate($this->getRules());
 
-        // Save the coupon based on whether it exists or is new
-        if ($this->coupon) {
+        if ($this->coupon->exists) {
+            // Update existing coupon
             $this->coupon->update([
-                'code' => $this->coupon['code'],
-                'discount_value' => $this->coupon['discount_value'],
-                'discount_type' => $this->coupon['discount_type'],
-                'status' => $this->coupon['status'],
-                'user_id' => $this->is_user_specific ? $this->user_id : null,
-                'category_id' => $this->is_category_specific ? $this->category_id : null,
+                'user_id' => $this->user_id,
+                'category_id' => $this->category_id,
                 'is_user_specific' => $this->is_user_specific,
                 'is_category_specific' => $this->is_category_specific,
             ]);
         } else {
+            // Create new coupon
             $this->coupon = Coupon::create([
                 'code' => $this->coupon['code'],
                 'discount_value' => $this->coupon['discount_value'],
@@ -88,11 +86,9 @@ class CouponForm extends Component
             ]);
         }
 
-        // Flash a success message
-        session()->flash('message', $this->coupon ? 'Coupon updated successfully!' : 'Coupon created successfully!');
+        session()->flash('message', $this->coupon->exists ? 'Coupon updated successfully!' : 'Coupon created successfully!');
     }
 
-    // Render the Livewire component view
     public function render()
     {
         return view('admin.livewire.coupon-form');
