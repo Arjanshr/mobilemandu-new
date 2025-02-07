@@ -9,6 +9,7 @@ use App\Http\Resources\ShippingPriceResource;
 use App\Models\Address;
 use App\Models\Area;
 use App\Models\City;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Province;
@@ -23,7 +24,7 @@ class OrderController extends BaseController
         $shipping_address .= "<br/>Phone: $request->phone_number";
         $shipping_address .= "<br/>Email: $request->email";
         $area = Area::find($request->area_id);
-        $shipping_address .= "<br/><br/>" .$area!=null?$area->name:'' . "(" . (ucfirst($request->address_type)) . ")";
+        $shipping_address .= "<br/><br/>" . $area != null ? $area->name : '' . "(" . (ucfirst($request->address_type)) . ")";
         $shipping_address .= "<br/> $request->location";
         $city = City::find($request->city_id);
         $province = Province::find($request->province_id);
@@ -125,5 +126,40 @@ class OrderController extends BaseController
     public function getShippingPrice(Area $area)
     {
         return $this->sendResponse(ShippingPriceResource::make($area), 'Shipping Price retrived successfully.');
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        return $request;
+        $coupon = Coupon::where('code', $request->code)->first();
+
+        if (!$coupon || !$coupon->isValid()) {
+            return response()->json(['message' => 'Invalid or expired coupon'], 400);
+        }
+
+        if (!$coupon->isValidForUser($request->user_id)) {
+            return response()->json(['message' => 'This coupon is not available for you'], 400);
+        }
+
+        $cartItems = $request->items;
+        $couponCategories = $coupon->categories->pluck('id')->toArray();
+
+        $discount = 0;
+        foreach ($cartItems as $item) {
+            if (empty($couponCategories) || in_array($item['category_id'], $couponCategories)) {
+                $discount += $coupon->type === 'fixed'
+                    ? min($coupon->discount, $item['price'] * $item['quantity'])
+                    : ($item['price'] * $item['quantity']) * ($coupon->discount / 100);
+            }
+        }
+
+        if ($discount == 0) {
+            return response()->json(['message' => 'No eligible items for this coupon'], 400);
+        }
+
+        return response()->json([
+            'discount' => $discount,
+            'new_total' => $request->cart_total - $discount
+        ]);
     }
 }

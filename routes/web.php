@@ -6,6 +6,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContentController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\OrderController;
@@ -247,4 +248,16 @@ Route::middleware([
         Route::patch('/blogs/edit/{blog}', [BlogController::class, 'update'])->name('blog.update');
     });
     Route::delete('/blogs/delete/{blog}', [BlogController::class, 'delete'])->name('blog.delete')->middleware('can:delete-blogs');
+
+    // Coupons routes
+    Route::get('/coupons', [CouponController::class, 'index'])->name('coupons')->middleware('can:browse-coupons');
+    Route::middleware('can:add-coupons')->group(function () {
+        Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
+        Route::post('/coupons/insert', [CouponController::class, 'insert'])->name('coupons.insert');
+    });
+    Route::middleware('can:edit-coupons')->group(function () {
+        Route::get('/coupons/{coupon}/edit', [CouponController::class, 'edit'])->name('coupons.edit');
+        Route::patch('/coupons/{coupon}', [CouponController::class, 'update'])->name('coupons.update');
+    });
+    Route::delete('/coupons/{coupon}', [CouponController::class, 'delete'])->name('coupons.delete')->middleware('can:delete-coupons');
 });

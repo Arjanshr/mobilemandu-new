@@ -429,6 +429,24 @@ return [
             ],
         ],
         [
+            'header' => 'Coupons',
+            'can' => ['browse-coupons'],
+        ],
+        [
+            'text'    => 'Coupons',
+            'icon'    => 'fas fa-fw fa-users',
+            'can' => ['browse-coupons'],
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Coupons',
+                    'url'  => 'admin/coupons',
+                    'can' => ['browse-coupons'],
+                    'active' => ['coupons', 'coupons*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
             'header' => 'CATEGORIES',
             'can' => ['browse-categories'],
         ],

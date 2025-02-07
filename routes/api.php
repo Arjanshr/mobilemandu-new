@@ -82,6 +82,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/content/{content_type?}/{items_per_page?}', [ContentController::class, 'getProductList']);
 
         //Place Order
+        Route::post('orders/apply-coupon', [OrderController::class, 'applyCoupon']);
         Route::post('orders/place', [OrderController::class, 'create']);
    
         //Address
@@ -121,6 +122,5 @@ Route::prefix('v1')->group(function () {
         Route::get('wishlists', [UserController::class, 'myWishlists']);
         Route::post('add-to-wishlist/{product}', [UserController::class, 'addToWishlist']);
         Route::post('remove-from-wishlist/{product}', [UserController::class, 'removeFromWishlist']);
-
     });
 });
