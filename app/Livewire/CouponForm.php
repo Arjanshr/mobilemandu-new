@@ -6,87 +6,100 @@ use Livewire\Component;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Coupon;
-use Illuminate\Validation\Rule;
 
 class CouponForm extends Component
 {
     public $coupon;
+
+    // Add these missing properties
+    public $code;
+    public $discount_type;
+    public $discount_value;
+    public $status;
+
     public $is_user_specific = false;
     public $is_category_specific = false;
     public $users = [];
     public $categories = [];
-    public $user_id;
-    public $category_id;
+    public $user_ids = [];
+    public $category_ids = [];
 
     protected $rules = [
-        'coupon.code' => 'required|string|unique:coupons,code,' .  'NULL', // Will handle validation later for updates
-        'coupon.discount_value' => 'required|numeric',
-        'coupon.discount_type' => 'required',
-        'coupon.status' => 'required|boolean',
+        'code' => 'required|string|unique:coupons,code',
+        'discount_value' => 'required|numeric',
+        'discount_type' => 'required',
+        'status' => 'required|boolean',
+        'user_ids' => ['nullable', 'array'],
+        'category_ids' => ['nullable', 'array'],
     ];
 
     public function mount($coupon = null)
     {
-        // Ensure coupon is always an object, even if it's null
-        $this->coupon = $coupon ?? new Coupon();
-
-        if ($coupon) {
-            $this->is_user_specific = $coupon->is_user_specific;
-            $this->is_category_specific = $coupon->is_category_specific;
-            $this->user_id = $coupon->user_id;
-            $this->category_id = $coupon->category_id;
-        }
-
-        // Load users and categories
         $this->users = User::all();
         $this->categories = Category::all();
-    }
 
-    // Adjust the rules dynamically based on conditions
-    public function getRules()
-    {
-        $rules = $this->rules;
-
-        // Apply 'required' for user_id only if 'is_user_specific' is checked
-        if ($this->is_user_specific) {
-            $rules['user_id'] = 'required|exists:users,id';
+        if ($coupon) {
+            $this->coupon = $coupon;
+            $this->code = $coupon->code;
+            $this->discount_type = $coupon->discount_type;
+            $this->discount_value = $coupon->discount_value;
+            $this->status = $coupon->status;
+            $this->is_user_specific = $coupon->is_user_specific;
+            $this->is_category_specific = $coupon->is_category_specific;
+            $this->user_ids = $coupon->users->pluck('id')->toArray();
+            $this->category_ids = $coupon->categories->pluck('id')->toArray();
         }
-
-        // Apply 'required' for category_id only if 'is_category_specific' is checked
-        if ($this->is_category_specific) {
-            $rules['category_id'] = 'required|exists:categories,id';
-        }
-
-        return $rules;
+        // Dispatch 'select2Hydrate' to refresh Select2 fields
+        $this->dispatch('select2Hydrate');
     }
 
     public function save()
     {
-        $this->validate($this->getRules());
+        $this->validate();
 
-        if ($this->coupon->exists) {
-            // Update existing coupon
+        if ($this->coupon) {
             $this->coupon->update([
-                'user_id' => $this->user_id,
-                'category_id' => $this->category_id,
+                'code' => $this->code,
+                'discount_value' => $this->discount_value,
+                'discount_type' => $this->discount_type,
+                'status' => $this->status,
+                'user_ids' => $this->is_user_specific ? $this->user_ids : [],
+                'category_ids' => $this->is_category_specific ? $this->category_ids : [],
                 'is_user_specific' => $this->is_user_specific,
                 'is_category_specific' => $this->is_category_specific,
             ]);
         } else {
-            // Create new coupon
             $this->coupon = Coupon::create([
-                'code' => $this->coupon['code'],
-                'discount_value' => $this->coupon['discount_value'],
-                'discount_type' => $this->coupon['discount_type'],
-                'status' => $this->coupon['status'],
-                'user_id' => $this->is_user_specific ? $this->user_id : null,
-                'category_id' => $this->is_category_specific ? $this->category_id : null,
+                'code' => $this->code,
+                'discount_value' => $this->discount_value,
+                'discount_type' => $this->discount_type,
+                'status' => $this->status,
                 'is_user_specific' => $this->is_user_specific,
                 'is_category_specific' => $this->is_category_specific,
             ]);
         }
 
-        session()->flash('message', $this->coupon->exists ? 'Coupon updated successfully!' : 'Coupon created successfully!');
+        session()->flash('message', 'Coupon saved successfully!');
+
+        // Dispatch 'select2Hydrate' after saving the coupon to update Select2 fields
+        $this->dispatch('select2Hydrate');
+    }
+
+    public function updatedIsCategorySpecific($value)
+    {
+        // $this->user_ids = $value;
+        $this->dispatch('select2Hydrate');
+    }
+    public function updateUserIds($value)
+    {
+        $this->user_ids = $value;
+        $this->dispatch('select2Hydrate');
+    }
+    
+    public function updateCategoryIds($value)
+    {
+        $this->category_ids = $value;
+        $this->dispatch('select2Hydrate');
     }
 
     public function render()

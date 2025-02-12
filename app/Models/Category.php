@@ -109,4 +109,9 @@ class Category extends Model
         return $this->belongsToMany(Specification::class)
             ->withPivot('is_variant');
     }
+
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class);
+    }
 }

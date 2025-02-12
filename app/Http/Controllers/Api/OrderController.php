@@ -130,7 +130,7 @@ class OrderController extends BaseController
 
     public function applyCoupon(Request $request)
     {
-        return $request;
+        // return $request;
         $coupon = Coupon::where('code', $request->code)->first();
 
         if (!$coupon || !$coupon->isValid()) {
