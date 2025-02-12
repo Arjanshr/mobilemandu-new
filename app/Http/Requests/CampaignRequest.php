@@ -25,7 +25,7 @@ class CampaignRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'date'],
+            'start_date' => ['required', 'date', 'before:end_date'],
             'end_date' => ['required', 'date', 'after:start_date'],
             'status' => ['required', new Enum(CampaignStatus::class)],
             'background_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // Max 2MB

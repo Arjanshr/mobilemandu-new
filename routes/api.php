@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\SocialiteController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PopupBannerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\UserController;
@@ -104,6 +105,9 @@ Route::prefix('v1')->group(function () {
 
         //Spec Compare        
         Route::get('compare-specifications', [ProductController::class, 'specCompare']);
+
+        //Popup Banner
+        Route::get('popup-banner', [PopupBannerController::class, 'first']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

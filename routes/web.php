@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PopupBannerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProductController;
@@ -260,4 +261,9 @@ Route::middleware([
         Route::patch('/coupons/{coupon}', [CouponController::class, 'update'])->name('coupons.update');
     });
     Route::delete('/coupons/{coupon}', [CouponController::class, 'delete'])->name('coupons.delete')->middleware('can:delete-coupons');
+
+    // Popup Banner routes
+    Route::get('/popup-banners', [PopupBannerController::class, 'index'])->name('popup-banners.index')->middleware('can:browse-popup-banners');
+    Route::get('/popup-banners/edit/{popupBanner}', [PopupBannerController::class, 'edit'])->name('popup-banners.edit')->middleware('can:edit-popup-banners');
+    Route::patch('/popup-banners/edit/{popupBanner}', [PopupBannerController::class, 'update'])->name('popup-banners.update');
 });

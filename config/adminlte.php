@@ -385,6 +385,19 @@ return [
             ],
         ],
         [
+            'text'    => 'Popup Banner',
+            'icon'    => 'fas fa-fw fa-list',
+            'submenu' => [
+                [
+                    'icon'    => 'fa fa-arrow-right',
+                    'text' => 'Manage Popup Banner',
+                    'url'  => 'admin/popup-banners',
+                    'can' => ['browse-popup-banners'],
+                    'active' => ['popup-banners', 'popup-banners*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
             'text'    => 'Sliders',
             'icon'    => 'fas fa-fw fa-list',
             'submenu' => [
