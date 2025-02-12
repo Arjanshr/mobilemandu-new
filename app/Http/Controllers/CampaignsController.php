@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CampaignRequest;
 use App\Models\Campaign;
 use App\Models\Product;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CampaignsController extends Controller
 {
     public function index()
     {
         $campaigns = Campaign::get();
-        return view('admin.campaign.index', compact(['campaigns']));
+        return view('admin.campaign.index', compact('campaigns'));
     }
+
     public function create()
     {
         return view('admin.campaign.form');
@@ -22,30 +23,47 @@ class CampaignsController extends Controller
 
     public function insert(CampaignRequest $request)
     {
-
-        $campaign = new Campaign;
+        $campaign = new Campaign();
         $campaign->name = $request->name;
         $campaign->start_date = $request->start_date;
         $campaign->end_date = $request->end_date;
         $campaign->status = $request->status;
+        $campaign->color_theme = $request->color_theme;
+
+        // Handle background image upload
+        if ($request->hasFile('background_image')) {
+            $campaign->background_image = $request->file('background_image')->store('campaigns', 'public');
+        }
+
         $campaign->save();
 
-        toastr()->success('Brand Created Successfully!');
+        toastr()->success('Campaign Created Successfully!');
         return redirect()->route('campaigns');
     }
 
     public function edit(Campaign $campaign)
     {
-        return view('admin.campaign.form', compact(['campaign']));
+        return view('admin.campaign.form', compact('campaign'));
     }
 
     public function update(CampaignRequest $request, Campaign $campaign)
     {
-
         $campaign->name = $request->name;
         $campaign->start_date = $request->start_date;
         $campaign->end_date = $request->end_date;
         $campaign->status = $request->status;
+        $campaign->color_theme = $request->color_theme;
+
+        // Handle background image update
+        if ($request->hasFile('background_image')) {
+            // Delete old image if exists
+            if ($campaign->background_image) {
+                Storage::disk('public')->delete($campaign->background_image);
+            }
+
+            $campaign->background_image = $request->file('background_image')->store('campaigns', 'public');
+        }
+
         $campaign->save();
 
         toastr()->success('Campaign Updated Successfully!');
@@ -54,53 +72,65 @@ class CampaignsController extends Controller
 
     public function delete(Campaign $campaign)
     {
+        // Delete background image if exists
+        if ($campaign->background_image) {
+            Storage::disk('public')->delete($campaign->background_image);
+        }
+
         $campaign->delete();
+
         return redirect()->route('campaigns')->with('flash_success', 'Campaign deleted successfully.');
     }
 
     public function products($id)
     {
-        $campaign = Campaign::with('products')->find($id);
+        $campaign = Campaign::with('products')->findOrFail($id);
         $products = Product::where('status', 1)->get();
         $existing_products = $campaign->products->pluck('id');
-        return view('admin.campaign.products', compact(['campaign', 'products', 'existing_products']));
+
+        return view('admin.campaign.products', compact('campaign', 'products', 'existing_products'));
     }
 
     public function productsAction($id, Request $request)
     {
-        $campaign = Campaign::with('products')->find($id);
+        $campaign = Campaign::with('products')->findOrFail($id);
         $current_products_ids = $campaign->products->pluck('id')->toArray();
         $sync_values = [];
-        if($request->products)
-        foreach ($request->products as $product_id) {
-            if (!in_array($product_id, $current_products_ids)) {
-                $product = Product::find($product_id);
-                $sync_values[$product->id] = ['campaign_price' => $product->price];
+
+        if ($request->products) {
+            foreach ($request->products as $product_id) {
+                if (!in_array($product_id, $current_products_ids)) {
+                    $product = Product::findOrFail($product_id);
+                    $sync_values[$product->id] = ['campaign_price' => $product->price];
+                }
             }
         }
+
         $campaign->products()->syncWithoutDetaching($sync_values);
-        return redirect()->route('campaigns.products', $campaign->id)->with('flash_success', 'Products Synced Successfully.');
+
+        return redirect()->route('campaigns.products', $campaign->id)
+            ->with('flash_success', 'Products Synced Successfully.');
     }
 
     public function productDelete(Campaign $campaign, Product $product)
     {
         $campaign->products()->wherePivot('product_id', '=', $product->id)->detach();
+
         return redirect()->route('campaigns.products', $campaign->id)
             ->with('flash_success', 'Product Removed Successfully.');
     }
 
     public function updateDiscount(Request $request)
     {
-        $this->validate($request, [
-            'campaign_id' => 'required',
-            'product_id' => 'required',
-            'campaign_price' => 'required',
+        $request->validate([
+            'campaign_id' => 'required|exists:campaigns,id',
+            'product_id' => 'required|exists:products,id',
+            'campaign_price' => 'required|numeric|min:0',
         ]);
-        $campaign = Campaign::find($request->campaign_id);
-        $campaign->products()
-            ->updateExistingPivot($request->product_id, ['campaign_price' => $request->campaign_price]);
-        return [
-            "message" => "Product Updated Successfully"
-        ];
+
+        $campaign = Campaign::findOrFail($request->campaign_id);
+        $campaign->products()->updateExistingPivot($request->product_id, ['campaign_price' => $request->campaign_price]);
+
+        return response()->json(["message" => "Product Updated Successfully"]);
     }
 }
