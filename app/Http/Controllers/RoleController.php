@@ -23,8 +23,17 @@ class RoleController extends Controller
 
     public function insert(RoleRequest $request)
     {
-        $role = Role::create($request->all());
-        $role->syncPermissions($request->permissions);
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web'
+        ]);
+    
+        // Convert permission IDs to names
+        $permissions = Permission::whereIn('id', $request->permissions)->pluck('name')->toArray();
+    
+        // Sync permissions using names
+        $role->syncPermissions($permissions);
+    
         toastr()->success('Role Created Successfully!');
         return redirect()->route('roles');
     }

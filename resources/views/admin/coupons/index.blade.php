@@ -59,8 +59,8 @@
                                                         </td>
                                                         <td>{{ $coupon->code }}</td>
                                                         <td>{{ $coupon->discount }}%</td>
-                                                        <td>{{ \Carbon\Carbon::parse($coupon->expiration_date)->format('d M, Y') }}</td>
-                                                        <td>{{ ucfirst($coupon->status) }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($coupon->expires_at)->format('d M, Y') }}</td>
+                                                        <td>{{ ucfirst($coupon->status?'active':'inactive') }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

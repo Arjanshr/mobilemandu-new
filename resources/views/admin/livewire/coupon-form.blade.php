@@ -1,52 +1,78 @@
 <div>
+    @if (session()->has('message'))
+        <div class="alert alert-success">
+            {{ session('message') }}
+        </div>
+    @endif
+    <form action="{{ isset($coupon) ? route('coupons.update', $coupon->id) : route('coupons.insert') }}" method="POST">
+        @csrf
+        @if (isset($coupon))
+            @method('patch')
+        @endif
     <div class="card-body row">
         <!-- Coupon Code -->
         <div class="form-group col-sm-12">
             <label for="code">Coupon Code*</label>
-            <input type="text" class="form-control" id="code" wire:model="code" placeholder="Coupon Code" required>
-            @error('coupon.code')
+            <input type="text" class="form-control" id="code" wire:model="code" placeholder="Coupon Code" name="code" required>
+            @error('code')
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
 
-        <!-- Discount Type -->
+        <!-- Discount Type & Discount Value -->
         <div class="form-group col-sm-6">
-            <label for="discount_type">Discount Type*</label>
-            <select wire:model="discount_type" class="form-control" required>
+            <label for="type">Discount Type*</label>
+            <select wire:model="type" class="form-control" name="type" required>
                 <option value="">Select Discount Type</option>
                 <option value="fixed">Fixed</option>
                 <option value="percentage">Percentage</option>
             </select>
-            @error('coupon.discount_type')
+            @error('type')
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
 
-        <!-- Discount Value -->
         <div class="form-group col-sm-6">
-            <label for="discount_value">Discount Value*</label>
-            <input type="number" class="form-control" wire:model="discount_value" placeholder="Discount Value"
-                required>
-            @error('coupon.discount_value')
+            <label for="discount">Discount Value*</label>
+            <input type="number" class="form-control" name="discount" wire:model="discount" placeholder="Discount Value" required>
+            @error('discount')
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
 
-        <!-- Is User Specific -->
+        <!-- Max Uses -->
+        <div class="form-group col-sm-6">
+            <label for="max_uses">Max Uses</label>
+            <input type="number" class="form-control" wire:model="max_uses" name="max_uses" placeholder="Max Uses">
+            @error('max_uses')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- Expiry Date -->
+        <div class="form-group col-sm-6">
+            <label for="expires_at">Expiration Date</label>
+            <input type="datetime-local" class="form-control" wire:model="expires_at" name="expires_at">
+            @error('expires_at')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- Is User Specific? -->
         <div class="form-group col-sm-6">
             <label for="is_user_specific">Is User Specific?</label>
-            <input type="checkbox" id="is_user_specific" wire:model.live="is_user_specific">
+            <input type="checkbox" id="is_user_specific" wire:model.live="is_user_specific" name="is_user_specific">
         </div>
 
-        <!-- User -->
+        <!-- User Selection -->
         @if ($is_user_specific)
-            <div class="form-group col-sm-6" wire:ignore>
+            <div class="form-group col-sm-12">
                 <label for="user_id">User</label>
-                <select name="user_id[]" id="user_id" class="form-control" multiple wire:model.defer="user_ids">
+                <select id="user_id" wire:model.live="user_ids" class="form-control" name="user_ids[]" multiple >
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}"
-                            {{ in_array($user->id, $user_ids ?? []) ? 'selected' : '' }}>
-                            {{ $user->name }}</option>
+                        <option value="{{ $user->id }}" {{ in_array($user->id, $user_ids) ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
                     @endforeach
                 </select>
                 @error('user_ids')
@@ -55,21 +81,21 @@
             </div>
         @endif
 
-        <!-- Is Category Specific -->
+        <!-- Is Category Specific? -->
         <div class="form-group col-sm-6">
             <label for="is_category_specific">Is Category Specific?</label>
-            <input type="checkbox" id="is_category_specific" wire:model.live="is_category_specific">
+            <input type="checkbox" id="is_category_specific" wire:model.live="is_category_specific" name="is_category_specific">
         </div>
 
-        <!-- Category -->
+        <!-- Category Selection -->
         @if ($is_category_specific)
-            <div class="form-group col-sm-6" wire:ignore>
+            <div class="form-group col-sm-12">
                 <label for="category_id">Category</label>
-                <select name="category_id[]" id="category_id" class="form-control" multiple
-                    wire:model.defer="category_ids">
+                <select id="category_id" wire:model.live="category_ids" class="form-control" multiple name="category_ids[]">
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}"
-                            {{ in_array($category->id, $category_ids ?? []) ? 'selected' : '' }}>{{ $category->name }}
+                            {{ in_array($category->id, $category_ids) ? 'selected' : '' }}>
+                            {{ $category->name }}
                         </option>
                     @endforeach
                 </select>
@@ -82,54 +108,54 @@
         <!-- Status -->
         <div class="form-group col-sm-6">
             <label for="status">Status*</label>
-            <select wire:model="status" class="form-control" required>
+            <select wire:model="status" class="form-control" name="status" required>
                 <option value="1">Active</option>
                 <option value="0">Inactive</option>
             </select>
-            @error('coupon.status')
+            @error('status')
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
 
         <!-- Submit -->
         <div class="form-group col-sm-12">
-            <button type="submit" class="btn btn-primary" wire:click="save">
+            <button type="submit" class="btn btn-primary">
                 {{ isset($coupon) ? 'Update Coupon' : 'Create Coupon' }}
             </button>
         </div>
     </div>
+    </form>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.3/dist/js/select2.min.js"></script>
+
+
 @script
     <script>
-        document.addEventListener('livewire:load', function() {
-            loadSelect2(); // Initialize Select2 when Livewire finishes loading the component
+        document.addEventListener('livewire:navigated', function() {
+            loadSelect2();
         });
 
-        window.loadSelect2 = () => {
-            // Initialize Select2 on user and category select elements
+        function loadSelect2() {
             $('#user_id').select2({
-                placeholder: '{{ __('Select Users') }}',
+                placeholder: 'Select Users',
                 allowClear: true
             }).on('change', function() {
-                var data = $('#user_id').select2("val");
-                @this.set('user_ids', data); // Bind the selected values to Livewire
+                Livewire.dispatch('updateUserIds', {
+                    value: $(this).val()
+                });
             });
 
             $('#category_id').select2({
-                placeholder: '{{ __('Select Categories') }}',
+                placeholder: 'Select Categories',
                 allowClear: true
             }).on('change', function() {
-                var data = $('#category_id').select2("val");
-                @this.set('category_ids', data); // Bind the selected values to Livewire
+                Livewire.dispatch('updateCategoryIds', {
+                    value: $(this).val()
+                });
             });
         }
 
-        // Listen for the select2Hydrate event to re-initialize Select2 when Livewire updates the DOM
-        Livewire.on('select2Hydrate', () => {
-            loadSelect2();
+        Livewire.on('select2Hydrate', function() {
+            setTimeout(loadSelect2, 500);
         });
     </script>
 @endscript
-

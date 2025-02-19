@@ -22,6 +22,7 @@ class CreateCouponsTable extends Migration
             $table->integer('uses')->default(0);
             $table->dateTime('expires_at')->nullable();
             $table->boolean('is_user_specific')->default(false);
+            $table->boolean('is_category_specific')->default(false);
             $table->integer('status')->default(1); // Default value '1' for Active status
             $table->timestamps();
         });

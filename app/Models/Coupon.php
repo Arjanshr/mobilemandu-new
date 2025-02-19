@@ -12,7 +12,17 @@ class Coupon extends Model
 {
     use HasFactory, LogsActivity;
 
-    protected $fillable = ['code', 'type', 'discount', 'max_uses', 'uses', 'expires_at', 'is_user_specific'];
+    protected $fillable = [
+        'code',
+        'type',
+        'discount',
+        'max_uses',
+        'uses',
+        'expires_at',
+        'is_user_specific',
+        'is_category_specific',
+        'status'
+    ];
     protected $casts = [
         'expires_at' => 'datetime', // Make sure 'expires_at' is cast to a Carbon instance
     ];
@@ -39,4 +49,3 @@ class Coupon extends Model
         return $this->users()->where('user_id', $userId)->exists();
     }
 }
-
