@@ -48,20 +48,19 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-
-
-                                    <!-- Phone -->
+                                    
+                                    <!-- Phone (Optional & Unique) -->
                                     <div class="form-group col-sm-4">
                                         <label for="phone">Phone</label>
                                         <input type="text" class="form-control" id="phone" name="phone"
-                                            placeholder="Phone" value="{{ isset($user) ? $user->phone : old('phone') }}"
-                                            required>
+                                            placeholder="Phone" value="{{ isset($user) ? $user->phone : old('phone') }}">
                                         @error('phone')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
 
-                                    <!-- DOB -->
+
+                                    <!-- DOB (Optional) -->
                                     <div class="form-group col-sm-4">
                                         <label for="dob">Date of birth</label>
                                         <input type="date" class="form-control" id="dob" name="dob"
@@ -72,21 +71,22 @@
                                         @enderror
                                     </div>
 
-                                    <!--  Gender -->
+                                    <!-- Gender (Optional) -->
                                     <div class="form-group col-sm-4">
-                                        <label>Gender*</label>
+                                        <label>Gender</label>
                                         <br />
                                         <input type="radio" id="male" name="gender" value="male"
-                                            {{ (isset($user) && $user->gender == 'Male') || old('gender') == 'male' ? 'checked=' . '"' . 'checked' . '"' : '' }}>
+                                            {{ (isset($user) && strtolower($user->gender) == 'male') || old('gender') == 'male' ? 'checked' : '' }}>
                                         <label for="male">Male</label><br>
+
                                         <input type="radio" id="female" name="gender" value="female"
-                                            {{ (isset($user) && $user->gender == 'Female') || old('gender') == 'female' ? 'checked=' . '"' . 'checked' . '"' : '' }}>
+                                            {{ (isset($user) && strtolower($user->gender) == 'female') || old('gender') == 'female' ? 'checked' : '' }}>
                                         <label for="female">Female</label><br>
+
                                         @error('gender')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <!--  Address -->
                                     <div class="form-group col-sm-4">
                                         <label for="address">Address</label>
@@ -101,14 +101,10 @@
                                         <label for="role">Role*</label>
                                         <select id='role' class="form-control" name="role[]" multiple="multiple">
                                             @foreach ($roles as $role)
-                                                @if (
-                                                    $role == 'super-admin' &&
-                                                        !auth()->user()->hasRole('super-admin'))
+                                                @if ($role == 'super-admin' && !auth()->user()->hasRole('super-admin'))
                                                     @php continue; @endphp
                                                 @endif
-                                                @if (
-                                                    $role == 'admin' &&
-                                                        !auth()->user()->can('add-admin'))
+                                                @if ($role == 'admin' && !auth()->user()->can('add-admin'))
                                                     @php continue; @endphp
                                                 @endif
                                                 <option value="{{ $role }}"

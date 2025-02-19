@@ -20,16 +20,19 @@ class UserRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules()
     {
+        $userId = $this->user ? $this->user->id : null;
+    
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable','string' ],
-            'gender' => ['nullable', 'in:male,female'],
-            'dob' => ['nullable', 'date'],
-            'password'=>['nullable','min:6'],
-            'photo' => ['nullable', 'mimes:jpeg,png,jpg,gif,svg,ico,pdf', 'max:2048'],
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $userId,
+            'phone' => 'nullable|string|max:15|unique:users,phone,' . $userId,
+            'dob' => 'nullable|date',
+            'gender' => 'nullable|in:male,female',
+            'address' => 'nullable|string|max:500',
+            'role' => 'required|array',
+            'role.*' => 'exists:roles,name',
         ];
-    }
+    }    
 }
