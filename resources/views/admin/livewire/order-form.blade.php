@@ -107,7 +107,7 @@
                 @foreach ($areas as $area)
                     <option value="{{ $area->id }}">{{ $area->name }}</option>
                 @endforeach
-            </select>            @error('area')
+            </select> @error('area')
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
@@ -169,7 +169,7 @@
                 <option value="unpaid"
                     {{ (isset($order) && $order->payment_status == 'unpaid') || old('payment_status') == 'unpaid' ? 'selected' : '' }}>
                     Unpaid</option>
-                <option value="partial"
+                <option value="partially_paid"
                     {{ (isset($order) && $order->payment_status == 'partially_paid') || old('payment_status') == 'partially_paid' ? 'selected' : '' }}>
                     Partial</option>
             </select>
@@ -184,7 +184,7 @@
         <div class="form-group col-sm-12">
             <label for="select_product">Select a Product*</label>
             <div wire:ignore>
-                <select class="form-control" id="select_product" wire:model.live="select_product" required>
+                <select class="form-control" id="select_product" wire:model.live="select_product">
                     <option value="">Select a Product</option>
                     @foreach ($products as $product)
                         <option value="{{ $product->id }}">
@@ -289,6 +289,18 @@
         </table>
 
     </div>
+    <div class="card-body row">
+        <div class="form-group col-sm-11">
+            <label for="coupon_code">Coupon Code</label>
+            <input type="text" class="form-control" wire:model.live="coupon_code" name="coupon_code">
+            <input type="hidden" wire:model.live="coupon_discount" name="coupon_discount">
+        </div>
+        <div class="form-group col-sm-1">
+            <br/>
+            <button class="btn btn-sm btn-success" wire:click="applyCoupon" x-on:click.prevent>Apply</button>
+        </div>
+    </div>
+
 </div>
 @script
     <script>

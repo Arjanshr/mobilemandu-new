@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Address;
 use App\Models\Area;
 use App\Models\City;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Province;
 use App\Models\User;
@@ -39,7 +40,9 @@ class OrderForm extends Component
     public $phone_number;
     public $email;
     public $addresses;
-
+    public $coupon_code;
+    public $coupon_discount = 0;
+    public $applied_coupon;
 
     public function mount()
     {
@@ -47,6 +50,8 @@ class OrderForm extends Component
         $this->cities = City::get();
         $this->areas = Area::get();
         if ($this->order != null) {
+            $this->coupon_discount = $this->order->coupon_discount;
+            $this->coupon_code = $this->order->coupon_code;
             $this->items = $this->order->order_items;
             if ($this->order->customer) {
                 $this->customer = $this->order->customer?->id;
@@ -91,9 +96,9 @@ class OrderForm extends Component
             $this->order_items = [];
         }
         $this->total_quantity = array_sum(array_column($this->order_items, 'quantity'));
-        $this->total_discount = array_sum(array_column($this->order_items, 'discount'));
+        $this->total_discount = array_sum(array_column($this->order_items, 'discount')) + $this->coupon_discount;
         $this->total_amount = array_sum(array_column($this->order_items, 'amount'));
-        $this->grand_total = array_sum(array_column($this->order_items, 'total'))+ $this->shipping_price??0;
+        $this->grand_total = (array_sum(array_column($this->order_items, 'total')) + $this->shipping_price ?? 0) - $this->total_discount;
         $this->dispatch('select2Hydrate');
     }
 
@@ -204,7 +209,33 @@ class OrderForm extends Component
             $this->dispatch('select2Hydrate');
         }
     }
+    public function applyCoupon()
+    {
+        $coupon = Coupon::where('code', $this->coupon_code)->where('status', 1)->first();
+        if ($coupon) {
+            $this->applied_coupon = $coupon;
 
+            $this->coupon_discount = $coupon->type === 'percentage'
+                ? ($this->total_amount * $coupon->discount / 100)
+                : $coupon->discount;
+        } else {
+            $this->coupon_discount = 0;
+            $this->applied_coupon = null;
+            session()->flash('error', 'Invalid or expired coupon code.');
+        }
+        // $this->total_discount += $this->coupon_discount;
+        $this->calculateTotals();
+        toastr()->success('Coupon Applied Successfully!');
+
+    }
+
+    private function calculateTotals()
+    {
+        $this->total_quantity = array_sum(array_column($this->order_items, 'quantity'));
+        $this->total_discount = array_sum(array_column($this->order_items, 'discount')) + $this->coupon_discount;
+        $this->total_amount = array_sum(array_column($this->order_items, 'amount'));
+        $this->grand_total = max(0, ($this->total_amount - $this->total_discount) + $this->shipping_price);
+    }
 
     public function render()
     {

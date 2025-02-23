@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\SocialiteController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PopupBannerController;
@@ -63,7 +64,7 @@ Route::prefix('v1')->group(function () {
         Route::get('products/get_rating_list_for_search', [ProductController::class, 'getRatingRangeForSearch']);
 
         //Product Detail
-        Route::get('product_detail/test/{product}',[ProductController::class,'productDetails']);
+        Route::get('product_detail/test/{product}', [ProductController::class, 'productDetails']);
         Route::get('product_detail/{product}', [ProductController::class, 'productDetails']);
         Route::get('product_specifications/{product}', [ProductController::class, 'productSpecifications']);
         Route::get('product_features/{product}', [ProductController::class, 'productFeatures']);
@@ -83,9 +84,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/content/{content_type?}/{items_per_page?}', [ContentController::class, 'getProductList']);
 
         //Place Order
-        Route::post('orders/apply-coupon', [OrderController::class, 'applyCoupon']);
         Route::post('orders/place', [OrderController::class, 'create']);
-   
+
         //Address
         Route::get('address/get-provinces', [OrderController::class, 'getProvinces']);
         Route::get('address/get-cities/{province_id?}', [OrderController::class, 'getCities']);
@@ -98,7 +98,7 @@ Route::prefix('v1')->group(function () {
 
         //Sliders
         Route::get('sliders', [SliderController::class, 'sliders']);
-        
+
         //Blogs
         Route::get('blogs', [BlogController::class, 'blogs']);
         Route::get('blogs/{blog}', [BlogController::class, 'blogDetails']);
@@ -126,5 +126,7 @@ Route::prefix('v1')->group(function () {
         Route::get('wishlists', [UserController::class, 'myWishlists']);
         Route::post('add-to-wishlist/{product}', [UserController::class, 'addToWishlist']);
         Route::post('remove-from-wishlist/{product}', [UserController::class, 'removeFromWishlist']);
+        //Coupon
+        Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
     });
 });
