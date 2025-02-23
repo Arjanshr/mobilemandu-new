@@ -43,40 +43,42 @@ class CouponController extends BaseController
 
         foreach ($request->items as $item) {
             $product = \App\Models\Product::with('categories')->find($item['id']);
-
+        
             if (!$product) {
                 continue;
             }
-
+        
             // Get all category IDs the product belongs to
             $product_category_ids = $product->categories->pluck('id')->toArray();
-
+        
             // Check if the product has at least one eligible category
             $is_eligible = !$is_category_specific || !empty(array_intersect($product_category_ids, $valid_category_ids));
-
+        
             if ($is_eligible) {
                 $item_total = $item['rate'] * $item['quantity'];
                 $discount = ($coupon->type === 'fixed') 
                     ? min($coupon->discount, $item_total) 
                     : ($item_total * $coupon->discount) / 100;
-
+        
                 if ($coupon->max_discount && $discount > $coupon->max_discount) {
                     $discount = $coupon->max_discount;
                 }
-
-                $item['discount'] = $discount;
-                $item['total'] = $item_total - $discount;
-                $total_discount += $discount;
+        
+                // Round values to 2 decimal places
+                $item['discount'] = round($discount, 2);
+                $item['total'] = round($item_total - $discount, 2);
+        
+                $total_discount += $item['discount'];
             } else {
                 $item['discount'] = 0;
-                $item['total'] = $item['rate'] * $item['quantity'];
+                $item['total'] = round($item['rate'] * $item['quantity'], 2);
             }
-
+        
             $updated_items[] = $item;
         }
-
-        $new_total = $request->cart_total - $total_discount;
-
+        
+        $new_total = round($request->cart_total - $total_discount, 2);
+        
         return $this->sendResponse(
             new CouponApplyResource((object) [
                 'total_discount' => $total_discount,
@@ -84,6 +86,6 @@ class CouponController extends BaseController
                 'updated_items'  => $updated_items
             ]),
             'Coupon applied successfully.'
-        );
+        );        
     }
 }
