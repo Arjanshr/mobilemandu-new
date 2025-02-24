@@ -63,21 +63,19 @@ class CouponController extends BaseController
                 if ($coupon->max_discount && $discount > $coupon->max_discount) {
                     $discount = $coupon->max_discount;
                 }
-        
-                // Round values to 2 decimal places
-                $item['discount'] = round($discount, 2);
-                $item['total'] = round($item_total - $discount, 2);
+                // Round up to the nearest whole number
+                $item['discount'] = ceil($discount);
+                $item['total'] = ceil($item_total - $discount);
         
                 $total_discount += $item['discount'];
             } else {
                 $item['discount'] = 0;
-                $item['total'] = round($item['rate'] * $item['quantity'], 2);
+                $item['total'] = ceil($item['rate'] * $item['quantity']);
             }
         
             $updated_items[] = $item;
         }
-        
-        $new_total = round($request->cart_total - $total_discount, 2);
+        $new_total = ceil($request->cart_total - $total_discount);
         
         return $this->sendResponse(
             new CouponApplyResource((object) [
