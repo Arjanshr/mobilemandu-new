@@ -68,7 +68,7 @@ class ProductDetailResource extends JsonResource
             "tags" => [
                 "new" => $this->isNew(),
                 "popular" => $this->isPopular(),
-                "campaign" => $this->firstCampaign()?->name,
+                "campaign" => $this->isCampaignProduct()->first()?->name,
             ],
             "variants" => $variants, // Include variants here
         ];
