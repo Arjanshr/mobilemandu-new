@@ -120,10 +120,14 @@ class Product extends Model implements HasMedia
         return false;
     }
 
-    public function isCampaignProduct()
-    {
-        return $this->campaigns()->get();
-    }
+public function firstCampaign()
+{
+    return $this->campaigns()
+        ->where('status', 1) // Active campaigns only
+        ->whereDate('start_date', '<=', now()) // Campaign has started
+        ->whereDate('end_date', '>=', now()) // Campaign is still running
+        ->first();
+}
 
     public function variants()
     {
