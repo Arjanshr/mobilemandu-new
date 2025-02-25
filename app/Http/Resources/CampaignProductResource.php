@@ -30,7 +30,7 @@ class CampaignProductResource extends JsonResource
             "tags"=>[
                 "new"=> $this->isNew(),
                 "popular"=> $this->isPopular(),
-                "campaign"=> $this->isCampaignProduct()->first()?$this->isCampaignProduct()->first()->name:false,
+                "campaign" => $this->firstCampaign()?->name,
             ]
         ];
     }
