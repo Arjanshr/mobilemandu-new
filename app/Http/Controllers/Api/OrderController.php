@@ -84,6 +84,8 @@ class OrderController extends BaseController
         $order->payment_status = $request->payment_status;
         $order->shipping_address = $shipping_address;
         $order->area_id = $area->id;
+        $order->coupon_code = $request->coupon_code;
+        $order->coupon_discount = $request->coupon_discount;
         $order->save();
         foreach ($request->items as $item) {
             $order_item = new OrderItem();
