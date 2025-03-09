@@ -23,11 +23,6 @@
                                 </div>
                                 <div class="col-3 pull-right">
                                     Invoice
-                                    {{-- <div><b>Lucky Shoes Pvt Ltd</b></div>
-                                    <div>Phasikeb,Kathmandu,Nepal</div>
-                                    <div class="my-1"><i class="fa fa-phone fa-flip-horizontal text-secondary mr-2"></i>
-                                        9843308361</div>
-                                    <div>Vat No: 606653886</div> --}}
                                 </div>
                             </div>
 
@@ -47,7 +42,7 @@
                                     INVOICE NO : <b>#{{ $order->id }}</b>
                                     <div class="date">Issue Date: {{ $order->created_at->format('m/d/Y') }}</div>
                                     <div class="date">Payment Type/Status: {{ ucfirst($order->payment_type) }}
-                                        ({{ucfirst($order->payment_status)}})</div>
+                                        ({{ ucfirst($order->payment_status) }})</div>
                                     {{-- <div class="date">Vat no: {{ $order->customer->vat_no }}</div> --}}
                                 </div>
                             </div>
@@ -67,7 +62,10 @@
                                     @foreach ($order->order_items as $item)
                                         <tr>
                                             <td class="no">{{ $loop->iteration }}</td>
-                                            <td class="desc">({{ $item->product->name }}){{ $item->variant ? $item->variant->sku : 'No Variant' }}</td>
+                                            <td class="desc">
+                                                ({{ $item->product->name }})
+                                                {{ $item->variant ? $item->variant->sku : 'No Variant' }}
+                                            </td>
                                             <td class="unit">{{ $item->quantity }}</td>
                                             <td class="rate">{{ $item->price }}</td>
                                             <td class="total">{{ $item->quantity * $item->price }}</td>
@@ -84,7 +82,18 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3"></td>
-                                        <td colspan="3">DISCOUNT</td>
+                                        <td>DISCOUNT</td>
+                                        <td colspan="2">
+                                            <table>
+                                                <tr>
+                                                    <td>Cpn Discount:{{ $order->coupon_discount }}</td>
+                                                    <td>Cpn Used:{{ $order->coupon_code }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">Other Discount:{{ $order->other_discount??0 }}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
                                         <td>Rs. {{ $order->discount }}</td>
                                     </tr>
                                     <tr>

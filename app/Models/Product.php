@@ -41,7 +41,7 @@ class Product extends Model implements HasMedia
     public function specifications()
     {
         return $this->belongsToMany(Specification::class)
-                    ->withPivot('value'); // Access the value column from the pivot table
+            ->withPivot('value'); // Access the value column from the pivot table
     }
 
     public function features()
@@ -95,7 +95,7 @@ class Product extends Model implements HasMedia
 
     public function getDiscountedPriceAttribute()
     {
-        return $this->campaigns()->running()->first()?$this->campaigns()->running()->first()->pivot->campaign_price:$this->price;
+        return $this->campaigns()->running()->first() ? $this->campaigns()->running()->first()->pivot->campaign_price : $this->price;
     }
 
     public function campaigns()
@@ -110,24 +110,24 @@ class Product extends Model implements HasMedia
 
     public function isPopular()
     {
-        if(PopularProduct::where('product_id',$this->id)->count()>0) return true;
+        if (PopularProduct::where('product_id', $this->id)->count() > 0) return true;
         return false;
     }
 
     public function isNew()
     {
-        if(NewArraival::where('product_id',$this->id)->count()>0) return true;
+        if (NewArraival::where('product_id', $this->id)->count() > 0) return true;
         return false;
     }
 
-public function isCampaignProduct()
-{
-    return $this->campaigns()
-        ->where('status', 1) // Active campaigns only
-        ->whereDate('start_date', '<=', now()) // Campaign has started
-        ->whereDate('end_date', '>=', now()) // Campaign is still running
-        ->get();
-}
+    public function isCampaignProduct()
+    {
+        return $this->campaigns()
+            ->where('status', 1) // Active campaigns only
+            ->whereDate('start_date', '<=', now()) // Campaign has started
+            ->whereDate('end_date', '>=', now()) // Campaign is still running
+            ->get();
+    }
 
     public function variants()
     {

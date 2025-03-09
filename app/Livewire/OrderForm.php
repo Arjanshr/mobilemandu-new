@@ -69,7 +69,7 @@ class OrderForm extends Component
                         $this->province = $default_address->province_id;
                         $this->city = $default_address->city_id;
                         $this->area = $default_address->area_id;
-                        $this->shipping_price = Area::find($default_address->area_id)->shipping_price;
+                        $this->shipping_price = $this->order->shipping_price??Area::find($default_address->area_id)->shipping_price;
                         $this->location = $default_address->location;
                         $this->phone_number = $default_address->phone_number;
                         $this->email = $this->order->customer->email;
@@ -88,17 +88,17 @@ class OrderForm extends Component
                         'quantity' => $item->quantity,
                         'rate' => $item->price,
                         'discount' => $item->discount,
-                        'total' => $item->quantity * $item->price,
-                        'amount' => $item->quantity * $item->price - $item->discount
+                        'amount' => $item->quantity * $item->price,
+                        'total' => $item->quantity * $item->price - $item->discount
                     ];
             }
         } else {
             $this->order_items = [];
         }
         $this->total_quantity = array_sum(array_column($this->order_items, 'quantity'));
-        $this->total_discount = array_sum(array_column($this->order_items, 'discount')) + $this->coupon_discount;
+        $this->total_discount = array_sum(array_column($this->order_items, 'discount'));
         $this->total_amount = array_sum(array_column($this->order_items, 'amount'));
-        $this->grand_total = (array_sum(array_column($this->order_items, 'total')) + $this->shipping_price ?? 0) - $this->total_discount;
+        $this->grand_total = array_sum(array_column($this->order_items, 'total')) + $this->shipping_price ?? 0;
         $this->dispatch('select2Hydrate');
     }
 

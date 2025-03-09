@@ -290,6 +290,16 @@
 
     </div>
     <div class="card-body row">
+        <div class="form-group col-sm-6">
+            <label for="coupon_code">Coupon Code</label>
+            <input type="text" class="form-control" wire:model.live="coupon_code" name="coupon_code" readonly>
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="coupon_code">Coupon Discount</label>
+            <input type="text" class="form-control" wire:model.live="coupon_discount" name="coupon_discount" readonly>
+        </div>
+    </div>
+    {{-- <div class="card-body row">
         <div class="form-group col-sm-11">
             <label for="coupon_code">Coupon Code</label>
             <input type="text" class="form-control" wire:model.live="coupon_code" name="coupon_code">
@@ -299,7 +309,7 @@
             <br/>
             <button class="btn btn-sm btn-success" wire:click="applyCoupon" x-on:click.prevent>Apply</button>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 @script

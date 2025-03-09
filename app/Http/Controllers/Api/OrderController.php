@@ -97,6 +97,7 @@ class OrderController extends BaseController
             $order_item->discount = $item['discount'];
             $order_item->save();
         }
+        Coupon::where('code', $request->coupon_code)->increment('uses');
         return $this->sendResponse(null, 'Order created successfully.');
     }
 
@@ -132,7 +133,6 @@ class OrderController extends BaseController
 
     public function applyCoupon(Request $request)
     {
-        // return $request;
         $coupon = Coupon::where('code', $request->code)->first();
 
         if (!$coupon || !$coupon->isValid()) {
