@@ -24,9 +24,13 @@ class CouponRequest extends FormRequest
             'is_user_specific' => 'nullable', // Allow null instead of boolean
             'user_ids' => 'nullable|array',
             'user_ids.*' => 'exists:users,id',
-            'is_category_specific' => 'nullable', // Allow null instead of boolean
+            'specific_type' => 'nullable',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
+            'brand_ids' => 'nullable|array',
+            'brand_ids.*' => 'exists:brands,id', // Ensure valid brand IDs
+            'product_ids' => 'nullable|array',
+            'product_ids.*' => 'exists:products,id', // Ensure valid product IDs
             'status' => 'required|boolean',
         ];
     }
@@ -41,6 +45,8 @@ class CouponRequest extends FormRequest
             'status.required' => 'Coupon status is required.',
             'user_ids.*.exists' => 'Selected user does not exist.',
             'category_ids.*.exists' => 'Selected category does not exist.',
+            'brand_ids.*.exists' => 'Selected brand does not exist.', // New message for brand
+            'product_ids.*.exists' => 'Selected product does not exist.', // New message for product
         ];
     }
 }

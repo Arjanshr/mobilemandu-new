@@ -18,8 +18,11 @@ return new class extends Migration
             $table->enum('specific_type', ['category', 'brand', 'product']);
             $table->timestamps();
 
-            // Ensure a coupon can't have multiple types at the same time
+            // Ensure a coupon can't have multiple entries of the same type
             $table->unique(['coupon_id', 'specific_id', 'specific_type']);
+
+            // Add an index for faster lookups
+            $table->index(['specific_id', 'specific_type']);
         });
     }
 

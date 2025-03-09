@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\CouponRequest;
 use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\CouponSpecific;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
-    // Show all coupons
     public function index()
     {
         $coupons = Coupon::latest()->paginate(10);
         return view('admin.coupons.index', compact('coupons'));
     }
 
-    // Show form to create a new coupon
     public function create()
     {
         $users = User::all();
@@ -33,8 +31,6 @@ class CouponController extends Controller
         return view('admin.coupons.form', compact('coupon', 'users', 'categories'));
     }
 
-
-    // Store a new coupon
     public function insert(CouponRequest $request)
     {
         $coupon = Coupon::create([
@@ -44,25 +40,28 @@ class CouponController extends Controller
             'max_uses' => $request->max_uses ?? null,
             'expires_at' => $request->expires_at ?? null,
             'status' => $request->status,
-            'is_user_specific' => $request->has('is_user_specific'), // Convert "on" to true/false
-            'is_category_specific' => $request->has('is_category_specific'), // Convert "on" to true/false
+            'specific_type' => $request->specific_type,
+            'is_user_specific' => $request->has('is_user_specific'),
         ]);
-    
-        // Attach users if user-specific
+
         if ($coupon->is_user_specific && $request->user_ids) {
             $coupon->users()->sync($request->user_ids);
         }
-    
-        // Attach categories if category-specific
-        if ($coupon->is_category_specific && $request->category_ids) {
-            $coupon->categories()->sync($request->category_ids);
-        }
-        toastr()->success('Coupon created successfully!');
 
+        if ($request->specific_type && $request->specific_ids) {
+            foreach ($request->specific_ids as $specific_id) {
+                CouponSpecific::create([
+                    'coupon_id' => $coupon->id,
+                    'specific_id' => $specific_id,
+                    'specific_type' => $request->specific_type,
+                ]);
+            }
+        }
+
+        toastr()->success('Coupon created successfully!');
         return redirect()->route('coupons')->with('message', 'Coupon created successfully!');
     }
 
-    // Update a coupon
     public function update(CouponRequest $request, Coupon $coupon)
     {
         $coupon->update([
@@ -72,31 +71,34 @@ class CouponController extends Controller
             'max_uses' => $request->max_uses ?? null,
             'expires_at' => $request->expires_at ?? null,
             'status' => $request->status,
+            'specific_type' => $request->specific_type,
             'is_user_specific' => $request->has('is_user_specific'),
-            'is_category_specific' => $request->has('is_category_specific'),
         ]);
 
-        // Sync users if user-specific
         if ($coupon->is_user_specific && $request->user_ids) {
             $coupon->users()->sync($request->user_ids);
         } else {
             $coupon->users()->detach();
         }
 
-        // Sync categories if category-specific
-        if ($coupon->is_category_specific && $request->category_ids) {
-            $coupon->categories()->sync($request->category_ids);
-        } else {
-            $coupon->categories()->detach();
+        CouponSpecific::where('coupon_id', $coupon->id)->delete();
+        if ($request->specific_type && $request->specific_ids) {
+            foreach ($request->specific_ids as $specific_id) {
+                CouponSpecific::create([
+                    'coupon_id' => $coupon->id,
+                    'specific_id' => $specific_id,
+                    'specific_type' => $request->specific_type,
+                ]);
+            }
         }
-        toastr()->success('Coupon updated successfully!');
 
+        toastr()->success('Coupon updated successfully!');
         return redirect()->route('coupons')->with('message', 'Coupon updated successfully!');
     }
 
-    // Delete a coupon
     public function delete(Coupon $coupon)
     {
+        CouponSpecific::where('coupon_id', $coupon->id)->delete();
         $coupon->delete();
         toastr()->success('Coupon deleted successfully!');
         return redirect()->route('coupons')->with('success', 'Coupon deleted successfully.');

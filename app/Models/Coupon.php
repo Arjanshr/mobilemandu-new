@@ -20,7 +20,7 @@ class Coupon extends Model
         'uses',
         'expires_at',
         'is_user_specific',
-        'is_category_specific',
+        'specific_type',
         'status'
     ];
     protected $casts = [
@@ -35,7 +35,17 @@ class Coupon extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class, 'coupon_category');
+        return $this->belongsToMany(Category::class,  'coupon_specifics', 'coupon_id', 'specific_id');
+    }
+    
+    public function brands()
+    {
+        return $this->belongsToMany(Brand::class,  'coupon_specifics', 'coupon_id', 'specific_id');
+    }
+    
+    public function products()
+    {
+        return $this->belongsToMany(Product::class,  'coupon_specifics', 'coupon_id', 'specific_id');
     }
 
     public function users()
