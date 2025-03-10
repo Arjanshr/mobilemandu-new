@@ -9,6 +9,7 @@ class CouponApplyResource extends JsonResource
     {
         return [
             'message'       => 'Coupon applied successfully',
+            'shipping_price'=>$this->shipping_price,
             'discount'      => $this->total_discount,
             'new_total'     => $this->new_total,
             'updated_items' => $this->updated_items
