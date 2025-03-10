@@ -58,7 +58,7 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $coupon->code }}</td>
-                                                        <td>{{ $coupon->discount }}%</td>
+                                                        <td>{{ ($coupon->type == 'fixed'?'RS : ':'').$coupon->discount.($coupon->type == 'percentage'?'% : ':'') }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($coupon->expires_at)->format('d M, Y') }}</td>
                                                         <td>{{ ucfirst($coupon->status?'active':'inactive') }}</td>
                                                     </tr>
