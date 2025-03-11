@@ -14,12 +14,12 @@
                         <div class="card-header clearfix">
                             <div class="row">
                                 <div class="col-9">
-                                    {{-- <a href="{{route('order.invoice',$order->id)}}" target="_blank" data-title="Print">
+                                    <a href="{{route('order.invoice',$order->id)}}" target="_blank" data-title="Print">
                                         <input type="hidden" name="print">
                                         <button type="submit" class="btn btn-outline-primary btn-icon">
                                             <i class="mr-1 fa fa-print text-primary-m1 text-120 w-2 me-2"></i>Print
                                         </button>
-                                    </a> --}}
+                                    </a>
                                 </div>
                                 <div class="col-3 pull-right">
                                     Invoice

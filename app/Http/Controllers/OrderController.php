@@ -28,6 +28,7 @@ class OrderController extends Controller
 
     public function insert(OrderRequest $request)
     {
+        // return $request;
         $shipping_address = "Name: $request->reciever_name";
         $shipping_address .= "<br/>Phone: $request->phone_number";
         $shipping_address .= "<br/>Email: $request->email";
@@ -47,7 +48,7 @@ class OrderController extends Controller
                     [
                         'name' => $request->reciever_name,
                         'email' => $request->email,
-                        'phone' => $request->phone,
+                        'phone' => $request->phone_number,
                         'password' => bcrypt('password'),
                     ]
                 );
@@ -142,7 +143,7 @@ class OrderController extends Controller
                     [
                         'name' => $request->reciever_name,
                         'email' => $request->email,
-                        'phone' => $request->phone,
+                        'phone' => $request->phone_number,
                         'password' => bcrypt('password'),
                     ]
                 );
