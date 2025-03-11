@@ -23,16 +23,27 @@ class UserRequest extends FormRequest
     public function rules()
     {
         $userId = $this->user ? $this->user->id : null;
-    
+
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $userId,
-            'phone' => 'nullable|string|max:15|unique:users,phone,' . $userId,
+            'email' => [
+                'nullable', // Allow null, since phone can be required
+                'email',
+                'unique:users,email,' . $userId,
+                'required_without_all:phone', // Require email if phone is missing
+            ],
+            'phone' => [
+                'nullable', // Allow null, since email can be required
+                'string',
+                'max:15',
+                'unique:users,phone,' . $userId,
+                'required_without_all:email', // Require phone if email is missing
+            ],
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
             'address' => 'nullable|string|max:500',
             'role' => 'required|array',
             'role.*' => 'exists:roles,name',
         ];
-    }    
+    }
 }

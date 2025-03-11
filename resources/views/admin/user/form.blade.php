@@ -43,7 +43,7 @@
                                         <label for="email">Email*</label>
                                         <input type="email" class="form-control" id="email" name="email"
                                             placeholder="Email" value="{{ isset($user) ? $user->email : old('email') }}"
-                                            required>
+                                            >
                                         @error('email')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
