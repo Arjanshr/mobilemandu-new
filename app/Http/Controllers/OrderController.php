@@ -205,6 +205,12 @@ class OrderController extends Controller
         toastr()->success('Order Created Successfully!');
         return redirect()->route('orders');
     }
+
+    public function invoice(Order $order)
+    {
+        return $order;
+    }
+    
     public function delete(Order $order)
     {
         $order->delete();
