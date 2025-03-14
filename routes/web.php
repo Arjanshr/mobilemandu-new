@@ -201,7 +201,6 @@ Route::middleware([
         Route::post('/orders/insert', [OrderController::class, 'insert'])->name('order.insert');
     });
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('order.show')->middleware('can:read-orders');
-    Route::get('/invoice/{order}', [OrderController::class, 'invoice'])->name('order.invoice')->middleware('can:read-orders');
     Route::middleware('can:edit-orders')->group(function () {
         Route::get('/orders/edit/{order}', [OrderController::class, 'edit'])->name('order.edit');
         Route::patch('/orders/edit/{order}', [OrderController::class, 'update'])->name('order.update');
