@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Province;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -208,7 +209,8 @@ class OrderController extends Controller
 
     public function invoice(Order $order)
     {
-        return $order;
+        $pdf = Pdf::loadView('invoice', compact('order'));
+        return $pdf->stream('invoice.pdf');
     }
     
     public function delete(Order $order)
