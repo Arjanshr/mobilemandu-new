@@ -62,8 +62,10 @@
                                             <tr>
                                                 <td class="no">{{ $loop->iteration }}</td>
                                                 <td class="desc">
-                                                    ({{ $item->product->name }})
-                                                    {{ $item->variant ? $item->variant->sku : 'No Variant' }}
+                                                    <a href="{{ route('product.show', $item->product_id) }}">
+                                                        ({{ $item->product->name }})
+                                                        {{ $item->variant ? $item->variant->sku : 'No Variant' }}
+                                                    </a>
                                                 </td>
                                                 <td class="unit">{{ $item->quantity }}</td>
                                                 <td class="rate">{{ $item->price }}</td>
@@ -84,16 +86,7 @@
                                             <td colspan="3"></td>
                                             <td>DISCOUNT</td>
                                             <td colspan="2">
-                                                <table>
-                                                    <tr>
-                                                        <td>Cpn Discount:{{ $order->coupon_discount }}</td>
-                                                        <td>Cpn Used:{{ $order->coupon_code }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">Other Discount:{{ $order->other_discount ?? 0 }}
-                                                        </td>
-                                                    </tr>
-                                                </table>
+
                                             </td>
                                             <td>Rs. {{ $order->discount }}</td>
                                         </tr>
@@ -116,6 +109,21 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($order->coupon_code)
+                                <table class="table table-responsive-lg">
+                                    <thead>
+                                        <tr>
+                                            <td colspan="3">Discount</td>
+                                        </tr>
+                                    </thead>
+                                    <tr>
+                                        <td>Coupon Discount:{{ $order->coupon_discount }}</td>
+                                        <td>Coupon Used:{{ $order->coupon_code }}</td>
+                                        <td>Other Discount:{{ $order->other_discount ?? 0 }}
+                                        </td>
+                                    </tr>
+                                </table>
+                                @endif
                             </div>
                         </div>
                     </div>
