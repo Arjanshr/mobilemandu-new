@@ -94,7 +94,7 @@ class OrderController extends BaseController
             $order_item->variant_id = $item['variant_id'] ?? null;
             $order_item->quantity = $item['quantity'];
             $order_item->price = $item['rate'];
-            $order_item->discount = $item['discount'];
+            $order_item->discount = $item['discount']??0;
             $order_item->save();
         }
         Coupon::where('code', $request->coupon_code)->increment('uses');
