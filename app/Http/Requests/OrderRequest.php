@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rule;
 use App\Models\Area;
+use App\Models\Coupon;
 
 class OrderRequest extends FormRequest
 {
@@ -44,20 +45,36 @@ class OrderRequest extends FormRequest
             'total_amount' => ['numeric', 'min:0'],
             'total_discount' => ['numeric', 'min:0'],
             'shipping_price' => [
+                'required',
                 'numeric',
                 'min:0',
                 function ($attribute, $value, $fail) {
-                    // Fetch area_id from the request
                     $area_id = $this->input('area_id');
-    
-                    if ($area_id) {
-                        $area = Area::find($area_id);
-    
-                        if (!$area) {
-                            return $fail('Invalid area selected.');
+                    $coupon_code = $this->input('coupon_code'); // Assuming coupon code is sent in request
+
+                    if (!$area_id || !is_numeric($area_id)) {
+                        return $fail('Invalid area selected.');
+                    }
+
+                    $area = Area::find($area_id);
+                    if (!$area) {
+                        return $fail('Invalid area selected.');
+                    }
+
+                    // Check if a free shipping coupon is applied
+                    $coupon = Coupon::where('code', $coupon_code)
+                        ->where('specific_type', 'free_shipping') // Assuming type column stores coupon type
+                        ->where('status', 1) // Ensure it's active
+                        ->first();
+
+                    if ($coupon) {
+                        // If free shipping coupon is applied, allow 0 as valid shipping price
+                        if (floatval($value) != 0) {
+                            return $fail('The shipping price should be 0 when using a Free Shipping coupon.');
                         }
-    
-                        if ($value != $area->shipping_price) {
+                    } else {
+                        // Otherwise, enforce the normal shipping price
+                        if (floatval($value) != floatval($area->shipping_price)) {
                             return $fail('The shipping price does not match the actual shipping price for the selected area.');
                         }
                     }
