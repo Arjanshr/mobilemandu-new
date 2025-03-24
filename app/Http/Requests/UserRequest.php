@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,28 +21,31 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        $userId = $this->user ? $this->user->id : null;
+        // Check if this is an update request and get the user ID
+        $userId = $this->user() ? $this->user()->id : null;
 
         return [
             'name' => 'required|string|max:255',
             'email' => [
-                'nullable', // Allow null, since phone can be required
+                'nullable',
                 'email',
-                'unique:users,email,' . $userId,
-                'required_without_all:phone', // Require email if phone is missing
+                Rule::unique('users', 'email')->ignore($userId),
+                'required_without_all:phone',
             ],
             'phone' => [
-                'nullable', // Allow null, since email can be required
+                'nullable',
                 'string',
                 'max:15',
-                'unique:users,phone,' . $userId,
-                'required_without_all:email', // Require phone if email is missing
+                Rule::unique('users', 'phone')->ignore($userId),
+                'required_without_all:email',
             ],
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
             'address' => 'nullable|string|max:500',
-            'role' => 'required|array',
-            'role.*' => 'exists:roles,name',
+
+            // Require role only if user ID is null (registration)
+            'role' => $userId ? 'sometimes|array' : 'required|array',
+            'role.*' => ['sometimes', Rule::exists('roles', 'name')],
         ];
     }
 }
