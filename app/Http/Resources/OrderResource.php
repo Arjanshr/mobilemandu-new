@@ -16,6 +16,8 @@ class OrderResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "order_date" => $this->created_at,
+            "total_items" => $this->order_items->count(),
             "total_price" => $this->total_price,
             "discount" => $this->discount,
             "shipping_price" => $this->shipping_price,
@@ -24,10 +26,26 @@ class OrderResource extends JsonResource
             "payment_type" => $this->payment_type,
             "payment_status" => $this->payment_status,
             "status" => $this->status,
-            "address_id" => $this->address_id,
+            "area" => [
+                "id" => $this->area->id,
+                "name" => $this->area->name,
+                "shipping_price" => $this->area->shipping_price,
+            ],
+            "city" => [
+                "id" => $this->area->city->id,
+                "name" => $this->area->city->name,
+            ],
+            "province" => [
+                "id" => $this->area->city->province->id,
+                "name" => $this->area->city->province->name,
+            ],
+            "address" => [
+                "type"=>$this->address->type,
+                "location"=>$this->address->location,
+                "phone_number"=>$this->address->phone_number,
+            ],
             "shipping_address" => $this->shipping_address,
-            "area_id" => $this->area_id,
-            "cancellable" => $this->status == 'pending' ? true : false,
+            "cancellable" => $this->status == 'pending',
         ];
     }
 }

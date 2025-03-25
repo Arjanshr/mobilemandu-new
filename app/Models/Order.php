@@ -26,6 +26,10 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
     public function address()
     {
         return $this->belongsTo(Address::class);
