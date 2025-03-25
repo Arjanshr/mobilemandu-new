@@ -63,10 +63,13 @@ class OrderRequest extends FormRequest
 
                     // Check if a free shipping coupon is applied
                     $coupon = Coupon::where('code', $coupon_code)
-                        ->where('specific_type', 'free_shipping') // Assuming type column stores coupon type
+                        ->where('specific_type', 'free_delivery') // Ensure it's a Free Shipping coupon
                         ->where('status', 1) // Ensure it's active
+                        ->where(function ($query) {
+                            $query->whereNull('expires_at') // No expiration date means always valid
+                                ->orWhere('expires_at', '>=', now()); // Check if it's not expired
+                        })
                         ->first();
-
                     if ($coupon) {
                         // If free shipping coupon is applied, allow 0 as valid shipping price
                         if (floatval($value) != 0) {
