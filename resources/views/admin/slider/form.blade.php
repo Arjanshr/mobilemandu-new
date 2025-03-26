@@ -26,6 +26,25 @@
                                     @method('patch')
                                 @endif
                                 <div class="card-body row">
+                                     <!-- Status -->
+                                     <div class="form-group col-sm-6">
+                                        <label for="type">Type*</label>
+                                        <select id='type' name="type" class="form-control" required>
+                                            <option value="">Select a type</option>
+                                            <option value="slider"
+                                                {{ (isset($slider) && $slider->type == 'slider') || old('type') == 'slider' ? 'selected' : '' }}>
+                                                Slider
+                                            </option>
+                                            <option value="banner"
+                                                {{ (isset($slider) && $slider->type == 'banner') || old('type') == 'banner' ? 'selected' : '' }}>
+                                                Banner
+                                            </option>
+
+                                        </select>
+                                        @error('type')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                     <div class="form-group col-sm-6">
                                         <label for="title">Slider Title</label>
                                         <input type="text" class="form-control" id="title" name="title" placeholder="Slider Title"

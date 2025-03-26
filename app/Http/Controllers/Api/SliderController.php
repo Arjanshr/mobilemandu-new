@@ -11,7 +11,12 @@ class SliderController extends BaseController
 {
     public function sliders()
     {
-        $sliders =  Slider::orderBy('display_order')->get();
+        $sliders =  Slider::where('type', 'slider')->orderBy('display_order')->get();
+        return $this->sendResponse(SliderResource::collection($sliders), 'Sliders retrieved successfully.');
+    }
+    public function banner()
+    {
+        $sliders =  Slider::where('type', 'banner')->orderBy('display_order')->get();
         return $this->sendResponse(SliderResource::collection($sliders), 'Sliders retrieved successfully.');
     }
 }

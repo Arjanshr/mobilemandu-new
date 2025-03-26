@@ -26,6 +26,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Actions</th>
+                                                    <th>Type</th>
                                                     <th>Linked URL</th>
                                                     <th>Display Order</th>
                                                     <th>Image</th>
@@ -55,6 +56,7 @@
                                                                 </form>
                                                             @endcan
                                                         </td>
+                                                        <td>{{ $slider->type }}</a></td>
                                                         <td><a href="{{ $slider->link_url }}">Linked Url</a></td>
                                                         <td>{{ $slider->display_order }}</a></td>
                                                         <td>@if($slider->image)<img src="{{ asset('storage/sliders/'.$slider->image) }}" width="100" />@endif</td>
