@@ -20,6 +20,8 @@ class CampaignResource extends JsonResource
             'name' => $this->name,
             'color_theme' => $this->color_theme,
             'background_image' => $this->background_image ? asset('storage/' . $this->background_image) : null,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
         ];
 
         // Determine the campaign status based on start_date and end_date

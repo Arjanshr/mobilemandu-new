@@ -32,7 +32,7 @@ class CampaignController extends BaseController
             default:
                 return $this->sendError('Invalid campaign status', 400);
         }
-
+        // return $campaigns;
         return $this->sendResponse(CampaignResource::collection($campaigns), 'Campaigns retrieved successfully.');
     }
 
