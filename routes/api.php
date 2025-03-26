@@ -98,6 +98,7 @@ Route::prefix('v1')->group(function () {
 
         //Sliders
         Route::get('sliders', [SliderController::class, 'sliders']);
+        Route::get('banners', [SliderController::class, 'banners']);
 
         //Blogs
         Route::get('blogs', [BlogController::class, 'blogs']);
