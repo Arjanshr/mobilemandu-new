@@ -19,10 +19,6 @@ class Campaign extends Model
             ->withTimestamps(); // If pivot table has timestamps
     }
 
-    public function scopePublished($query)
-    {
-        return $query->where('status', 'publish');
-    }
     public function scopeNotStarted($query)
     {
         return $query->where('start_date', '>', now());
