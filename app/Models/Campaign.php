@@ -21,7 +21,7 @@ class Campaign extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', 'publish');
     }
     public function scopeNotStarted($query)
     {
