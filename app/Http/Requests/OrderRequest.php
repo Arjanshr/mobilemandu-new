@@ -48,40 +48,40 @@ class OrderRequest extends FormRequest
                 'required',
                 'numeric',
                 'min:0',
-                function ($attribute, $value, $fail) {
-                    $area_id = $this->input('area_id');
-                    $coupon_code = $this->input('coupon_code'); // Assuming coupon code is sent in request
+                // function ($attribute, $value, $fail) {
+                //     $area_id = $this->input('area_id');
+                //     $coupon_code = $this->input('coupon_code'); // Assuming coupon code is sent in request
 
-                    if (!$area_id || !is_numeric($area_id)) {
-                        return $fail('Invalid area selected.');
-                    }
+                //     if (!$area_id || !is_numeric($area_id)) {
+                //         return $fail('Invalid area selected.');
+                //     }
 
-                    $area = Area::find($area_id);
-                    if (!$area) {
-                        return $fail('Invalid area selected.');
-                    }
+                //     $area = Area::find($area_id);
+                //     if (!$area) {
+                //         return $fail('Invalid area selected.');
+                //     }
 
-                    // Check if a free shipping coupon is applied
-                    $coupon = Coupon::where('code', $coupon_code)
-                        ->where('specific_type', 'free_delivery') // Ensure it's a Free Shipping coupon
-                        ->where('status', 1) // Ensure it's active
-                        ->where(function ($query) {
-                            $query->whereNull('expires_at') // No expiration date means always valid
-                                ->orWhere('expires_at', '>=', now()); // Check if it's not expired
-                        })
-                        ->first();
-                    if ($coupon) {
-                        // If free shipping coupon is applied, allow 0 as valid shipping price
-                        if (floatval($value) != 0) {
-                            return $fail('The shipping price should be 0 when using a Free Shipping coupon.');
-                        }
-                    } else {
-                        // Otherwise, enforce the normal shipping price
-                        if (floatval($value) != floatval($area->shipping_price)) {
-                            return $fail('The shipping price does not match the actual shipping price for the selected area.');
-                        }
-                    }
-                },
+                //     // Check if a free shipping coupon is applied
+                //     $coupon = Coupon::where('code', $coupon_code)
+                //         ->where('specific_type', 'free_delivery') // Ensure it's a Free Shipping coupon
+                //         ->where('status', 1) // Ensure it's active
+                //         ->where(function ($query) {
+                //             $query->whereNull('expires_at') // No expiration date means always valid
+                //                 ->orWhere('expires_at', '>=', now()); // Check if it's not expired
+                //         })
+                //         ->first();
+                //     if ($coupon) {
+                //         // If free shipping coupon is applied, allow 0 as valid shipping price
+                //         if (floatval($value) != 0) {
+                //             return $fail('The shipping price should be 0 when using a Free Shipping coupon.');
+                //         }
+                //     } else {
+                //         // Otherwise, enforce the normal shipping price
+                //         if (floatval($value) != floatval($area->shipping_price)) {
+                //             return $fail('The shipping price does not match the actual shipping price for the selected area.');
+                //         }
+                //     }
+                // },
             ],
             'grand_total' => ['numeric', 'min:0'],
             'payment_type' => ['required', new Enum(PaymentType::class)]

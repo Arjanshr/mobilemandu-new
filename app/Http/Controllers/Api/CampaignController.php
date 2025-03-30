@@ -39,8 +39,7 @@ class CampaignController extends BaseController
     
     public function getCampaignProducts(Campaign $campaign)
     {
-        $products = $campaign->products()->where('products.status', 'publish')->get();
+        $products = $campaign->products()->published()->get();
         return $this->sendResponse(CampaignProductResource::collection($products)->resource, 'Campaign products retrieved successfully.');
     }
-    
 }
