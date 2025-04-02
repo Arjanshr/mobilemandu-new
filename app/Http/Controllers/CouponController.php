@@ -31,6 +31,13 @@ class CouponController extends Controller
         return view('admin.coupons.form', compact('coupon', 'users', 'categories'));
     }
 
+    public function show(Coupon $coupon)
+    {
+        $couponUsageCount = $coupon->users()->count(); // Assuming a many-to-many relationship with users
+        $totalDiscount = \App\Models\Order::where('coupon_code', $coupon->code)->sum('coupon_discount');
+        return view('admin.coupons.show', compact('coupon', 'couponUsageCount', 'totalDiscount'));
+    }
+
     public function insert(CouponRequest $request)
     {
         $coupon = Coupon::create([
@@ -102,5 +109,11 @@ class CouponController extends Controller
         $coupon->delete();
         toastr()->success('Coupon deleted successfully!');
         return redirect()->route('coupons')->with('success', 'Coupon deleted successfully.');
+    }
+
+    public function orders(Coupon $coupon)
+    {
+        $orders = \App\Models\Order::where('coupon_code', $coupon->code)->paginate(10);
+        return view('admin.coupons.orders', compact('coupon', 'orders'));
     }
 }

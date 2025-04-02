@@ -256,11 +256,13 @@ Route::middleware([
         Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
         Route::post('/coupons/insert', [CouponController::class, 'insert'])->name('coupons.insert');
     });
+    Route::get('/coupons/{coupon}', [CouponController::class, 'show'])->name('coupons.show');
     Route::middleware('can:edit-coupons')->group(function () {
         Route::get('/coupons/{coupon}/edit', [CouponController::class, 'edit'])->name('coupons.edit');
         Route::patch('/coupons/{coupon}', [CouponController::class, 'update'])->name('coupons.update');
     });
     Route::delete('/coupons/{coupon}', [CouponController::class, 'delete'])->name('coupons.delete')->middleware('can:delete-coupons');
+    Route::get('/coupons/{coupon}/orders', [CouponController::class, 'orders'])->name('coupons.orders');
 
     // Popup Banner routes
     Route::get('/popup-banners', [PopupBannerController::class, 'index'])->name('popup-banners.index')->middleware('can:browse-popup-banners');

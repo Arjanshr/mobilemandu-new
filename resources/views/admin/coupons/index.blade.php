@@ -56,6 +56,9 @@
                                                                     </button>
                                                                 </form>
                                                             @endcan
+                                                            <a href="{{ route('coupons.show', $coupon->id) }}" class="btn btn-info btn-sm" title="View">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
                                                         </td>
                                                         <td>{{ $coupon->code }}</td>
                                                         <td>{{ ($coupon->type == 'fixed' ? 'RS ' : '') . $coupon->discount . ($coupon->type == 'percentage' ? ' %' : '') }}
