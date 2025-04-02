@@ -40,7 +40,12 @@
                 </tr>
                 <tr>
                     <th>Status</th>
-                    <td>{{ ucfirst($coupon->status ? 'active' : 'inactive') }}</td>
+                    <td>
+                        {{ ucfirst($coupon->status ? 'active' : 'inactive') }}
+                        @if ($coupon->expires_at && \Carbon\Carbon::now()->greaterThan(\Carbon\Carbon::parse($coupon->expires_at)))
+                            (expired)
+                        @endif
+                    </td>
                 </tr>
             </table>
         </div>
