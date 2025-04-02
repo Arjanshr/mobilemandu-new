@@ -28,11 +28,11 @@
                 </tr>
                 <tr>
                     <th>Usage Count</th>
-                    <td>{{ $couponUsageCount }}</td>
+                    <td>{{ $coupon_usage_count }}</td>
                 </tr>
                 <tr>
                     <th>Total Discount from Orders</th>
-                    <td>RS {{ $totalDiscount }}</td>
+                    <td>RS {{ $total_discount }}</td>
                 </tr>
                 <tr>
                     <th>Expiration Date</th>

@@ -22,7 +22,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $totalDiscount = 0; @endphp
+                    @php $total_discount = 0; @endphp
                     @forelse ($orders as $order)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
@@ -35,7 +35,9 @@
                                 <a href="{{ route('order.show', $order->id) }}" class="btn btn-info btn-sm">View</a>
                             </td>
                         </tr>
-                        @php $totalDiscount += $order->coupon_discount; @endphp
+                        @if ($order->status === 'delivered')
+                            @php $total_discount += $order->coupon_discount; @endphp
+                        @endif
                     @empty
                         <tr>
                             <td colspan="7" class="text-center">No orders found for this coupon.</td>
@@ -44,7 +46,7 @@
                 </tbody>
             </table>
             <div class="mt-3">
-                <h5>Total Discounts from Coupon: RS {{ $totalDiscount }}</h5>
+                <h5>Total Discounts from Delivered Orders: RS {{ $total_discount }}</h5>
             </div>
             {{ $orders->links() }}
         </div>
