@@ -35,7 +35,7 @@ class CouponController extends Controller
     {
         $coupon_usage_count = \App\Models\Order::where('coupon_code', $coupon->code)->count(); // Count all orders using this coupon
         $total_discount = \App\Models\Order::where('coupon_code', $coupon->code)
-            ->where('status', 'delivered') // Only include delivered orders
+            ->where('status', 'completed') // Only include delivered orders
             ->sum('coupon_discount');
         return view('admin.coupons.show', compact('coupon', 'coupon_usage_count', 'total_discount'));
     }
