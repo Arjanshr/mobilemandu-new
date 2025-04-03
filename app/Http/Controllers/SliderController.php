@@ -64,4 +64,15 @@ class SliderController extends Controller
         return redirect()->route('sliders');
     }
 
+    public function updateOrder(Request $request)
+    {
+        $order = $request->input('order');
+
+        foreach ($order as $item) {
+            Slider::where('id', $item['id'])->update(['display_order' => $item['position']]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
 }

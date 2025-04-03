@@ -32,9 +32,9 @@
                                                     <th>Image</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="sortable">
                                                 @foreach ($sliders as $slider)
-                                                    <tr>
+                                                    <tr data-id="{{ $slider->id }}">
                                                         <td width="20px">{{ $loop->iteration }}</td>
                                                         <td>
                                                             @can('edit-sliders')
@@ -50,15 +50,15 @@
                                                                     @csrf
                                                                     @method('delete')
                                                                     <button class="delete btn btn-danger btn-sm" type="submit"
-                                                                        title="Delete" onclick="">
+                                                                        title="Delete">
                                                                         <i class="fas fa-trash-alt"></i>
                                                                     </button>
                                                                 </form>
                                                             @endcan
                                                         </td>
-                                                        <td>{{ $slider->type }}</a></td>
+                                                        <td>{{ $slider->type }}</td>
                                                         <td><a href="{{ $slider->link_url }}">Linked Url</a></td>
-                                                        <td>{{ $slider->display_order }}</a></td>
+                                                        <td>{{ $slider->display_order }}</td>
                                                         <td>@if($slider->image)<img src="{{ asset('storage/sliders/'.$slider->image) }}" width="100" />@endif</td>
                                                     </tr>
                                                 @endforeach
@@ -107,6 +107,45 @@
         $(document).ready(function() {
             $('#example2').DataTable();
             $('.dataTables_length').addClass('bs-select');
-        })
+
+            // Enable sortable rows
+            $("#sortable").sortable({
+                update: function(event, ui) {
+                    let order = [];
+                    $('#sortable tr').each(function(index, element) {
+                        order.push({
+                            id: $(element).data('id'),
+                            position: index + 1
+                        });
+                    });
+
+                    // Send AJAX request to update order
+                    $.ajax({
+                        url: "{{ route('slider.updateOrder') }}",
+                        method: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            order: order
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Order updated successfully!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed to update order!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @stop

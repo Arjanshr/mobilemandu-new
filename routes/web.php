@@ -236,6 +236,7 @@ Route::middleware([
         Route::patch('/sliders/edit/{slider}', [SliderController::class, 'update'])->name('slider.update');
     });
     Route::delete('/sliders/delete/{slider}', [SliderController::class, 'delete'])->name('slider.delete')->middleware('can:delete-sliders');
+    Route::post('/slider/update-order', [SliderController::class, 'updateOrder'])->name('slider.updateOrder');
 
     //Blogs routes
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs')->middleware('can:browse-blogs');
