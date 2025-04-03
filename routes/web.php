@@ -5,6 +5,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CategorySpecificationController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
@@ -131,6 +132,8 @@ Route::middleware([
         Route::patch('/category-specifications/edit/{category}/{category_specification}', [CategoryController::class, 'updateCategorySpecifications'])->name('category-specification.update');
     });
     Route::delete('/category-specifications/delete/{category}/{category_specification_id}', [CategoryController::class, 'deleteCategorySpecifications'])->name('category-specification.delete')->middleware('can:delete-category-specifications');
+    Route::post('categories/{category}/specifications/update-order', [CategoryController::class, 'updateOrder'])
+        ->name('category-specification.updateOrder');
 
     //Brand routes
     Route::get('/brands', [BrandController::class, 'index'])->name('brands')->middleware('can:browse-brands');

@@ -107,7 +107,8 @@ class Category extends Model
     public function specifications()
     {
         return $this->belongsToMany(Specification::class)
-            ->withPivot('is_variant');
+            ->withPivot('is_variant')
+            ->withPivot('display_order');
     }
 
     public function coupons()

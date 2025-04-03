@@ -64,7 +64,7 @@
                                                                     <i class="fa fa-pen"></i>
                                                                 </a>
                                                             @endcan --}}
-                                                            @can('delete-products')
+                                                            @can('delete-product-specifiations')
                                                                 <form method="post"
                                                                     action="{{ route('product.specification.delete', [$product_specification->pivot->product_id,$product_specification->pivot->specification_id]) }}"
                                                                     style="display: initial;">

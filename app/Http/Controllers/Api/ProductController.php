@@ -326,7 +326,12 @@ class ProductController extends BaseController
 
     public function productSpecifications(Product $product)
     {
-        return $this->sendResponse(ProductSpecificationsResource::collection($product->specifications), 'Product specifications retrieved successfully.');
+        $specifications = $product->specifications()
+            ->join('category_specification', 'specifications.id', '=', 'category_specification.specification_id')
+            ->orderBy('category_specification.display_order')
+            ->get(['specifications.*']); // Select only columns from the specifications table
+
+        return $this->sendResponse(ProductSpecificationsResource::collection($specifications), 'Product specifications retrieved successfully.');
     }
 
     public function productReviews(Product $product)

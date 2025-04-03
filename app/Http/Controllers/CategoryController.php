@@ -7,6 +7,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use App\Models\Specification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class CategoryController extends Controller
@@ -84,7 +85,7 @@ class CategoryController extends Controller
 
     public function categorySpecifications(Category $category)
     {
-        $category_specifications = $category->specifications;
+        $category_specifications = $category->specifications()->orderBy('pivot_display_order')->get(); // Order by display_order
         return view('admin.category.category-specifications.index', compact('category', 'category_specifications'));
     }
     public function createCategorySpecifications(Category $category)
@@ -133,5 +134,24 @@ class CategoryController extends Controller
         $category->specifications()->where(['specification_id' => $category_specifications])->first()->delete();
         toastr()->success('Specification Deleted Successfully!');
         return redirect()->route('category-specifications', $category->id);
+    }
+
+    public function updateOrder(Request $request, $category_id)
+    {
+        $order = $request->input('order');
+
+        foreach ($order as $item) {
+            $categorySpecification = Category::find($category_id)
+                ->specifications()
+                ->where('specification_id', $item['id'])
+                ->first();
+
+            if ($categorySpecification) {
+                $categorySpecification->pivot->display_order = $item['position'];
+                $categorySpecification->pivot->save();
+            }
+        }
+
+        return response()->json(['success' => true]);
     }
 }
