@@ -21,9 +21,9 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        // Check if this is an update request and get the user ID
-        $userId = $this->user() ? $this->user()->id : null;
-
+        // Get the ID of the user being edited (if any)
+        $userId = $this->route('user') ? $this->route('user')->id : null;
+    
         return [
             'name' => 'required|string|max:255',
             'email' => [
@@ -42,7 +42,7 @@ class UserRequest extends FormRequest
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
             'address' => 'nullable|string|max:500',
-
+    
             // Require role only if user ID is null (registration)
             'role' => $userId ? 'sometimes|array' : 'required|array',
             'role.*' => ['sometimes', Rule::exists('roles', 'name')],
