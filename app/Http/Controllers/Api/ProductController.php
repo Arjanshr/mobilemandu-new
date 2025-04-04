@@ -329,6 +329,7 @@ class ProductController extends BaseController
         $specifications = $product->specifications()
             ->join('category_specification', 'specifications.id', '=', 'category_specification.specification_id')
             ->orderBy('category_specification.display_order')
+            ->distinct() // Ensure no duplicate entries
             ->get(['specifications.*']); // Select only columns from the specifications table
 
         return $this->sendResponse(ProductSpecificationsResource::collection($specifications), 'Product specifications retrieved successfully.');
