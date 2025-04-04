@@ -139,11 +139,12 @@ class ProductController extends Controller
     public function manageSpecifications(Product $product)
     {
         $product_specifications = $product->specifications()
-            ->join('category_specification', 'specifications.id', '=', 'category_specification.specification_id') // Join with category_specification table
-            ->select('specifications.*', 'category_specification.display_order') // Select specifications and display_order
+            ->join('category_specification', 'specifications.id', '=', 'category_specification.specification_id')
+            ->select('specifications.id', 'specifications.name', 'category_specification.display_order') // Select specific fields to avoid ambiguity
             ->distinct() // Ensure unique rows are returned
             ->orderBy('category_specification.display_order') // Sort by display_order
             ->get();
+
         return view('admin.product.specifications', compact('product_specifications', 'product'));
     }
 
