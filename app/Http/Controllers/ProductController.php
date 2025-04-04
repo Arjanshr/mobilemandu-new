@@ -138,8 +138,19 @@ class ProductController extends Controller
 
     public function manageSpecifications(Product $product)
     {
-        $product_specifications = $product->specifications()
+        $specifications = $product->categories()
+            ->first()
+            ->specifications()
+            ->withPivot('display_order') // Ensure pivot field is loaded
+            ->orderBy('category_specification.display_order') // Correct table and column name
             ->get();
+        $product_specifications = [];
+        foreach ($specifications as $specification) {
+            $specification_data = $product->specifications()->where('specification_id', $specification->id)->first();
+            if ($specification_data !== null) { // Remove null values
+                $product_specifications[] = $specification_data;
+            }
+        }
         return view('admin.product.specifications', compact('product_specifications', 'product'));
     }
 
@@ -313,7 +324,7 @@ class ProductController extends Controller
     {
         // Eager load necessary relationships
         $product->load(['variants.variant_options.specification']);
-    
+
         // Prepare the variants data in a streamlined manner
         $variants = $product->variants->map(function ($variant) {
             return [
@@ -327,18 +338,18 @@ class ProductController extends Controller
                 ])->values(), // Ensure a clean indexed array
             ];
         })->values(); // Ensure the result is a clean indexed array
-    
+
         // Pass data to the view
         return view('admin.product.variants', compact('product', 'variants'));
     }
-    
 
-    private function generateUniqueSku($variant_data,$product)
+
+    private function generateUniqueSku($variant_data, $product)
     {
         // Define the specifications that should be included in the SKU
         $sku_parts = [];
         $sku_parts[0] = strtoupper($product->slug);
-    
+
         // Dynamically loop through the variant data to create SKU
         foreach ($variant_data as $key => $value) {
             // Exclude non-specification fields like price and stock_quantity
@@ -347,23 +358,23 @@ class ProductController extends Controller
                 $sku_parts[] = strtoupper($key) . '-' . strtoupper($value);
             }
         }
-    
+
         // If no valid parts are available for SKU, throw an error
         if (empty($sku_parts)) {
             throw new \Exception("Failed to generate SKU. Missing required specifications.");
         }
-    
+
         // Generate the SKU by joining the parts with a dash
         return implode('-', $sku_parts);
     }
-    
+
 
 
     public function editVariants($productId, $variantId)
     {
         $product = Product::findOrFail($productId);
         $variant = $product->variants()->findOrFail($variantId);
-    
+
         return view('admin.product.variants_edit', compact('product', 'variant'));
     }
 
@@ -373,29 +384,29 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
         ]);
-    
+
         $product = Product::findOrFail($productId);
         $variant = $product->variants()->findOrFail($variantId);
-    
+
         $variant->update([
             'price' => $request->price,
             'stock_quantity' => $request->stock_quantity,
         ]);
         toastr()->success('Variants edited successfully.');
         return redirect()->route('product.variants', $productId)
-                         ->with('success', 'Variant updated successfully.');
+            ->with('success', 'Variant updated successfully.');
     }
-    
+
 
     public function deleteVariants($productId, $variantId)
     {
         $product = Product::findOrFail($productId);
         $variant = $product->variants()->findOrFail($variantId);
-    
+
         $variant->delete();
-    
+
         return redirect()->route('product.variants', $productId)
-                         ->with('success', 'Variant deleted successfully.');
+            ->with('success', 'Variant deleted successfully.');
     }
     public function deleteAllVariants(Product $product)
     {

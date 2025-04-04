@@ -326,10 +326,22 @@ class ProductController extends BaseController
 
     public function productSpecifications(Product $product)
     {
-        $specifications = $product->specifications()
-            ->get(['specifications.*']); // Select only columns from the specifications table
-
-        return $this->sendResponse(ProductSpecificationsResource::collection($specifications), 'Product specifications retrieved successfully.');
+        // $specifications = $product->specifications()
+        //     ->get(['specifications.*']); // Select only columns from the specifications table
+        $specifications = $product->categories()
+            ->first()
+            ->specifications()
+            ->withPivot('display_order') // Ensure pivot field is loaded
+            ->orderBy('category_specification.display_order') // Correct table and column name
+            ->get();
+        $product_specifications = [];
+        foreach ($specifications as $specification) {
+            $specification_data = $product->specifications()->where('specification_id', $specification->id)->first();
+            if ($specification_data !== null) { // Remove null values
+                $product_specifications[] = $specification_data;
+            }
+        }
+        return $this->sendResponse(ProductSpecificationsResource::collection($product_specifications), 'Product specifications retrieved successfully.');
     }
 
     public function productReviews(Product $product)
