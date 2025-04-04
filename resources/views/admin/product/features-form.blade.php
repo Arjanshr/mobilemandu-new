@@ -3,7 +3,7 @@
 @section('title', 'Features')
 
 @section('content_header')
-    <h1>Features</h1>
+    <h1>Features({{ $product->name }})</h1>
 @stop
 
 @section('content')
