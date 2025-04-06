@@ -14,24 +14,25 @@ class MyWishlistsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $product = $this->product;
 
         return [
-            "id" => $this->product->id,
-            "name" => $this->product->name,
-            "slug" => $this->product->slug,
-            "rating" => $this->product->getAverageRating(),
-            "discounted_amount" => $this->product->discounted_price,
-            "original_amount" => $this->product->price,
+            "id" => $product ? $product->id : null,
+            "name" => $product ? $product->name : null,
+            "slug" => $product ? $product->slug : null,
+            "rating" => $product ? $product->getAverageRating() : null,
+            "discounted_amount" => $product ? $product->discounted_price : null,
+            "original_amount" => $product ? $product->price : null,
             "added_to_cart" => false,
             "added_to_wishlist" => false,
-            "image_link" => $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
+            "image_link" => $product && $product->getFirstMedia() ? $product->getFirstMedia()->getUrl() : null,
             "offer" => null,
             "alt_text" => $this->alt_text,
-            "status" => $this->product->status,
+            "status" => $product ? $product->status : null,
             "tags" => [
-                "new" => $this->product->isNew(),
-                "popular" => $this->product->isPopular(),
-                "campaign" => $this->product->isCampaignProduct()->first() ? $this->product->isCampaignProduct()->first()->name : false,
+                "new" => $product ? $product->isNew() : false,
+                "popular" => $product ? $product->isPopular() : false,
+                "campaign" => $product && $product->isCampaignProduct()->first() ? $product->isCampaignProduct()->first()->name : false,
             ]
         ];
     }

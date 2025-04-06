@@ -144,13 +144,24 @@ class UserController extends BaseController
         return $this->sendResponse(null, 'Review posted successfully');
     }
 
-    public function addToWishlist(Product $product)
+    public function addToWishlist($product)
     {
+        $product = Product::findOrFail($product);
+
+        $existingWishlist = Wishlist::where('user_id', auth()->user()->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($existingWishlist) {
+            return $this->sendError('error', 'Product is already in your wishlist.');
+        }
+
         $wishlist = new Wishlist();
         $wishlist->user_id = auth()->user()->id;
         $wishlist->product_id = $product->id;
         $wishlist->save();
-        return $this->sendResponse(null, 'Product added to wishlist');
+
+        return $this->sendResponse(new MyWishlistsResource($wishlist), 'Added to my wishlist successfully.');
     }
 
     public function removeFromWishlist(Product $product)
