@@ -16,6 +16,8 @@ class ProductForm extends Component
     public $price;
     public $product;
     public $description;
+    public $alt_text;
+    public $keywords;
 
     public function mount()
     {
@@ -27,6 +29,8 @@ class ProductForm extends Component
             $this->name = $this->product->name;
             $this->price = $this->product->price;
             $this->description = $this->product->description;
+            $this->alt_text = $this->product->alt_text;
+            $this->keywords = explode(',', $this->product->keywords); // Split keywords into an array
         }
     }
 

@@ -41,6 +41,7 @@
             height: 34px !important;
         }
     </style>
+    <!-- Removed Tagify CSS -->
 @stop
 
 @section('js')
@@ -51,12 +52,6 @@
     </script>
 
     <script src="https://cdn.ckeditor.com/ckeditor5/35.1.0/classic/ckeditor.js"></script>
-    {{-- <script>
-        ClassicEditor.create(document.querySelector('#description'))
-            .catch(error => {
-                console.error(error);
-            });
-    </script> --}}
     <script>
         ClassicEditor.create(document.querySelector('#description'), {
                 ckfinder: {
@@ -72,4 +67,6 @@
             $('#categories').select2();
         });
     </script>
+
+    <!-- Removed Tagify JS -->
 @stop

@@ -166,48 +166,47 @@ class ProductController extends BaseController
     public function searchProducts(Request $request, $paginate = 8)
     {
         $products = Product::query()->where('status', 'publish');
-    
+
         if (!empty($request->query('query'))) {
             $category_ids = Category::where('name', 'like', '%' . $request->query('query') . '%')->pluck('id');
-    
+
             $products->where(function ($query) use ($request, $category_ids) {
                 $query->whereHas('categories', function ($q) use ($category_ids) {
                     $q->whereIn('categories.id', $category_ids);
                 })
-                ->orWhere('name', 'like', '%' . $request->query('query') . '%');
+                ->orWhere('name', 'like', '%' . $request->query('query') . '%')
+                ->orWhere('keywords', 'like', '%' . $request->query('query') . '%');
             });
-    
-            // Clone the query to check if results exist before adding description search
+
             $tempQuery = clone $products;
-            if ($tempQuery->count() == 0) {
+            if ($tempQuery->count() <= 5) {
                 $products->orWhere('description', 'like', '%' . $request->query('query') . '%');
             }
         }
-    
+
         if (!empty($request->categories) && is_array($request->categories)) {
             $category_ids = $request->categories;
             $products->whereHas('categories', function ($query) use ($category_ids) {
                 $query->whereIn('categories.id', $category_ids);
             });
         }
-    
+
         if (!empty($request->brand) && is_array($request->brand)) {
             $products->whereIn('brand_id', $request->brand);
         }
-    
+
         if (!empty($request->min_price)) {
             $products->where('price', '>=', $request->min_price);
         }
-    
+
         if (!empty($request->max_price)) {
             $products->where('price', '<=', $request->max_price);
         }
-    
-        // Filter products by average rating
+
         if (isset($request->min_rating) || isset($request->max_rating)) {
             $min_rating = $request->min_rating ?? 0;
             $max_rating = $request->max_rating ?? 5;
-    
+
             $products->whereIn('id', function ($query) use ($min_rating, $max_rating) {
                 $query->select('product_id')
                     ->from('reviews')
@@ -215,13 +214,11 @@ class ProductController extends BaseController
                     ->havingRaw('AVG(rating) BETWEEN ? AND ?', [$min_rating, $max_rating]);
             });
         }
-    
-        // Order by latest and paginate
+
         $products = $products->orderBy('id', 'DESC')->paginate($paginate);
-    
+
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
-    
 
     public function getBrandsForSearch(Request $request)
     {

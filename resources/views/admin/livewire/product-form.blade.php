@@ -87,6 +87,22 @@
                 @enderror
             </div>
 
+            <!-- Keywords -->
+            <div class="form-group col-sm-6">
+                <label for="keywords">Keywords</label>
+                <div class="tags-container">
+                    @if (is_array($keywords))
+                        @foreach ($keywords as $keyword)
+                            <span class="badge badge-primary">{{ $keyword }}</span>
+                        @endforeach
+                    @endif
+                </div>
+                <textarea class="form-control" id="keywords" name="keywords" rows="3" placeholder="Enter keywords separated by commas">{{ is_array($keywords) ? implode(',', $keywords) : $keywords }}</textarea>
+                @error('keywords')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
             <!-- Status -->
             <div class="form-group col-sm-4">
                 <label for="status">Status*</label>
@@ -112,3 +128,31 @@
             </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const keywordsInput = document.querySelector('#keywords');
+        const tagsContainer = document.querySelector('.tags-container');
+
+        function updateTags() {
+            const keywords = keywordsInput.value.split(',').map(kw => kw.trim()).filter(kw => kw);
+            tagsContainer.innerHTML = '';
+            keywords.forEach(keyword => {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-primary';
+                badge.textContent = keyword;
+                badge.style.marginRight = '5px'; // Add spacing between badges
+                badge.style.marginBottom = '5px'; // Add spacing below badges
+                tagsContainer.appendChild(badge);
+            });
+        }
+
+        keywordsInput.addEventListener('input', function (e) {
+            if (e.inputType === 'insertText' && e.data === ',') {
+                updateTags();
+            }
+        });
+
+        keywordsInput.addEventListener('blur', updateTags);
+    });
+</script>

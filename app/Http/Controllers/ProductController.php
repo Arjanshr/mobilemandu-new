@@ -71,13 +71,7 @@ class ProductController extends Controller
 
     public function update(Product $product, ProductRequest $request)
     {
-        $product->name = $request->name;
-        $product->brand_id = $request->brand_id;
-        $product->description = $request->description;
-        $product->price = $request->price;
-        $product->status = $request->status;
-        $product->alt_text = $request->alt_text;
-        $product->save();
+        $product->update($request->only(['name', 'description', 'price', 'status', 'alt_text', 'keywords']));
         $product->categories()->sync($request->category_id);
         toastr()->success('Product Edited Successfully!');
         return redirect()->route('products');
