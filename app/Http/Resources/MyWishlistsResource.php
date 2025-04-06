@@ -16,7 +16,23 @@ class MyWishlistsResource extends JsonResource
     {
 
         return [
-            "product_id" => $this->product_id,
+            "id" => $this->product->id,
+            "name" => $this->product->name,
+            "slug" => $this->product->slug,
+            "rating" => $this->product->getAverageRating(),
+            "discounted_amount" => $this->product->discounted_price,
+            "original_amount" => $this->product->price,
+            "added_to_cart" => false,
+            "added_to_wishlist" => false,
+            "image_link" => $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
+            "offer" => null,
+            "alt_text" => $this->alt_text,
+            "status" => $this->product->status,
+            "tags" => [
+                "new" => $this->product->isNew(),
+                "popular" => $this->product->isPopular(),
+                "campaign" => $this->product->isCampaignProduct()->first() ? $this->product->isCampaignProduct()->first()->name : false,
+            ]
         ];
     }
 }

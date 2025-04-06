@@ -164,7 +164,7 @@ class UserController extends BaseController
 
     public function myWishLists()
     {
-        $wishlist = Wishlist::where('user_id', auth()->user()->id)->get();
-        return $this->sendResponse(MyWishlistsResource::collection($wishlist), 'My reviews retrieved successfully.');
+        $wishlist = Wishlist::where('user_id', auth()->user()->id)->with('product')->get();
+        return $this->sendResponse(MyWishlistsResource::collection($wishlist), 'My wishlists retrieved successfully.');
     }
 }
