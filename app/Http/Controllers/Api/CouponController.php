@@ -120,8 +120,8 @@ class CouponController extends BaseController
             $product = Product::with('categories', 'brand')->find($item['id']);
             if (!$product) continue;
 
-            // Check eligibility based on the coupon's specific_type
-            $is_eligible = $this->isItemEligible($product, $coupon->specific_type, $valid_specific_ids);
+            // Check eligibility based on the coupon's specific_type or apply to all if type is "normal"
+            $is_eligible = $coupon->specific_type === 'normal' || $this->isItemEligible($product, $coupon->specific_type, $valid_specific_ids);
 
             // Calculate discount and update item details
             $item['discount'] = $is_eligible ? $this->calculateDiscount($coupon, $item) : 0;
