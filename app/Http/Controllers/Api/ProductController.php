@@ -230,12 +230,7 @@ class ProductController extends BaseController
 
         $products = $products->orderBy('id', 'DESC')->paginate($paginate);
 
-        $response = [
-            'products' => ProductResource::collection($products)->resource,
-            'total_count' => $products->total(),
-        ];
-
-        return $this->sendResponse($response, 'Products retrieved successfully.');
+        return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
     public function getBrandsForSearch(Request $request)
