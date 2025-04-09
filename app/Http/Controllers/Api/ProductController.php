@@ -168,19 +168,32 @@ class ProductController extends BaseController
         $products = Product::query()->where('status', 'publish');
 
         if (!empty($request->query('query'))) {
-            $category_ids = Category::where('name', 'like', '%' . $request->query('query') . '%')->pluck('id');
+            $searchQuery = $request->query('query');
+            $pluralQuery = \Illuminate\Support\Str::plural($searchQuery);
+            $singularQuery = \Illuminate\Support\Str::singular($searchQuery);
 
-            $products->where(function ($query) use ($request, $category_ids) {
+            $category_ids = Category::where('name', 'like', '%' . $searchQuery . '%')
+                ->orWhere('name', 'like', '%' . $pluralQuery . '%')
+                ->orWhere('name', 'like', '%' . $singularQuery . '%')
+                ->pluck('id');
+
+            $products->where(function ($query) use ($searchQuery, $pluralQuery, $singularQuery, $category_ids) {
                 $query->whereHas('categories', function ($q) use ($category_ids) {
                     $q->whereIn('categories.id', $category_ids);
                 })
-                ->orWhere('name', 'like', '%' . $request->query('query') . '%')
-                ->orWhere('keywords', 'like', '%' . $request->query('query') . '%');
+                ->orWhere('name', 'like', '%' . $searchQuery . '%')
+                ->orWhere('name', 'like', '%' . $pluralQuery . '%')
+                ->orWhere('name', 'like', '%' . $singularQuery . '%')
+                ->orWhere('keywords', 'like', '%' . $searchQuery . '%')
+                ->orWhere('keywords', 'like', '%' . $pluralQuery . '%')
+                ->orWhere('keywords', 'like', '%' . $singularQuery . '%');
             });
 
             $tempQuery = clone $products;
             if ($tempQuery->count() <= 5) {
-                $products->orWhere('description', 'like', '%' . $request->query('query') . '%');
+                $products->orWhere('description', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('description', 'like', '%' . $pluralQuery . '%')
+                    ->orWhere('description', 'like', '%' . $singularQuery . '%');
             }
         }
 
@@ -217,7 +230,12 @@ class ProductController extends BaseController
 
         $products = $products->orderBy('id', 'DESC')->paginate($paginate);
 
-        return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
+        $response = [
+            'products' => ProductResource::collection($products)->resource,
+            'total_count' => $products->total(),
+        ];
+
+        return $this->sendResponse($response, 'Products retrieved successfully.');
     }
 
     public function getBrandsForSearch(Request $request)
