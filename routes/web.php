@@ -21,7 +21,7 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
-use Meilisearch\Client;
+use Illuminate\Support\Facades\Http;
 
 Route::get('/', [FrontController::class, 'home'])->name('front.home');
 Route::get('/clear-config', function () {
@@ -32,12 +32,24 @@ Route::get('/clear-config', function () {
 
 
 Route::get('/test-meilisearch', function () {
-    $client = new Client(
-        config('scout.meilisearch.host'),
-        config('scout.meilisearch.key')
-    );
+    $url = config('scout.meilisearch.host');
+    $key = config('scout.meilisearch.key');
 
-    return $client->getVersion(); // This should return version info
+    $response = Http::withHeaders([
+        'X-Meili-API-Key' => $key,
+    ])->get($url . '/health');
+
+    if ($response->successful()) {
+        return response()->json([
+            'status' => '✅ Meilisearch connection successful!',
+            'response' => $response->json(),
+        ]);
+    }
+
+    return response()->json([
+        'status' => '❌ Failed to connect to Meilisearch.',
+        'response' => $response->body(),
+    ], $response->status());
 });
 
 Route::get('/storage-link', function () {
