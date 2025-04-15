@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
@@ -27,12 +28,15 @@ Route::get('/', [FrontController::class, 'home'])->name('front.home');
 Route::get('/clear-config', function () {
     Artisan::call('config:clear');
     Artisan::call('config:cache');
-    Artisan::call('scout:flush');
+    Artisan::call('scout:flush "App\Models\Product"');
     Artisan::call('scout:import "App\Models\Product"');
     return 'Config cache cleared!';
 });
 
-
+Route::get('/test-search', function () {
+    $products = Product::search('laptop')->get();
+    return $products;
+});
 Route::get('/test-meilisearch', function () {
     $url = config('scout.meilisearch.host');
     $key = config('scout.meilisearch.key');
