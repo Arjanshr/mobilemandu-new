@@ -21,12 +21,23 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Meilisearch\Client;
 
 Route::get('/', [FrontController::class, 'home'])->name('front.home');
 Route::get('/clear-config', function () {
     Artisan::call('config:clear');
     Artisan::call('config:cache');
     return 'Config cache cleared!';
+});
+
+
+Route::get('/test-meilisearch', function () {
+    $client = new Client(
+        config('scout.meilisearch.host'),
+        config('scout.meilisearch.key')
+    );
+
+    return $client->getVersion(); // This should return version info
 });
 
 Route::get('/storage-link', function () {
