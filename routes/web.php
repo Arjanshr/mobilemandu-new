@@ -27,6 +27,8 @@ Route::get('/', [FrontController::class, 'home'])->name('front.home');
 Route::get('/clear-config', function () {
     Artisan::call('config:clear');
     Artisan::call('config:cache');
+    Artisan::call('scout:flush');
+    Artisan::call('scout:import "App\Models\Product"');
     return 'Config cache cleared!';
 });
 
