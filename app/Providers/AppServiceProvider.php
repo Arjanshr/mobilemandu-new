@@ -8,6 +8,8 @@ use Illuminate\Pagination\Paginator;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Meilisearch\Client;
+use Laravel\Scout\EngineManager;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,5 +42,14 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
         Paginator::useBootstrap();
+
+        resolve(EngineManager::class)->extend('meilisearch', function () {
+            return new \Laravel\Scout\Engines\MeilisearchEngine(
+                new Client(
+                    config('scout.meilisearch.host'),
+                    config('scout.meilisearch.key')
+                )
+            );
+        });
     }
 }
