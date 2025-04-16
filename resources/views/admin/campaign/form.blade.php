@@ -93,6 +93,22 @@
                                         @endif
                                     </div>
 
+                                    <!-- Campaign Banner -->
+                                    <div class="form-group col-sm-12">
+                                        <label for="campaign_banner">Campaign Banner</label>
+                                        <input type="file" class="form-control" id="campaign_banner" name="campaign_banner">
+                                        @error('campaign_banner')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+
+                                        <!-- Preview existing banner -->
+                                        @if(isset($campaign) && $campaign->campaign_banner)
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $campaign->campaign_banner) }}" alt="Campaign Banner" width="150">
+                                            </div>
+                                        @endif
+                                    </div>
+
                                     <!-- Color Theme -->
                                     <div class="form-group col-sm-4">
                                         <label for="color_theme">Color Theme</label>

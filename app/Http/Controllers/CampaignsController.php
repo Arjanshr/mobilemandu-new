@@ -35,6 +35,11 @@ class CampaignsController extends Controller
             $campaign->background_image = $request->file('background_image')->store('campaigns', 'public');
         }
 
+        // Handle campaign banner upload
+        if ($request->hasFile('campaign_banner')) {
+            $campaign->campaign_banner = $request->file('campaign_banner')->store('campaign_banners', 'public');
+        }
+
         $campaign->save();
 
         toastr()->success('Campaign Created Successfully!');
@@ -56,12 +61,18 @@ class CampaignsController extends Controller
 
         // Handle background image update
         if ($request->hasFile('background_image')) {
-            // Delete old image if exists
             if ($campaign->background_image) {
                 Storage::disk('public')->delete($campaign->background_image);
             }
-
             $campaign->background_image = $request->file('background_image')->store('campaigns', 'public');
+        }
+
+        // Handle campaign banner update
+        if ($request->hasFile('campaign_banner')) {
+            if ($campaign->campaign_banner) {
+                Storage::disk('public')->delete($campaign->campaign_banner);
+            }
+            $campaign->campaign_banner = $request->file('campaign_banner')->store('campaign_banners', 'public');
         }
 
         $campaign->save();
@@ -75,6 +86,11 @@ class CampaignsController extends Controller
         // Delete background image if exists
         if ($campaign->background_image) {
             Storage::disk('public')->delete($campaign->background_image);
+        }
+
+        // Delete campaign banner if exists
+        if ($campaign->campaign_banner) {
+            Storage::disk('public')->delete($campaign->campaign_banner);
         }
 
         $campaign->delete();

@@ -10,7 +10,15 @@ class Campaign extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'start_date', 'end_date', 'status', 'background_image', 'color_theme'];
+    protected $fillable = [
+        'name',
+        'start_date',
+        'end_date',
+        'status',
+        'background_image',
+        'color_theme',
+        'campaign_banner',
+    ];
 
     public function products()
     {

@@ -20,6 +20,7 @@ class CampaignResource extends JsonResource
             'name' => $this->name,
             'color_theme' => $this->color_theme,
             'background_image' => $this->background_image ? asset('storage/' . $this->background_image) : null,
+            'campaign_banner' => $this->campaign_banner ? asset('storage/' . $this->campaign_banner) : null,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
         ];

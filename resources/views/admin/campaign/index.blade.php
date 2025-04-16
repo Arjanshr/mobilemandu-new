@@ -27,6 +27,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Banner</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -60,6 +61,13 @@
                                                             @endcan
                                                         </td>
                                                         <td>{{ $campaign->name }}</td>
+                                                        <td>
+                                                            @if($campaign->campaign_banner)
+                                                                <img src="{{ asset('storage/' . $campaign->campaign_banner) }}" alt="Banner" width="100">
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -68,6 +76,7 @@
                                                     <th>#</th>
                                                     <th>Actions</th>
                                                     <th>Name</th>
+                                                    <th>Banner</th>
                                                 </tr>
                                             </tfoot>
                                         </table>
