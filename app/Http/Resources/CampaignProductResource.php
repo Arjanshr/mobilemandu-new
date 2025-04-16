@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,8 @@ class CampaignProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $campaign = Campaign::find($this->pivot->campaign_id)->hasStarted();
+        
         return [
             "id" => $this->id,
             "name" => $this->name,
@@ -21,7 +24,7 @@ class CampaignProductResource extends JsonResource
             "rating" => $this->getAverageRating(),
             "discounted_amount" => $this->discounted_price,
             "original_amount" => $this->price,
-            "campaign_price" => $this->pivot->campaign_price,
+            "campaign_price" => $campaign ? $this->pivot->campaign_price : '???',
             "added_to_cart" => false,
             "added_to_wishlist" => false,
             "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,

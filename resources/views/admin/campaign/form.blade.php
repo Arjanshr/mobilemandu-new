@@ -7,12 +7,12 @@
 @stop
 
 @section('content')
-
     <div class="card-body">
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
+                        <!-- Removed Sortable Campaign List -->
                         <div class="card card-primary">
                             <div class="card-header">
                                 <h3 class="card-title">{{ isset($campaign) ? 'Edit Campaign' : 'Create New Campaign' }}</h3>
@@ -147,16 +147,34 @@
             </div>
         </section>
     </div>
-
 @stop
 
 @section('css')
 @stop
 
 @section('js')
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#role').select2();
+        $(function() {
+            $("#sortable-campaigns").sortable({
+                update: function(event, ui) {
+                    let order = $(this).sortable('toArray', { attribute: 'data-id' });
+                    $.ajax({
+                        url: "{{ route('campaigns.updateOrder') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            order: order
+                        },
+                        success: function(response) {
+                            alert('Order updated successfully!');
+                        },
+                        error: function() {
+                            alert('Failed to update order.');
+                        }
+                    });
+                }
+            });
         });
     </script>
 @stop

@@ -18,15 +18,15 @@ class CampaignController extends BaseController
     {
         switch ($status) {
             case 'active':
-                $campaigns = Campaign::running()->orderBy('id','DESC')->get();
+                $campaigns = Campaign::running()->orderBy('display_order', 'asc')->get(); // Order by display_order
                 break;
 
             case 'expired':
-                $campaigns = Campaign::expired()->orderBy('id','DESC')->get();
+                $campaigns = Campaign::expired()->orderBy('display_order', 'asc')->get(); // Order by display_order
                 break;
 
             case 'future':
-                $campaigns = Campaign::notStarted()->orderBy('id','DESC')->get();
+                $campaigns = Campaign::notStarted()->orderBy('display_order', 'asc')->get(); // Order by display_order
                 break;
 
             default:

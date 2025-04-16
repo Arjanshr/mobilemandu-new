@@ -64,6 +64,11 @@ class Campaign extends Model
         return $query->selectRaw('TIMESTAMPDIFF(SECOND, end_date, NOW()) AS time_since_expired');
     }
 
+    public function hasStarted(): bool
+    {
+        return $this->start_date <= now();
+    }
+
     // Accessors
     public function getTimeUntilStartAttribute()
     {

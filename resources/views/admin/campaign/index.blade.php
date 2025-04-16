@@ -20,7 +20,7 @@
                             <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <table id="example2" class="table table-bordered table-hover dataTable dtr-inline"
+                                        <table id="sortable-campaigns" class="table table-bordered table-hover dataTable dtr-inline"
                                             aria-describedby="example2_info">
                                             <thead>
                                                 <tr>
@@ -32,8 +32,8 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($campaigns as $campaign)
-                                                    <tr>
-                                                        <td width="20px">{{ $loop->iteration }}</td>
+                                                    <tr data-id="{{ $campaign->id }}">
+                                                        <td width="20px">{{ $campaign->display_order }}</td> <!-- Display display_order -->
                                                         <td>
                                                             @can('edit-campaigns')
                                                                 <a href="{{ route('campaigns.edit', $campaign->id) }}"
@@ -100,7 +100,42 @@
 @stop
 
 @section('js')
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
+        $(function() {
+            $("#sortable-campaigns tbody").sortable({
+                update: function(event, ui) {
+                    let order = $(this).sortable('toArray', { attribute: 'data-id' });
+                    $.ajax({
+                        url: "{{ route('campaigns.updateOrder') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            order: order
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Campaing Display Order updated successfully!',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to update Campaign Display Order.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                }
+            }).disableSelection();
+        });
+
         $(document.body).on('click', '.delete', function(event) {
             event.preventDefault();
             var form = $(this).closest("form");
@@ -118,9 +153,10 @@
                 }
             })
         });
+
         $(document).ready(function() {
             $('#example2').DataTable();
             $('.dataTables_length').addClass('bs-select');
-        })
+        });
     </script>
 @stop

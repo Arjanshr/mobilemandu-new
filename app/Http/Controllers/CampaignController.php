@@ -12,7 +12,7 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $campaigns = Campaign::get();
+        $campaigns = Campaign::orderBy('display_order', 'asc')->get(); // Order by display_order
         return view('admin.campaign.index', compact('campaigns'));
     }
 
@@ -23,12 +23,16 @@ class CampaignController extends Controller
 
     public function insert(CampaignRequest $request)
     {
+        // Increment display_order of all existing campaigns
+        Campaign::query()->increment('display_order');
+
         $campaign = new Campaign();
         $campaign->name = $request->name;
         $campaign->start_date = $request->start_date;
         $campaign->end_date = $request->end_date;
         $campaign->status = $request->status;
         $campaign->color_theme = $request->color_theme;
+        $campaign->display_order = 1; // Set the new campaign as the first position
 
         // Handle background image upload
         if ($request->hasFile('background_image')) {
@@ -164,5 +168,14 @@ class CampaignController extends Controller
         $campaign->products()->updateExistingPivot($request->product_id, ['campaign_price' => $request->campaign_price]);
 
         return response()->json(["message" => "Product Updated Successfully"]);
+    }
+
+    public function updateOrder(Request $request)
+    {
+        $order = $request->input('order');
+        foreach ($order as $index => $id) {
+            Campaign::where('id', $id)->update(['display_order' => $index + 1]);
+        }
+        return response()->json(['success' => true, 'message' => 'Order updated successfully!']);
     }
 }

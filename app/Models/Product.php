@@ -101,7 +101,7 @@ class Product extends Model implements HasMedia
 
     public function campaigns()
     {
-        return $this->belongsToMany(Campaign::class)->withPivot('campaign_price');;
+        return $this->belongsToMany(Campaign::class)->withPivot('campaign_price');
     }
 
     public function scopePublished($query)

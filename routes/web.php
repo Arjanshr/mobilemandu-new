@@ -227,6 +227,7 @@ Route::middleware([
     Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignController::class, 'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
     Route::delete('/campaigns/delete/{campaign}', [CampaignController::class, 'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
     Route::post('/update-discount', [CampaignController::class, 'updateDiscount']);
+    Route::post('/campaigns/update-order', [CampaignController::class, 'updateOrder'])->name('campaigns.updateOrder');
 
     //Sliders routes
     Route::get('/sliders', [SliderController::class, 'index'])->name('sliders')->middleware('can:browse-sliders');
