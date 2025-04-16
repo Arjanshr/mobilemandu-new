@@ -17,7 +17,6 @@ class ProductResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "brand" => $this->brand?$this->brand->name:null,
             "link" => 'https://www.mobilemandu.com/products/'.$this->slug,
             "description" => $this->description,
             "slug" => $this->slug,

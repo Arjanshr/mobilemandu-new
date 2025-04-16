@@ -12,6 +12,7 @@ use App\Models\ProductSpecification;
 use App\Models\Specification;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
 
 
 class ProductController extends Controller
@@ -407,5 +408,46 @@ class ProductController extends Controller
         $product->specifications()->detach();
         toastr()->success('Product Specification Deleted Successfully!');
         return redirect()->route('product.specifications', $product->id);
+    }
+    public function export()
+    {
+        $products = Product::with(['categories', 'brand', 'variants', 'media'])->get();
+
+        $csvData = [];
+        $csvData[] = ['ID', 'Name', 'Price', 'Category', 'Brand', 'Variant', 'Status', 'Image Link', 'Product Link'];
+
+        foreach ($products as $product) {
+            $categories = $product->categories->pluck('name')->implode(', ');
+            $brand = $product->brand ? $product->brand->name : 'N/A';
+            $variants = $product->variants->pluck('name')->implode(', ');
+            $imageLink = $product->getFirstMedia() ? $product->getFirstMedia()->getUrl() : 'N/A';
+            $productLink = "https://www.mobilemandu.com/products/" . $product->slug;
+
+            $csvData[] = [
+                $product->id,
+                $product->name,
+                $product->price,
+                $categories,
+                $brand,
+                $variants,
+                ucfirst($product->status) . 'ed',
+                $imageLink,
+                $productLink,
+            ];
+        }
+
+        $filename = 'products_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $handle = fopen('php://temp', 'w+');
+        foreach ($csvData as $row) {
+            fputcsv($handle, $row);
+        }
+        rewind($handle);
+
+        return Response::stream(function () use ($handle) {
+            fpassthru($handle);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
     }
 }

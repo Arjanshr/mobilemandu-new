@@ -13,34 +13,42 @@
                     <div class="card">
                         @can('add-products')
                             <div class="card-header">
-                                <div class="row">
-
-                                    <div class="col-md-6">
-                                        <a href="{{ route('product.create') }}" class="btn btn-success">Create Product</a>
+                                <div class="row align-items-center">
+                                    <div class="col-md-4 mb-2">
+                                        <a href="{{ route('product.create') }}" class="btn btn-success btn-sm">
+                                            <i class="fas fa-plus"></i> Create Product
+                                        </a>
+                                        @can('export-products')
+                                        <a href="{{ route('product.export') }}" class="btn btn-info btn-sm ml-2" title="Export to CSV">
+                                            <i class="fas fa-file-export"></i>
+                                        </a>
+                                        @endcan
                                     </div>
                                     @can('import-products')
-                                    <div class="col-md-6">
-                                        <form action="{{ route('product.import') }}" method="post"
-                                            enctype="multipart/form-data">
+                                    <div class="col-md-4 mb-2 ml-auto">
+                                        <form action="{{ route('product.import') }}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end">
                                             @csrf
-                                            <input type="file" class="" name="import_file">
-                                            <button type="submit" class="btn btn-primary">Import</button>
+                                            <input type="file" name="import_file" class="form-control-file mr-2">
+                                            <button type="submit" class="btn btn-primary btn-sm" title="Import">
+                                                <i class="fas fa-file-import"></i>
+                                            </button>
                                         </form>
                                     </div>
                                     @endcan
+                                </div>
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <form>
                                             <div class="row">
-                                                <!-- Brand-->
+                                                <!-- Brand -->
                                                 <div class="form-group col-sm-3">
                                                     <label for="brand_id">Brand</label>
-                                                    <select id='brand_id' name="brand_id" class="form-control">
+                                                    <select id="brand_id" name="brand_id" class="form-control">
                                                         <option value="">Select a Brand</option>
                                                         @foreach ($brands as $brand)
                                                             <option value="{{ $brand->id }}"
                                                                 {{ (isset($selected_brand) && $selected_brand == $brand->id) || old('brand_id') == $brand->id ? 'selected' : '' }}>
                                                                 {{ $brand->name }}
-
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -48,17 +56,17 @@
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-
-                                                <!-- Categories-->
+                                                <!-- Categories -->
                                                 <div class="form-group col-sm-4">
-                                                    <label for="category_id">Categories</label><br />
+                                                    <label for="category_id">Categories</label>
                                                     <select name="category_id[]" id="categories" class="form-control" multiple>
                                                         <option value="">--select--</option>
                                                         @if (isset($categories))
                                                             @foreach ($categories as $category)
                                                                 <option value="{{ $category->id }}"
-                                                                    @if (isset($selected_categories) && in_array($category->id, $selected_categories)) {{ 'selected' }} @endif>
-                                                                    {{ $category->name }}</option>
+                                                                    @if (isset($selected_categories) && in_array($category->id, $selected_categories)) selected @endif>
+                                                                    {{ $category->name }}
+                                                                </option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -66,17 +74,19 @@
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Categories-->
+                                                <!-- Keyword -->
                                                 <div class="form-group col-sm-4">
-                                                    <label for="category_id">Keyword</label><br />
-                                                    <input type="text" name="query" value="{{$query??''}}" class="form-control"/>
-                                                    @error('category_id')
+                                                    <label for="query">Keyword</label>
+                                                    <input type="text" name="query" value="{{ $query ?? '' }}" class="form-control" placeholder="Search by keyword">
+                                                    @error('query')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <div class="form-group col-sm-1">
-                                                    <input id="submit" type="submit" value="Filter"
-                                                        class="btn btn-warning" />
+                                                <!-- Filter Button -->
+                                                <div class="form-group col-sm-1 d-flex align-items-end">
+                                                    <button id="submit" type="submit" class="btn btn-warning btn-block">
+                                                        <i class="fas fa-filter"></i> Filter
+                                                    </button>
                                                 </div>
                                             </div>
                                         </form>
