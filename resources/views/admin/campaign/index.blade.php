@@ -28,6 +28,7 @@
                                                     <th>Actions</th>
                                                     <th>Name</th>
                                                     <th>Banner</th>
+                                                    <th>Status</th> <!-- New column for status -->
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -68,6 +69,25 @@
                                                                 N/A
                                                             @endif
                                                         </td>
+                                                        <td>
+                                                            <span class="badge {{ $campaign->status ? 'badge-active' : 'badge-inactive' }}">
+                                                                {{ $campaign->status ? 'Active' : 'Inactive' }}
+                                                            </span>
+                                                            @if($campaign->start_date && $campaign->end_date)
+                                                                @php
+                                                                    $now = \Carbon\Carbon::now();
+                                                                    $start = \Carbon\Carbon::parse($campaign->start_date);
+                                                                    $end = \Carbon\Carbon::parse($campaign->end_date);
+                                                                @endphp
+                                                                @if($now->between($start, $end))
+                                                                    <span class="badge badge-success">Active</span> <!-- Green for Active -->
+                                                                @elseif($now->isBefore($start))
+                                                                    <span class="badge badge-warning">Upcoming</span> <!-- Yellow for Upcoming -->
+                                                                @elseif($now->isAfter($end))
+                                                                    <span class="badge badge-danger">Expired</span> <!-- Red for Expired -->
+                                                                @endif
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -77,6 +97,7 @@
                                                     <th>Actions</th>
                                                     <th>Name</th>
                                                     <th>Banner</th>
+                                                    <th>Status</th> <!-- Footer column for status -->
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -97,6 +118,28 @@
 @stop
 
 @section('css')
+    <style>
+        .badge-active {
+            background-color: #007bff;
+            color: white;
+        }
+        .badge-inactive {
+            background-color: #6c757d;
+            color: white;
+        }
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
 @stop
 
 @section('js')
