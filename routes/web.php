@@ -3,7 +3,7 @@
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CampaignsController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySpecificationController;
 use App\Http\Controllers\ContentController;
@@ -216,17 +216,17 @@ Route::middleware([
     Route::post('/contents/{content_type}/insert', [ContentController::class, 'insert'])->name('contents.insert')->middleware('can:add-contents');
     Route::delete('/contents/{content_type}/delete/{content_id}', [ContentController::class, 'delete'])->name('content.delete')->middleware('can:delete-contents');
 
-    //Campaign Routes
-    Route::get('/campaigns', [CampaignsController::class, 'index'])->name('campaigns')->middleware('can:browse-campaigns');
-    Route::get('/campaigns/create', [CampaignsController::class, 'create'])->name('campaigns.create')->middleware('can:add-campaigns');
-    Route::post('/campaigns/create', [CampaignsController::class, 'insert'])->name('campaigns.insert')->middleware('can:add-campaigns');
-    Route::get('/campaigns/edit/{campaign}', [CampaignsController::class, 'edit'])->name('campaigns.edit')->middleware('can:edit-campaigns');
-    Route::patch('/campaigns/edit/{campaign}', [CampaignsController::class, 'update'])->name('campaigns.update')->middleware('can:edit-campaigns');
-    Route::get('/campaigns/products/{campaign}', [CampaignsController::class, 'products'])->name('campaigns.products')->middleware('can:read-campaigns');
-    Route::post('/campaigns/products/{campaign}', [CampaignsController::class, 'productsAction'])->name('campaigns.products.action')->middleware('can:read-campaigns');
-    Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignsController::class, 'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
-    Route::delete('/campaigns/delete/{campaign}', [CampaignsController::class, 'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
-    Route::post('/update-discount', [CampaignsController::class, 'updateDiscount']);
+    // Campaign Routes
+    Route::get('/campaigns', [CampaignController::class, 'index'])->name('campaigns')->middleware('can:browse-campaigns');
+    Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create')->middleware('can:add-campaigns');
+    Route::post('/campaigns/create', [CampaignController::class, 'insert'])->name('campaigns.insert')->middleware('can:add-campaigns');
+    Route::get('/campaigns/edit/{campaign}', [CampaignController::class, 'edit'])->name('campaigns.edit')->middleware('can:edit-campaigns');
+    Route::patch('/campaigns/edit/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update')->middleware('can:edit-campaigns');
+    Route::get('/campaigns/products/{campaign}', [CampaignController::class, 'products'])->name('campaigns.products')->middleware('can:read-campaigns');
+    Route::post('/campaigns/products/{campaign}', [CampaignController::class, 'productsAction'])->name('campaigns.products.action')->middleware('can:read-campaigns');
+    Route::get('/campaigns/products/{campaign}/delete/{product}', [CampaignController::class, 'productDelete'])->name('campaigns.products.delete')->middleware('can:delete-campaigns');
+    Route::delete('/campaigns/delete/{campaign}', [CampaignController::class, 'delete'])->name('campaigns.delete')->middleware('can:delete-campaigns');
+    Route::post('/update-discount', [CampaignController::class, 'updateDiscount']);
 
     //Sliders routes
     Route::get('/sliders', [SliderController::class, 'index'])->name('sliders')->middleware('can:browse-sliders');

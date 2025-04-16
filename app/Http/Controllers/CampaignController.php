@@ -8,7 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class CampaignsController extends Controller
+class CampaignController extends Controller
 {
     public function index()
     {
@@ -59,12 +59,28 @@ class CampaignsController extends Controller
         $campaign->status = $request->status;
         $campaign->color_theme = $request->color_theme;
 
+        // Handle removal of background image
+        if ($request->has('remove_background_image') && $request->remove_background_image) {
+            if ($campaign->background_image) {
+                Storage::disk('public')->delete($campaign->background_image);
+            }
+            $campaign->background_image = null;
+        }
+
         // Handle background image update
         if ($request->hasFile('background_image')) {
             if ($campaign->background_image) {
                 Storage::disk('public')->delete($campaign->background_image);
             }
             $campaign->background_image = $request->file('background_image')->store('campaigns', 'public');
+        }
+
+        // Handle removal of campaign banner
+        if ($request->has('remove_campaign_banner') && $request->remove_campaign_banner) {
+            if ($campaign->campaign_banner) {
+                Storage::disk('public')->delete($campaign->campaign_banner);
+            }
+            $campaign->campaign_banner = null;
         }
 
         // Handle campaign banner update
