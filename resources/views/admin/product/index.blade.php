@@ -42,8 +42,8 @@
                                             <div class="row">
                                                 <!-- Brand -->
                                                 <div class="form-group col-sm-3">
-                                                    <label for="brand_id">Brand</label>
-                                                    <select id="brand_id" name="brand_id" class="form-control">
+                                                    <label for="brand_id" class="font-weight-bold">Brand</label>
+                                                    <select id="brand_id" name="brand_id" class="form-control select2">
                                                         <option value="">Select a Brand</option>
                                                         @foreach ($brands as $brand)
                                                             <option value="{{ $brand->id }}"
@@ -52,14 +52,11 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
-                                                    @error('brand_id')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                    @enderror
                                                 </div>
                                                 <!-- Categories -->
                                                 <div class="form-group col-sm-4">
-                                                    <label for="category_id">Categories</label>
-                                                    <select name="category_id[]" id="categories" class="form-control" multiple>
+                                                    <label for="categories" class="font-weight-bold">Categories</label>
+                                                    <select name="category_id[]" id="categories" class="form-control select2" multiple>
                                                         <option value="">--select--</option>
                                                         @if (isset($categories))
                                                             @foreach ($categories as $category)
@@ -70,20 +67,15 @@
                                                             @endforeach
                                                         @endif
                                                     </select>
-                                                    @error('category_id')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                    @enderror
                                                 </div>
                                                 <!-- Keyword -->
-                                                <div class="form-group col-sm-4">
-                                                    <label for="query">Keyword</label>
-                                                    <input type="text" name="query" value="{{ $query ?? '' }}" class="form-control" placeholder="Search by keyword">
-                                                    @error('query')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                    @enderror
+                                                <div class="form-group col-sm-3">
+                                                    <label for="query" class="font-weight-bold">Keyword</label>
+                                                    <input type="text" name="query" value="{{ $query ?? '' }}" class="form-control"
+                                                        placeholder="Search by keyword">
                                                 </div>
                                                 <!-- Filter Button -->
-                                                <div class="form-group col-sm-1 d-flex align-items-end">
+                                                <div class="form-group col-sm-2 d-flex align-items-end">
                                                     <button id="submit" type="submit" class="btn btn-warning btn-block">
                                                         <i class="fas fa-filter"></i> Filter
                                                     </button>
@@ -97,10 +89,26 @@
                         <div class="card-body">
                             <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                 <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="items_per_page">Show</label>
+                                            <select id="items_per_page" name="items_per_page" class="form-control form-control-sm d-inline-block" style="width: auto;" onchange="location = this.value;">
+                                                <option value="{{ request()->fullUrlWithQuery(['items_per_page' => 10]) }}" {{ request('items_per_page') == 10 ? 'selected' : '' }}>10</option>
+                                                <option value="{{ request()->fullUrlWithQuery(['items_per_page' => 25]) }}" {{ request('items_per_page') == 25 ? 'selected' : '' }}>25</option>
+                                                <option value="{{ request()->fullUrlWithQuery(['items_per_page' => 50]) }}" {{ request('items_per_page') == 50 ? 'selected' : '' }}>50</option>
+                                                <option value="{{ request()->fullUrlWithQuery(['items_per_page' => 100]) }}" {{ request('items_per_page') == 100 ? 'selected' : '' }}>100</option>
+                                            </select>
+                                            <span>entries</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <!-- Existing search or other controls can go here -->
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-12">
-                                        <table id="example2" class="table table-bordered table-hover dataTable dtr-inline"
-                                            aria-describedby="example2_info">
-                                            <thead>
+                                        <table id="example2" class="table table-bordered table-hover table-striped">
+                                            <thead class="thead-dark">
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Actions</th>
@@ -115,88 +123,65 @@
                                             <tbody>
                                                 @foreach ($products as $product)
                                                     <tr>
-                                                        <td width="20px">{{ $loop->iteration }}</td>
-                                                        <td style="line-height: 35px">
-                                                            @can('read-products')
-                                                                <a href="{{ route('product.show', $product->id) }}"
-                                                                    class="btn btn-sm btn-primary" title="View Details">
-                                                                    <i class="fa fa-eye"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-products')
-                                                                <a href="{{ route('product.edit', $product->id) }}"
-                                                                    class="btn btn-sm btn-success" title="Edit">
-                                                                    <i class="fa fa-pen"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-products')
-                                                                <a href="{{ route('product.specifications', $product->id) }}"
-                                                                    class="btn btn-sm btn-warning"
-                                                                    title="Manage Specifications">
-                                                                    <i class="fa fa-list"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-products')
-                                                                <a href="{{ route('product.features', $product->id) }}"
-                                                                    class="btn btn-sm btn-primary" title="Manage Features">
-                                                                    <i class="fa fa-list"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-products')
-                                                                <a href="{{ route('product.variants', $product->id) }}"
-                                                                    class="btn btn-sm btn-success" title="Manage Variants">
-                                                                    <i class="fa fa-clipboard"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('edit-products')
-                                                                <a href="{{ route('product.images', $product->id) }}"
-                                                                    class="btn btn-sm btn-secondary" title="Manage Images">
-                                                                    <i class="fa fa-image"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('delete-products')
-                                                                <form method="post"
-                                                                    action="{{ route('product.delete', $product->id) }}"
-                                                                    style="display: initial;">
-                                                                    @csrf
-                                                                    @method('delete')
-                                                                    <button class="delete btn btn-danger btn-sm" type="submit"
-                                                                        title="Delete" onclick="">
-                                                                        <i class="fas fa-trash-alt"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endcan
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>
+                                                            <div class="d-flex flex-wrap align-items-center" style="gap: 0.5rem;">
+                                                                @can('read-products')
+                                                                    <a href="{{ route('product.show', $product->id) }}" class="btn btn-sm btn-primary" title="View Details">
+                                                                        <i class="fa fa-eye"></i>
+                                                                    </a>
+                                                                @endcan
+                                                                @can('edit-products')
+                                                                    <a href="{{ route('product.edit', $product->id) }}" class="btn btn-sm btn-success" title="Edit">
+                                                                        <i class="fa fa-pen"></i>
+                                                                    </a>
+                                                                    <a href="{{ route('product.specifications', $product->id) }}" class="btn btn-sm btn-warning" title="Manage Specifications">
+                                                                        <i class="fa fa-list"></i>
+                                                                    </a>
+                                                                    <a href="{{ route('product.features', $product->id) }}" class="btn btn-sm btn-primary" title="Manage Features">
+                                                                        <i class="fa fa-list"></i>
+                                                                    </a>
+                                                                    <a href="{{ route('product.variants', $product->id) }}" class="btn btn-sm btn-success" title="Manage Variants">
+                                                                        <i class="fa fa-clipboard"></i>
+                                                                    </a>
+                                                                    <a href="{{ route('product.images', $product->id) }}" class="btn btn-sm btn-secondary" title="Manage Images">
+                                                                        <i class="fa fa-image"></i>
+                                                                    </a>
+                                                                @endcan
+                                                                @can('delete-products')
+                                                                    <form method="post" action="{{ route('product.delete', $product->id) }}" style="display: inline;">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                        <button class="delete btn btn-danger btn-sm" type="submit" title="Delete">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                            </div>
                                                         </td>
                                                         <td>{{ $product->name }}</td>
-                                                        <td>Rs {{ $product->price }}</td>
+                                                        <td>Rs {{ number_format($product->price, 2) }}</td>
                                                         <td>
                                                             @foreach ($product->categories as $category)
-                                                                {{ $category->name }}{{ !$loop->last ? ',' : '' }}
+                                                                <span class="badge badge-info">{{ $category->name }}</span>
                                                             @endforeach
                                                         </td>
-                                                        <td>{{ $product->brand ? $product->brand->name : '' }}</td>
+                                                        <td>{{ $product->brand ? $product->brand->name : 'N/A' }}</td>
                                                         <td>
                                                             @if ($product->getFirstMedia())
-                                                                <img src="{{ $product->getFirstMedia()->getUrl() }}"
-                                                                    width="100" />
+                                                                <img src="{{ $product->getFirstMedia()->getUrl() }}" class="img-thumbnail" style="height: 100px; object-fit: cover;" />
+                                                            @else
+                                                                <span class="text-muted">No Image</span>
                                                             @endif
                                                         </td>
-                                                        <td>{{ ucfirst($product->status) }}ed</td>
+                                                        <td>
+                                                            <span class="badge badge-{{ $product->status == 'publish' ? 'success' : ($product->status == 'active' ? 'success' : 'danger') }}">
+                                                                {{ ucfirst($product->status) }}ed
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Actions</th>
-                                                    <th>Name</th>
-                                                    <th>Price</th>
-                                                    <th>Category</th>
-                                                    <th>Brand</th>
-                                                    <th>Image</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>

@@ -22,27 +22,37 @@ class ProductController extends Controller
         $selected_brand = $request->brand_id ?? null;
         $selected_categories = $request->category_id ?? [];
         $query = $request->get('query') ?? null;
-        $products = Product::with('images')
-            ->orderBy('id', 'DESC');
-        if ($selected_brand != null) {
-            $products = $products->where('brand_id', $selected_brand);
-        }
-        if (count($selected_categories) > 0) {
-            $products = $products->whereHas('categories', function ($q) use ($selected_categories) {
-                $q->whereIn('categories.id', $selected_categories);
-            });
-        }
-        if (isset($request->query) && $request->query != '') {
 
-            $products = $products->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->get('query') . '%')
-                    ->orWhere('description', 'like', '%' . $request->get('query') . '%');
-            });
-        }
-        $products = $products->paginate(10);
-        $categories = Category::get();
-        $brands = Brand::get();
-        return view('admin.product.index', compact('products', 'categories', 'brands', 'selected_brand', 'selected_categories', 'query'));
+        // Get the items per page value from the request or default to 10
+        $itemsPerPage = $request->get('items_per_page', 10);
+
+        // Fetch products with filtering and pagination
+        $products = Product::with(['categories', 'brand'])
+            ->when($selected_brand, function ($query, $selected_brand) {
+                return $query->where('brand_id', $selected_brand);
+            })
+            ->when(!empty($selected_categories), function ($query) use ($selected_categories) {
+                return $query->whereHas('categories', function ($q) use ($selected_categories) {
+                    $q->whereIn('categories.id', $selected_categories);
+                });
+            })
+            ->when($query, function ($queryBuilder, $query) {
+                return $queryBuilder->where(function ($q) use ($query) {
+                    $q->where('name', 'like', '%' . $query . '%')
+                        ->orWhere('description', 'like', '%' . $query . '%');
+                });
+            })
+            ->orderBy('id', 'DESC')
+            ->paginate($itemsPerPage);
+
+        return view('admin.product.index', [
+            'products' => $products,
+            'brands' => Brand::all(),
+            'categories' => Category::all(),
+            'selected_brand' => $selected_brand,
+            'selected_categories' => $selected_categories,
+            'query' => $query,
+        ]);
     }
 
     public function create()
