@@ -187,7 +187,7 @@ class ProductController extends BaseController
         if (isset($request->min_rating) || isset($request->max_rating)) {
             $min_rating = $request->min_rating ?? 0;
             $max_rating = $request->max_rating ?? 5;
-            $filters[] = "rating BETWEEN $min_rating AND $max_rating";
+            $filters[] = "rating >= $min_rating AND rating <= $max_rating"; // Replace BETWEEN with valid syntax
         }
 
         $filterString = implode(' AND ', $filters);
