@@ -192,13 +192,18 @@ class ProductController extends BaseController
 
         $filterString = implode(' AND ', $filters);
 
+        // Ensure filterable attributes are set in the Meilisearch index
+        $index = app('meilisearch')->index('products'); // Replace 'products' with your actual index name
+        $index->updateFilterableAttributes([
+            'price', 'rating', 'categories.id', 'brand_id'
+        ]);
+
         $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
             $options['filter'] = $filterString;
             return $meilisearch->search($query, $options);
         })->paginate($paginate);
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
-
     }
 
     public function getBrandsForSearch(Request $request)
