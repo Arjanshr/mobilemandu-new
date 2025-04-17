@@ -142,7 +142,7 @@ class Product extends Model implements HasMedia
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'price' => $this->price,
+            'price' => (float) $this->price, // Ensure price is cast to a float
             'status' => $this->status,
             'brand_id' => $this->brand_id,
             'categories' => $this->categories->pluck('id')->toArray(),
