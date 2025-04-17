@@ -192,11 +192,14 @@ class ProductController extends BaseController
 
         $filterString = implode(' AND ', $filters);
 
+        // Add status filter to ensure only published products are retrieved
+        $filterString = "status = 'publish'" . (empty($filterString) ? '' : " AND $filterString");
+
         // Use Meilisearch\Client directly
         $meilisearch = new \Meilisearch\Client(config('scout.meilisearch.host'), config('scout.meilisearch.key'));
         $index = $meilisearch->index('products'); // Replace 'products' with your actual index name
         $index->updateFilterableAttributes([
-            'price', 'rating', 'categories.id', 'brand_id'
+            'price', 'rating', 'categories.id', 'brand_id', 'status'
         ]);
 
         $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
