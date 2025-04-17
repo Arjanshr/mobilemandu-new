@@ -10,10 +10,11 @@ use Spatie\Sluggable\SlugOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Laravel\Scout\Searchable;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory, LogsActivity, HasSlug, InteractsWithMedia;
+    use HasFactory, LogsActivity, HasSlug, InteractsWithMedia, Searchable;
     protected $fillable = [
         'brand_id',
         'name',
@@ -133,5 +134,19 @@ class Product extends Model implements HasMedia
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'price' => $this->price,
+            'status' => $this->status,
+            'brand_id' => $this->brand_id,
+            'categories' => $this->categories->pluck('id')->toArray(),
+            'rating' => $this->getAverageRating(),
+        ];
     }
 }

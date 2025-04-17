@@ -165,72 +165,53 @@ class ProductController extends BaseController
 
     public function searchProducts(Request $request, $paginate = 8)
     {
-        $products = Product::query()->where('status', 'publish');
-
-        if (!empty($request->query('query'))) {
-            $searchQuery = $request->query('query');
-            $pluralQuery = \Illuminate\Support\Str::plural($searchQuery);
-            $singularQuery = \Illuminate\Support\Str::singular($searchQuery);
-
-            $category_ids = Category::where('name', 'like', '%' . $searchQuery . '%')
-                ->orWhere('name', 'like', '%' . $pluralQuery . '%')
-                ->orWhere('name', 'like', '%' . $singularQuery . '%')
-                ->pluck('id');
-
-            $products->where(function ($query) use ($searchQuery, $pluralQuery, $singularQuery, $category_ids) {
-                $query->whereHas('categories', function ($q) use ($category_ids) {
-                    $q->whereIn('categories.id', $category_ids);
-                })
-                ->orWhere('name', 'like', '%' . $searchQuery . '%')
-                ->orWhere('name', 'like', '%' . $pluralQuery . '%')
-                ->orWhere('name', 'like', '%' . $singularQuery . '%')
-                ->orWhere('keywords', 'like', '%' . $searchQuery . '%')
-                ->orWhere('keywords', 'like', '%' . $pluralQuery . '%')
-                ->orWhere('keywords', 'like', '%' . $singularQuery . '%');
-            });
-
-            $tempQuery = clone $products;
-            if ($tempQuery->count() <= 5) {
-                $products->orWhere('description', 'like', '%' . $searchQuery . '%')
-                    ->orWhere('description', 'like', '%' . $pluralQuery . '%')
-                    ->orWhere('description', 'like', '%' . $singularQuery . '%');
-            }
-        }
+        $searchQuery = $request->query('query', '');
+        $filters = [];
 
         if (!empty($request->categories) && is_array($request->categories)) {
-            $category_ids = $request->categories;
-            $products->whereHas('categories', function ($query) use ($category_ids) {
-                $query->whereIn('categories.id', $category_ids);
-            });
+            $filters[] = 'categories.id IN [' . implode(',', $request->categories) . ']';
         }
 
         if (!empty($request->brand) && is_array($request->brand)) {
-            $products->whereIn('brand_id', $request->brand);
+            $filters[] = 'brand_id IN [' . implode(',', $request->brand) . ']';
         }
 
         if (!empty($request->min_price)) {
-            $products->where('price', '>=', $request->min_price);
+            $filters[] = 'price >= ' . $request->min_price;
         }
 
         if (!empty($request->max_price)) {
-            $products->where('price', '<=', $request->max_price);
+            $filters[] = 'price <= ' . $request->max_price;
         }
 
         if (isset($request->min_rating) || isset($request->max_rating)) {
             $min_rating = $request->min_rating ?? 0;
             $max_rating = $request->max_rating ?? 5;
-
-            $products->whereIn('id', function ($query) use ($min_rating, $max_rating) {
-                $query->select('product_id')
-                    ->from('reviews')
-                    ->groupBy('product_id')
-                    ->havingRaw('AVG(rating) BETWEEN ? AND ?', [$min_rating, $max_rating]);
-            });
+            $filters[] = "rating BETWEEN $min_rating AND $max_rating";
         }
 
-        $products = $products->orderBy('id', 'DESC')->paginate($paginate);
+        $filterString = implode(' AND ', $filters);
 
-        return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
+        $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
+            $options['filter'] = $filterString;
+            return $meilisearch->search($query, $options);
+        })->paginate($paginate);
+
+        return $this->sendResponse([
+            'current_page' => $products->currentPage(),
+            'data' => ProductResource::collection($products->items())->resource,
+            'first_page_url' => $products->url(1),
+            'from' => $products->firstItem(),
+            'last_page' => $products->lastPage(),
+            'last_page_url' => $products->url($products->lastPage()),
+            'links' => $products->linkCollection(),
+            'next_page_url' => $products->nextPageUrl(),
+            'path' => $products->path(),
+            'per_page' => $products->perPage(),
+            'prev_page_url' => $products->previousPageUrl(),
+            'to' => $products->lastItem(),
+            'total' => $products->total(),
+        ], 'Products retrieved successfully.');
     }
 
     public function getBrandsForSearch(Request $request)
