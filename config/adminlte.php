@@ -318,24 +318,24 @@ return [
         ],
         [
             'text'    => 'Users',
-            'icon'    => 'fas fa-fw fa-users',
+            'icon'    => 'fas fa-users', // Updated icon for Users
             'submenu' => [
                 [
-                    'icon'    => 'fa fa-arrow-right',
+                    'icon'    => 'fas fa-user-cog', // Updated icon for Manage Users
                     'text' => 'Manage Users',
                     'url'  => 'admin/users',
                     'can' => ['browse-users'],
                     'active' => ['users', 'users*', 'regex:@^content/[0-9]+$@'],
                 ],
                 [
-                    'icon'    => 'fa fa-arrow-right',
+                    'icon'    => 'fas fa-user-shield', // Updated icon for Manage Roles
                     'text' => 'Manage Roles',
                     'url'  => 'admin/roles',
                     'can' => ['browse-roles'],
                     'active' => ['roles', 'roles*', 'regex:@^content/[0-9]+$@'],
                 ],
                 [
-                    'icon'    => 'fa fa-arrow-right',
+                    'icon'    => 'fas fa-key', // Updated icon for Manage Permissions
                     'text' => 'Manage Permissions',
                     'url'  => 'admin/permissions',
                     'can' => ['browse-permissions'],
@@ -343,119 +343,21 @@ return [
                 ],
             ],
         ],
-        
         [
-            'header' => 'CONTENTS',
-            'key'=>'contents',
-            'can' => ['browse-contents','browse-featured-products','browse-new-arriavals','browse-popular-products','browse-combo-offers'],
+            'header' => 'PRODUCTS',
+            'can' => ['browse-products'],
         ],
         [
-            'text'    => 'Home Page',
-            'icon'    => 'fas fa-money-bill',
-            'can' => ['browse-contents'],
+            'text'    => 'Products',
+            'icon'    => 'fas fa-box', // Updated icon for Products
+            'can' => ['browse-products'],
             'submenu' => [
                 [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Featured Products',
-                    'url'  => 'admin/contents/featured-products',
-                    'can' => ['browse-contents'],
-                    'active' => ['featured-products', 'featured-products*', 'regex:@^content/[0-9]+$@'],
-                ],
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Popular Products',
-                    'url'  => 'admin/contents/popular-products',
-                    'can' => ['browse-contents'],
-                    'active' => ['popular-products', 'popular-products*', 'regex:@^content/[0-9]+$@'],
-                ],
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage New Arrivals',
-                    'url'  => 'admin/contents/new-arriavals',
-                    'can' => ['browse-contents'],
-                    'active' => ['new-arriavals', 'new-arriavals*', 'regex:@^content/[0-9]+$@'],
-                ],
-                // [
-                //     'icon'    => 'fa fa-arrow-right',
-                //     'text' => 'Manage Combo Offers',
-                //     'url'  => 'admin/offers/combo-offers',
-                //     'can' => ['browse-contents'],
-                //     'active' => ['combo-offers', 'combo-offers*', 'regex:@^content/[0-9]+$@'],
-                // ],
-            ],
-        ],
-        [
-            'text'    => 'Popup Banner',
-            'icon'    => 'fas fa-fw fa-list',
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Popup Banner',
-                    'url'  => 'admin/popup-banners',
-                    'can' => ['browse-popup-banners'],
-                    'active' => ['popup-banners', 'popup-banners*', 'regex:@^content/[0-9]+$@'],
-                ],
-            ],
-        ],
-        [
-            'text'    => 'Sliders',
-            'icon'    => 'fas fa-fw fa-list',
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Sliders',
-                    'url'  => 'admin/sliders',
-                    'can' => ['browse-sliders'],
-                    'active' => ['sliders', 'sliders*', 'regex:@^content/[0-9]+$@'],
-                ],
-            ],
-        ],
-        [
-            'text'    => 'Blogs',
-            'icon'    => 'fas fa-fw fa-list',
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Blogs',
-                    'url'  => 'admin/blogs',
-                    'can' => ['browse-blogs'],
-                    'active' => ['blogs', 'blogs*', 'regex:@^content/[0-9]+$@'],
-                ],
-            ],
-        ],
-        [
-            'header' => 'Campaigns',
-            'can' => ['browse-campaigns'],
-        ],
-        [
-            'text'    => 'Campaigns',
-            'icon'    => 'fas fa-fw fa-users',
-            'can' => ['browse-campaigns'],
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Campaigns',
-                    'url'  => 'admin/campaigns',
-                    'can' => ['browse-campaigns'],
-                    'active' => ['leads', 'leads*', 'regex:@^content/[0-9]+$@'],
-                ],
-            ],
-        ],
-        [
-            'header' => 'Coupons',
-            'can' => ['browse-coupons'],
-        ],
-        [
-            'text'    => 'Coupons',
-            'icon'    => 'fas fa-fw fa-users',
-            'can' => ['browse-coupons'],
-            'submenu' => [
-                [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Coupons',
-                    'url'  => 'admin/coupons',
-                    'can' => ['browse-coupons'],
-                    'active' => ['coupons', 'coupons*', 'regex:@^content/[0-9]+$@'],
+                    'icon'    => 'fas fa-boxes', // Updated icon for managing Products
+                    'text' => 'Manage Products',
+                    'url'  => 'admin/products',
+                    'can' => ['browse-products'],
+                    'active' => ['products', 'products*', 'regex:@^content/[0-9]+$@'],
                 ],
             ],
         ],
@@ -465,11 +367,11 @@ return [
         ],
         [
             'text'    => 'Categories',
-            'icon'    => 'fas fa-fw fa-list-alt',
+            'icon'    => 'fas fa-list-alt', // Updated icon for Categories
             'can' => ['browse-categories'],
             'submenu' => [
                 [
-                    'icon'    => 'fa fa-arrow-right',
+                    'icon'    => 'fas fa-folder', // Updated icon for managing Categories
                     'text' => 'Manage Categories',
                     'url'  => 'admin/categories',
                     'can' => ['browse-categories'],
@@ -483,11 +385,11 @@ return [
         ],
         [
             'text'    => 'Brands',
-            'icon'    => 'fas fa-fw fa-list-alt',
+            'icon'    => 'fas fa-tags', // Updated icon for Brands
             'can' => ['browse-brands'],
             'submenu' => [
                 [
-                    'icon'    => 'fa fa-arrow-right',
+                    'icon'    => 'fas fa-briefcase', // Updated icon for managing Brands
                     'text' => 'Manage Brands',
                     'url'  => 'admin/brands',
                     'can' => ['browse-brands'],
@@ -496,28 +398,118 @@ return [
             ],
         ],
         [
-            'header' => 'PRODUCTS',
-            'can' => ['browse-products'],
+            'header' => 'CONTENTS',
+            'key'=>'contents',
+            'can' => ['browse-contents','browse-featured-products','browse-new-arriavals','browse-popular-products','browse-combo-offers'],
         ],
         [
-            'text'    => 'Products',
-            'icon'    => 'fas fa-fw fa-list-alt',
-            'can' => ['browse-products'],
+            'text'    => 'Home Page',
+            'icon'    => 'fas fa-home', // Updated icon for Home Page
+            'can' => ['browse-contents'],
             'submenu' => [
                 [
-                    'icon'    => 'fa fa-arrow-right',
-                    'text' => 'Manage Products',
-                    'url'  => 'admin/products',
-                    'can' => ['browse-products'],
-                    'active' => ['products', 'products*', 'regex:@^content/[0-9]+$@'],
+                    'icon'    => 'fas fa-star', // Updated icon for Featured Products
+                    'text' => 'Manage Featured Products',
+                    'url'  => 'admin/contents/featured-products',
+                    'can' => ['browse-contents'],
+                    'active' => ['featured-products', 'featured-products*', 'regex:@^content/[0-9]+$@'],
+                ],
+                [
+                    'icon'    => 'fas fa-fire', // Updated icon for Popular Products
+                    'text' => 'Manage Popular Products',
+                    'url'  => 'admin/contents/popular-products',
+                    'can' => ['browse-contents'],
+                    'active' => ['popular-products', 'popular-products*', 'regex:@^content/[0-9]+$@'],
+                ],
+                [
+                    'icon'    => 'fas fa-box-open', // Updated icon for New Arrivals
+                    'text' => 'Manage New Arrivals',
+                    'url'  => 'admin/contents/new-arriavals',
+                    'can' => ['browse-contents'],
+                    'active' => ['new-arriavals', 'new-arriavals*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Popup Banner',
+            'icon'    => 'fas fa-image', // Updated icon for Popup Banner
+            'submenu' => [
+                [
+                    'icon'    => 'fas fa-edit', // Updated icon for managing Popup Banner
+                    'text' => 'Manage Popup Banner',
+                    'url'  => 'admin/popup-banners',
+                    'can' => ['browse-popup-banners'],
+                    'active' => ['popup-banners', 'popup-banners*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Sliders',
+            'icon'    => 'fas fa-sliders-h', // Updated icon for Sliders
+            'submenu' => [
+                [
+                    'icon'    => 'fas fa-edit', // Updated icon for managing Sliders
+                    'text' => 'Manage Sliders',
+                    'url'  => 'admin/sliders',
+                    'can' => ['browse-sliders'],
+                    'active' => ['sliders', 'sliders*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
+            'text'    => 'Blogs',
+            'icon'    => 'fas fa-blog', // Updated icon for Blogs
+            'submenu' => [
+                [
+                    'icon'    => 'fas fa-edit', // Updated icon for managing Blogs
+                    'text' => 'Manage Blogs',
+                    'url'  => 'admin/blogs',
+                    'can' => ['browse-blogs'],
+                    'active' => ['blogs', 'blogs*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
+            'header' => 'Campaigns',
+            'can' => ['browse-campaigns'],
+        ],
+        [
+            'text'    => 'Campaigns',
+            'icon'    => 'fas fa-bullhorn', // Updated icon for Campaigns
+            'can' => ['browse-campaigns'],
+            'submenu' => [
+                [
+                    'icon'    => 'fas fa-tasks', // Updated icon for managing Campaigns
+                    'text' => 'Manage Campaigns',
+                    'url'  => 'admin/campaigns',
+                    'can' => ['browse-campaigns'],
+                    'active' => ['leads', 'leads*', 'regex:@^content/[0-9]+$@'],
+                ],
+            ],
+        ],
+        [
+            'header' => 'Coupons',
+            'can' => ['browse-coupons'],
+        ],
+        [
+            'text'    => 'Coupons',
+            'icon'    => 'fas fa-ticket-alt', // Updated icon for Coupons
+            'can' => ['browse-coupons'],
+            'submenu' => [
+                [
+                    'icon'    => 'fas fa-tags', // Updated icon for managing Coupons
+                    'text' => 'Manage Coupons',
+                    'url'  => 'admin/coupons',
+                    'can' => ['browse-coupons'],
+                    'active' => ['coupons', 'coupons*', 'regex:@^content/[0-9]+$@'],
                 ],
             ],
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
+            'text' => 'Profile',
             'url'  => 'user/profile',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-user-circle', // Updated icon for Profile
         ],
         [
             'header' => 'SETTINGS',
@@ -525,23 +517,22 @@ return [
         ],
         [
             'text'    => 'Settings',
-            'icon'    => 'fas fa-fw fa-cog',
+            'icon'    => 'fas fa-cogs', // Updated icon for Settings
             'can' => 'browse-settings',
             'submenu' => [
                 [
                     'can' => 'browse-settings',
-                    'text' => 'Manage setting form',
+                    'text' => 'Manage Setting Form',
                     'url'  => 'admin/settings',
-                    'icon'    => 'fa fa-arrow-right',
-                    // 'active' => ['settings', 'settings*', 'regex:@^content/[0-9]+$@'],
+                    'icon' => 'fas fa-sliders-h', // Updated icon for managing Settings
                 ],
             ],
         ],
         [
             'can' => 'browse-general-settings',
-            'text' => 'General settings',
+            'text' => 'General Settings',
             'url'  => 'admin/settings/general',
-            'icon' => 'fas fa-fw fa-cog',
+            'icon' => 'fas fa-tools', // Updated icon for General Settings
         ],
     ],
 

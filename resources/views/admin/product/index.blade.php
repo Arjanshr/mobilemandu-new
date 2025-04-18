@@ -15,12 +15,12 @@
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col-md-4 mb-2">
-                                        <a href="{{ route('product.create') }}" class="btn btn-success btn-sm">
-                                            <i class="fas fa-plus"></i> Create Product
+                                        <a href="{{ route('product.create') }}" class="btn btn-success btn-sm" title="Create Product">
+                                            <i class="fas fa-plus-circle"></i> Create Product
                                         </a>
                                         @can('export-products')
                                         <a href="{{ route('product.export') }}" class="btn btn-info btn-sm ml-2" title="Export to CSV">
-                                            <i class="fas fa-file-export"></i>
+                                            <i class="fas fa-file-csv"></i>
                                         </a>
                                         @endcan
                                     </div>
@@ -30,7 +30,7 @@
                                             @csrf
                                             <input type="file" name="import_file" class="form-control-file mr-2">
                                             <button type="submit" class="btn btn-primary btn-sm" title="Import">
-                                                <i class="fas fa-file-import"></i>
+                                                <i class="fas fa-upload"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -76,8 +76,8 @@
                                                 </div>
                                                 <!-- Filter Button -->
                                                 <div class="form-group col-sm-2 d-flex align-items-end">
-                                                    <button id="submit" type="submit" class="btn btn-warning btn-block">
-                                                        <i class="fas fa-filter"></i> Filter
+                                                    <button id="submit" type="submit" class="btn btn-warning btn-block" title="Apply Filters">
+                                                        <i class="fas fa-search"></i> Filter
                                                     </button>
                                                 </div>
                                             </div>
@@ -128,32 +128,32 @@
                                                             <div class="d-flex flex-wrap align-items-center" style="gap: 0.5rem;">
                                                                 @can('read-products')
                                                                     <a href="{{ route('product.show', $product->id) }}" class="btn btn-sm btn-primary" title="View Details">
-                                                                        <i class="fa fa-eye"></i>
+                                                                        <i class="fas fa-eye"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('edit-products')
-                                                                    <a href="{{ route('product.edit', $product->id) }}" class="btn btn-sm btn-success" title="Edit">
-                                                                        <i class="fa fa-pen"></i>
+                                                                    <a href="{{ route('product.edit', $product->id) }}" class="btn btn-sm btn-success" title="Edit Product">
+                                                                        <i class="fas fa-edit"></i>
                                                                     </a>
                                                                     <a href="{{ route('product.specifications', $product->id) }}" class="btn btn-sm btn-warning" title="Manage Specifications">
-                                                                        <i class="fa fa-list"></i>
+                                                                        <i class="fas fa-cogs"></i>
                                                                     </a>
                                                                     <a href="{{ route('product.features', $product->id) }}" class="btn btn-sm btn-primary" title="Manage Features">
-                                                                        <i class="fa fa-list"></i>
+                                                                        <i class="fas fa-list-alt"></i>
                                                                     </a>
                                                                     <a href="{{ route('product.variants', $product->id) }}" class="btn btn-sm btn-success" title="Manage Variants">
-                                                                        <i class="fa fa-clipboard"></i>
+                                                                        <i class="fas fa-clone"></i>
                                                                     </a>
                                                                     <a href="{{ route('product.images', $product->id) }}" class="btn btn-sm btn-secondary" title="Manage Images">
-                                                                        <i class="fa fa-image"></i>
+                                                                        <i class="fas fa-images"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete-products')
                                                                     <form method="post" action="{{ route('product.delete', $product->id) }}" style="display: inline;">
                                                                         @csrf
                                                                         @method('delete')
-                                                                        <button class="delete btn btn-danger btn-sm" type="submit" title="Delete">
-                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        <button class="delete btn btn-danger btn-sm" type="submit" title="Delete Product">
+                                                                            <i class="fas fa-trash"></i>
                                                                         </button>
                                                                     </form>
                                                                 @endcan
