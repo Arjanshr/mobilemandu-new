@@ -19,7 +19,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ControlSidebarController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +28,6 @@ Route::get('/storage-link', function () {
     return 'storage:linked';
 });
 Route::get('/front-test', [FrontController::class, 'test'])->name('front.test');
-Route::get('/control-sidebar', [ControlSidebarController::class, 'index'])->name('control-sidebar');
 Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'loginSocial'])
         ->name('socialite.auth');
