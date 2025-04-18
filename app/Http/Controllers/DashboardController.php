@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
+use Spatie\Activitylog\Models\Activity; // Import Spatie's Activity model
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -18,7 +19,7 @@ class DashboardController extends Controller
         $recentOrders = Order::latest()->take(5)->get();
         $recentUsers = User::latest()->take(5)->get();
         $recentProducts = Product::with('variants')->latest()->take(5)->get();
-        $activities = [];
+        $activities = Activity::latest()->take(10)->get(); // Fetch the latest 10 activities
 
         return view('admin.dashboard', compact(
             'userCount',
