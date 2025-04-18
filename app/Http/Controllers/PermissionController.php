@@ -29,7 +29,10 @@ class PermissionController extends Controller
                 ]);
             }
         } else {
-            $permission = Permission::create($request->all());
+            $permission = Permission::create([
+                'name' =>  $request->name,
+                'guard_name' => 'web'
+            ]);
         }
         toastr()->success('Permission Created Successfully!');
         return redirect()->route('permissions');
