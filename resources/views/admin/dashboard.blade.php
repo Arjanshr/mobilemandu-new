@@ -142,19 +142,8 @@
 
 
 @section('right-sidebar')
-    <div class="p-3">
-        <h5>User Activities</h5>
-        <ul class="list-group">
-            @forelse ($activities as $activity)
-                <li class="list-group-item">
-                    {{ $activity->causer ? $activity->causer->name : 'Someone' }} 
-                    {{ $activity->description }} 
-                    {{ $activity->subject ? $activity->subject->name : 'a subject' }} 
-                    <small class="text-muted">({{ $activity->created_at->diffForHumans() }})</small>
-                </li>
-            @empty
-                <li class="list-group-item text-center">No recent activities.</li>
-            @endforelse
-        </ul>
+    <div class="p-3 text-white">
+        <h5>Test Sidebar Content</h5>
+        <p>This is static content to test rendering.</p>
     </div>
 @endsection
