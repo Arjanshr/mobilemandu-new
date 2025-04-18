@@ -149,7 +149,7 @@
                 <li class="list-group-item">
                     {{ $activity->causer ? $activity->causer->name : 'Someone' }} 
                     {{ $activity->description }} 
-                    {{ $activity->subject ? $activity->subject->name : 'a '.last(explode('\\', $activity->subject_type)) }} 
+                    {{ $activity->subject&&$activity->subject->name ? $activity->subject->name : 'a '.last(explode('\\', $activity->subject_type)) }} 
                     <small class="text-muted">({{ $activity->created_at->diffForHumans() }})</small>
                 </li>
             @empty
