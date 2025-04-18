@@ -19,7 +19,10 @@ class DashboardController extends Controller
         $recentOrders = Order::latest()->take(5)->get();
         $recentUsers = User::latest()->take(5)->get();
         $recentProducts = Product::with('variants')->latest()->take(5)->get();
-        $activities = Activity::latest()->take(10)->get(); // Fetch the latest 10 activities
+        $activities = Activity::latest()->take(10)->get()->map(function ($activity) {
+            $activity->description = str_replace('App\Models\Product', 'Product', $activity->description);
+            return $activity;
+        }); // Customize activity descriptions
 
         return view('admin.dashboard', compact(
             'userCount',
