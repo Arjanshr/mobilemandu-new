@@ -82,7 +82,7 @@ class ProductController extends Controller
 
     public function update(Product $product, ProductRequest $request)
     {
-        $product->update($request->only(['name', 'description', 'price', 'status', 'alt_text', 'keywords']));
+        $product->update($request->only(['name', 'brand_id', 'description', 'price', 'status', 'alt_text', 'keywords']));
         $product->categories()->sync($request->category_id);
         toastr()->success('Product Edited Successfully!');
         return redirect()->route('products');
@@ -298,7 +298,7 @@ class ProductController extends Controller
         $variants = $request['variants'];
         foreach ($variants as $variant_data) {
             // Generate SKU based on specifications (e.g., RAM, ROM, Color)
-            $sku = $this->generateUniqueSku($variant_data,$product);
+            $sku = $this->generateUniqueSku($variant_data, $product);
             // Create the variant with price, stock_quantity, and sku
             $variant = $product->variants()->create([
                 'price' => $variant_data['price'],
