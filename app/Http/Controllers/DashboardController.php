@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $recentOrders = Order::latest()->take(5)->get();
         $recentUsers = User::latest()->take(5)->get();
         $recentProducts = Product::with('variants')->latest()->take(5)->get();
-        $activities = Activity::latest()->take(12)->get(); // Fetch the latest 10 activities
+        $activities = Activity::latest()->take(10)->get(); // Fetch the latest 10 activities
 
         return view('admin.dashboard', compact(
             'userCount',
