@@ -129,5 +129,6 @@ Route::prefix('v1')->group(function () {
         Route::post('remove-from-wishlist/{product}', [UserController::class, 'removeFromWishlist']);
         //Coupon
         Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
+        Route::get('/notifications', [AuthController::class, 'getNotifications']);
     });
 });

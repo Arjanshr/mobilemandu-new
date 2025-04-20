@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Models\Notification;
+use App\Models\Wishlist;
+use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
@@ -61,6 +64,7 @@ class AuthController extends BaseController
             if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
                 if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                     $user = Auth::user();
+                    $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
                     $success['token'] =  $user->createToken('MyApp')->plainTextToken;
                     $success['name'] =  $user->name;
                     return $this->sendResponse($success, 'User login successfully.');
@@ -75,6 +79,7 @@ class AuthController extends BaseController
             if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
                 if (Auth::attempt(['phone' => $request->email, 'password' => $request->password])) {
                     $user = Auth::user();
+                    $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
                     $success['token'] =  $user->createToken('MyApp')->plainTextToken;
                     $success['name'] =  $user->name;
                     return $this->sendResponse($success, 'User login successfully.');
@@ -122,5 +127,40 @@ class AuthController extends BaseController
         ]);
         $status = Password::sendResetLink($request->only('email'));
         return $status === Password::RESET_LINK_SENT ? $this->sendResponse(null, __($status)) : $this->sendError(__($status));
+    }
+
+    public function checkWishlistForCampaigns($userId)
+    {
+        $wishlistItems = Wishlist::where('user_id', $userId)->pluck('product_id');
+        $activeCampaigns = Campaign::running()->whereHas('products', function ($query) use ($wishlistItems) {
+            $query->whereIn('products.id', $wishlistItems); // Specify 'products.id' to avoid ambiguity
+        })->get();
+
+        foreach ($activeCampaigns as $campaign) {
+            foreach ($campaign->products as $product) {
+                if ($wishlistItems->contains($product->id)) {
+                    // Check if a notification already exists for this product and campaign
+                    $existingNotification = Notification::where('user_id', $userId)
+                        ->where('message', "The product '{$product->name}' in your wishlist is part of an active campaign: '{$campaign->name}'. Check it out!")
+                        ->exists();
+
+                    if (!$existingNotification) {
+                        $message = "The product '{$product->name}' in your wishlist is part of an active campaign: '{$campaign->name}'. Check it out!";
+                        Notification::create([
+                            'user_id' => $userId,
+                            'message' => $message,
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function getNotifications(Request $request)
+    {
+        $user = auth()->user();
+        $notifications = Notification::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+
+        return $this->sendResponse($notifications, 'Notifications retrieved successfully.');
     }
 }

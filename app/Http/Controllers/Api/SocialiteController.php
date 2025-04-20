@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Notification;
+use App\Models\Wishlist;
+use App\Models\Campaign;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends BaseController
 {
-    public function loginSocial(string $provider = null)
+    public function loginSocial(?string $provider = null)
     {
         if ($provider == 'facebook') {
             $data['FACEBOOK_CLIENT_ID'] = env('FACEBOOK_CLIENT_ID');
@@ -69,14 +70,44 @@ class SocialiteController extends BaseController
             }
         }
 
-
         if ($request->avatar_url)
             $data['avatar'] = $request->avatar_url;
         $user->update($data);
+
+        // Check wishlist for campaigns and add notifications
+        $this->checkWishlistForCampaigns($user->id);
+
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['name'] =  $user->name;
 
         return $this->sendResponse($success, 'User login successfully.');
+    }
+
+    protected function checkWishlistForCampaigns($userId)
+    {
+        $wishlistItems = Wishlist::where('user_id', $userId)->pluck('product_id');
+        $activeCampaigns = Campaign::running()->whereHas('products', function ($query) use ($wishlistItems) {
+            $query->whereIn('products.id', $wishlistItems); // Specify 'products.id' to avoid ambiguity
+        })->get();
+
+        foreach ($activeCampaigns as $campaign) {
+            foreach ($campaign->products as $product) {
+                if ($wishlistItems->contains($product->id)) {
+                    // Check if a notification already exists for this product and campaign
+                    $existingNotification = Notification::where('user_id', $userId)
+                        ->where('message', "The product '{$product->name}' in your wishlist is part of an active campaign: '{$campaign->name}'. Check it out!")
+                        ->exists();
+
+                    if (!$existingNotification) {
+                        $message = "The product '{$product->name}' in your wishlist is part of an active campaign: '{$campaign->name}'. Check it out!";
+                        Notification::create([
+                            'user_id' => $userId,
+                            'message' => $message,
+                        ]);
+                    }
+                }
+            }
+        }
     }
 
     protected function validateProvider($provider): array
