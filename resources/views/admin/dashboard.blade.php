@@ -67,7 +67,7 @@
 
         <div class="row">
             <!-- Recently Added Products -->
-            <div class="col-lg-7">
+            <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Recently Added Products</h3>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
+            <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Remove Background Test</h3>
