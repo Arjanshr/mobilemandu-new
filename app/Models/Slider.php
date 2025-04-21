@@ -13,6 +13,7 @@ class Slider extends Model
         'title',
         'type',
         'image',
+        'mobile_image',
         'link_url',
         'display_order'
     ];

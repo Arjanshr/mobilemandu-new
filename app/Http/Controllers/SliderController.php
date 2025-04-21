@@ -23,7 +23,15 @@ class SliderController extends Controller
     public function insert(SliderRequest $request)
     {
         $slider = $request->validated();
-        $slider['image'] = $request->hasFile('image') ? $request->validated()['image']->file_name : '';
+
+        $slider['image'] = $request->hasFile('image') 
+            ? $request->validated()['image']->file_name 
+            : '';
+
+        $slider['mobile_image'] = $request->hasFile('mobile_image') 
+            ? $request->validated()['mobile_image']->file_name 
+            : null;
+
         Slider::create($slider);
         toastr()->success('Slider Created Successfully!');
         return redirect()->route('sliders');
@@ -45,11 +53,21 @@ class SliderController extends Controller
         $slider->title = $request->title;
         $slider->link_url = $request->link_url;
         $slider->display_order = $request->display_order;
+
         if ($request->hasFile('image')) {
-            if (File::exists(storage_path("app/public/sliders/$slider->image")))
+            if (File::exists(storage_path("app/public/sliders/$slider->image"))) {
                 File::delete(storage_path("app/public/sliders/$slider->image"));
+            }
             $slider->image = $request->validated()['image']->file_name;
         }
+
+        if ($request->hasFile('mobile_image')) {
+            if ($slider->mobile_image && File::exists(storage_path("app/public/sliders/$slider->mobile_image"))) {
+                File::delete(storage_path("app/public/sliders/$slider->mobile_image"));
+            }
+            $slider->mobile_image = $request->validated()['mobile_image']->file_name;
+        }
+
         $slider->save();
         toastr()->success('Slider Edited Successfully!');
         return redirect()->route('sliders');
@@ -57,8 +75,14 @@ class SliderController extends Controller
 
     public function delete(Slider $slider)
     {
-        if (File::exists(storage_path("app/public/sliders/$slider->image")))
+        if (File::exists(storage_path("app/public/sliders/$slider->image"))) {
             File::delete(storage_path("app/public/sliders/$slider->image"));
+        }
+
+        if ($slider->mobile_image && File::exists(storage_path("app/public/sliders/$slider->mobile_image"))) {
+            File::delete(storage_path("app/public/sliders/$slider->mobile_image"));
+        }
+
         $slider->delete();
         toastr()->success('Slider Deleted Successfully!');
         return redirect()->route('sliders');
@@ -74,5 +98,4 @@ class SliderController extends Controller
 
         return response()->json(['success' => true]);
     }
-
 }

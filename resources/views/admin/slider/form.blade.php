@@ -8,7 +8,6 @@
 
 @section('content')
 
-
     <div class="card-body">
         <section class="content">
             <div class="container-fluid">
@@ -26,7 +25,7 @@
                                     @method('patch')
                                 @endif
                                 <div class="card-body row">
-                                     <!-- Status -->
+                                     <!-- Type -->
                                      <div class="form-group col-sm-6">
                                         <label for="type">Type*</label>
                                         <select id='type' name="type" class="form-control" required>
@@ -39,12 +38,13 @@
                                                 {{ (isset($slider) && $slider->type == 'banner') || old('type') == 'banner' ? 'selected' : '' }}>
                                                 Banner
                                             </option>
-
                                         </select>
                                         @error('type')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <!-- Title -->
                                     <div class="form-group col-sm-6">
                                         <label for="title">Slider Title</label>
                                         <input type="text" class="form-control" id="title" name="title" placeholder="Slider Title"
@@ -53,7 +53,8 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <!-- URL -->
+
+                                    <!-- Link URL -->
                                     <div class="form-group col-sm-6">
                                         <label for="link_url">Link URL</label>
                                         <input type="url" class="form-control" id="link_url" name="link_url" placeholder="Link URL"
@@ -62,7 +63,8 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <!-- URL -->
+
+                                    <!-- Display Order -->
                                     <div class="form-group col-sm-6">
                                         <label for="display_order">Display Order</label>
                                         <input type="number" class="form-control" id="display_order" name="display_order" placeholder="Display Order"
@@ -71,33 +73,46 @@
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <!--  Image -->
+
+                                    <!-- Image -->
                                     <div class="form-group col-sm-6">
                                         <label for="image">Image*</label>
                                         <input type="file" class="form-control" name="image" {{isset($slider)?'':'required'}}/>
                                         @if (isset($slider) && $slider->image)
-                                            <img src="{{ asset('storage/sliders/' . $slider->image) }}"class="img-fluid img-thumbnail"
+                                            <img src="{{ asset('storage/sliders/' . $slider->image) }}" class="img-fluid img-thumbnail"
                                                 style="height:100px" />
                                         @endif
                                         @error('image')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <!-- Mobile Image -->
+                                    <div class="form-group col-sm-6">
+                                        <label for="mobile_image">Mobile Image</label>
+                                        <input type="file" class="form-control" name="mobile_image" />
+                                        @if (isset($slider) && $slider->mobile_image)
+                                            <img src="{{ asset('storage/sliders/' . $slider->mobile_image) }}" class="img-fluid img-thumbnail"
+                                                style="height:100px" />
+                                        @endif
+                                        @error('mobile_image')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Submit Button -->
                                     <div class="form-group col-sm-12">
                                         <input id="submit" type="submit" value="{{ isset($slider) ? 'Edit' : 'Create' }}"
                                             class="btn btn-primary" />
                                     </div>
                             </form>
                         </div>
-                        
                     </div>
 
                 </div>
-
             </div>
         </section>
     </div>
-
 
 @stop
 

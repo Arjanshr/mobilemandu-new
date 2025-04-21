@@ -17,8 +17,11 @@ class SliderResource extends JsonResource
         return [
             'title' => $this->title,
             'link_url' => $this->link_url,
-            "display_order" => $this->display_order,
-            "imageLink" => $this->image?asset('storage/sliders/' . $this->image):asset('images/default.png'),
+            'display_order' => $this->display_order,
+            // Desktop image
+            'imageLink' => $this->image ? asset('storage/sliders/' . $this->image) : asset('images/default.png'),
+            // Mobile image
+            'mobileImageLink' => $this->mobile_image ? asset('storage/sliders/' . $this->mobile_image) : asset('images/default.png'),
         ];
     }
 }
