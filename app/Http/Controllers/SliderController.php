@@ -23,17 +23,15 @@ class SliderController extends Controller
     public function insert(SliderRequest $request)
     {
         $slider = $request->validated();
-    
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $slider['image'] = $request->file('image')->store('sliders', 'public'); // Store the file and get the path
-        }
-    
-        // Handle mobile image upload
-        if ($request->hasFile('mobile_image')) {
-            $slider['mobile_image'] = $request->file('mobile_image')->store('sliders', 'public'); // Store mobile image
-        }
-    
+
+        $slider['image'] = $request->hasFile('image') 
+            ? $request->validated()['image']->file_name 
+            : '';
+
+        $slider['mobile_image'] = $request->hasFile('mobile_image') 
+            ? $request->validated()['mobile_image']->file_name 
+            : null;
+
         Slider::create($slider);
         toastr()->success('Slider Created Successfully!');
         return redirect()->route('sliders');
@@ -55,25 +53,21 @@ class SliderController extends Controller
         $slider->title = $request->title;
         $slider->link_url = $request->link_url;
         $slider->display_order = $request->display_order;
-    
-        // Update image if a new file is uploaded
+
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if (File::exists(storage_path("app/public/sliders/$slider->image"))) {
                 File::delete(storage_path("app/public/sliders/$slider->image"));
             }
-            $slider->image = $request->file('image')->store('sliders', 'public'); // Store and get new filename
+            $slider->image = $request->validated()['image']->file_name;
         }
-    
-        // Update mobile image if a new file is uploaded
+
         if ($request->hasFile('mobile_image')) {
-            // Delete old mobile image if exists
             if ($slider->mobile_image && File::exists(storage_path("app/public/sliders/$slider->mobile_image"))) {
                 File::delete(storage_path("app/public/sliders/$slider->mobile_image"));
             }
-            $slider->mobile_image = $request->file('mobile_image')->store('sliders', 'public'); // Store and get new filename
+            $slider->mobile_image = $request->validated()['mobile_image']->file_name;
         }
-    
+
         $slider->save();
         toastr()->success('Slider Edited Successfully!');
         return redirect()->route('sliders');

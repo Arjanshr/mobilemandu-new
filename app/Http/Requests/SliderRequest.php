@@ -40,5 +40,10 @@ class SliderRequest extends FormRequest
             $this->image->move(storage_path('app/public/sliders'), $image_name);
             $this['image']->file_name = $image_name;
         }
+        if ($this->hasFile('mobile_image')) {
+            $image_name = rand(0, 99999) . time() . '.' . $this->mobile_image->extension();
+            $this->mobile_image->move(storage_path('app/public/sliders'), $image_name);
+            $this['mobile_image']->file_name = $image_name;
+        }
     }
 }
