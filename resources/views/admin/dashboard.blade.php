@@ -67,7 +67,7 @@
 
         <div class="row">
             <!-- Recently Added Products -->
-            <div class="col-lg-12">
+            <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Recently Added Products</h3>
@@ -93,6 +93,21 @@
                                 </li>
                             @endforeach
                         </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Remove Background Test</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/remove-bg" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="image" required>
+                            <button type="submit">Remove Background</button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>

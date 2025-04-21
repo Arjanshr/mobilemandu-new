@@ -10,6 +10,7 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PopupBannerController;
@@ -27,6 +28,8 @@ Route::get('/storage-link', function () {
     Artisan::call('storage:link');
     return 'storage:linked';
 });
+Route::post('/remove-bg', [ImageController::class, 'removeBackground']);
+
 Route::get('/front-test', [FrontController::class, 'test'])->name('front.test');
 Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'loginSocial'])
