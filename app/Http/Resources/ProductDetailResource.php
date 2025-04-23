@@ -59,7 +59,7 @@ class ProductDetailResource extends JsonResource
             "original_amount" => $this->price,
             "added_to_cart" => false,
             "added_to_wishlist" => $user
-                ? $user->hasInWishlist($this->product->id)
+                ? $user->hasInWishlist($this->id)
                 : false,
             "offer" => null,
             "status" => $this->status,

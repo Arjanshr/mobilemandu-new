@@ -25,7 +25,7 @@ class ProductResource extends JsonResource
             "original_amount" => $this->price,
             "added_to_cart" => false,
             "added_to_wishlist" => $user
-                ? $user->hasInWishlist($this->product->id)
+                ? $user->hasInWishlist($this->id)
                 : false,
             "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
             "offer" => null,
