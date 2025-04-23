@@ -44,7 +44,7 @@ class UserRequest extends FormRequest
             'address' => 'nullable|string|max:500',
     
             // Require role only if user ID is null (registration)
-            'role' => $userId ? 'sometimes|array' : 'required|array',
+            // 'role' => $userId ? 'sometimes|array' : 'required|array',
             'role.*' => ['sometimes', Rule::exists('roles', 'name')],
         ];
     }

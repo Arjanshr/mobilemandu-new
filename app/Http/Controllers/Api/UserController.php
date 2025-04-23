@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReviewRequest;
+use App\Http\Requests\UserProfileRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\MyReviewsResource;
@@ -36,7 +37,7 @@ class UserController extends BaseController
         return $this->sendResponse(AddressResource::collection($addresses), 'Addresses retrieved successfully.');
     }
 
-    public function editProfile(UserRequest $request)
+    public function editProfile(UserProfileRequest $request)
     {
         $user = auth()->user();
         $user->name = $request->name;
