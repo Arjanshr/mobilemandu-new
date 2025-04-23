@@ -14,6 +14,8 @@ class ContentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
+
         return [
             "id" => $this->product->id,
             "name" => $this->product->name,
@@ -22,15 +24,17 @@ class ContentResource extends JsonResource
             "discounted_amount" => $this->product->discounted_price,
             "original_amount" => $this->product->price,
             "added_to_cart" => false,
-            "added_to_wishlist" => false,
-            "image_link" => $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
+            "added_to_wishlist" => $user
+                ? $user->hasInWishlist($this->product->id)
+                : false,
+            "image_link" => $this->product->getFirstMedia()?->getUrl(),
             "offer" => null,
             "alt_text" => $this->alt_text,
             "status" => $this->product->status,
             "tags" => [
                 "new" => $this->product->isNew(),
                 "popular" => $this->product->isPopular(),
-                "campaign" => $this->product->isCampaignProduct()->first() ? $this->product->isCampaignProduct()->first()->name : false,
+                "campaign" => optional($this->product->isCampaignProduct()->first())->name ?? false,
             ]
         ];
     }

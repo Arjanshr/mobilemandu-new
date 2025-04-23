@@ -8,6 +8,8 @@ use Illuminate\Pagination\Paginator;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\OptionalAuthenticate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,5 +42,6 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super-admin') ? true : null;
         });
         Paginator::useBootstrap();
+        Route::aliasMiddleware('optional.auth', OptionalAuthenticate::class);
     }
 }

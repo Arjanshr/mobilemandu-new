@@ -70,7 +70,7 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    
+
     protected function casts(): array
     {
         return [
@@ -98,7 +98,7 @@ class User extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new ResetPasswordNotification($token,request()->reset_url));
+        $this->notify(new ResetPasswordNotification($token, request()->reset_url));
     }
 
     public function addresses()
@@ -116,4 +116,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Coupon::class);
     }
 
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function hasInWishlist($product_id)
+    {
+        return $this->wishlists()->where('product_id', $product_id)->exists();
+    }
 }

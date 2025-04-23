@@ -16,7 +16,8 @@ class CampaignProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         $campaign = Campaign::find($this->pivot->campaign_id)->hasStarted();
-        
+        $user = $request->user();
+
         return [
             "id" => $this->id,
             "name" => $this->name,
@@ -26,8 +27,9 @@ class CampaignProductResource extends JsonResource
             "original_amount" => $this->price,
             "campaign_price" => $campaign ? $this->pivot->campaign_price : '???',
             "added_to_cart" => false,
-            "added_to_wishlist" => false,
-            "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
+            "added_to_wishlist" => $user
+                ? $user->hasInWishlist($this->product->id)
+                : false,            "image_link" => $this->getFirstMedia() ? $this->getFirstMedia()->getUrl() : null,
             "offer" => null,
             "status" => $this->status,
             "tags"=>[

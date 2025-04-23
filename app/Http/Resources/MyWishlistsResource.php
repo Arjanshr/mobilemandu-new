@@ -15,6 +15,7 @@ class MyWishlistsResource extends JsonResource
     public function toArray(Request $request): array
     {
         $product = $this->product;
+        $user = $request->user();
 
         return [
             "id" => $product ? $product->id : null,
@@ -24,7 +25,9 @@ class MyWishlistsResource extends JsonResource
             "discounted_amount" => $product ? $product->discounted_price : null,
             "original_amount" => $product ? $product->price : null,
             "added_to_cart" => false,
-            "added_to_wishlist" => false,
+            "added_to_wishlist" => $user
+                ? $user->hasInWishlist($this->product->id)
+                : false,
             "image_link" => $product && $product->getFirstMedia() ? $product->getFirstMedia()->getUrl() : null,
             "offer" => null,
             "alt_text" => $this->alt_text,

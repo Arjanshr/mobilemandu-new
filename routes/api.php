@@ -27,10 +27,9 @@ use App\Http\Controllers\Api\UserController;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::middleware('guest')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('registers', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
+    Route::middleware('optional.auth')->group(function () {
+        //Home Page Contents
+        Route::get('/content/{content_type?}/{items_per_page?}', [ContentController::class, 'getProductList']);
         Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
         Route::post('password/email', [AuthController::class, 'resetPasswordSendEmail']);
         Route::get('brands', [BrandController::class, 'brands']);
@@ -80,8 +79,7 @@ Route::prefix('v1')->group(function () {
         Route::get('social-login-data/{provider?}', [SocialiteController::class, 'loginSocial']);
         Route::post('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial']);
 
-        //Home Page Contents
-        Route::get('/content/{content_type?}/{items_per_page?}', [ContentController::class, 'getProductList']);
+
 
         //Place Order
         Route::post('orders/place', [OrderController::class, 'create']);
@@ -109,6 +107,12 @@ Route::prefix('v1')->group(function () {
 
         //Popup Banner
         Route::get('popup-banner', [PopupBannerController::class, 'first']);
+
+    });
+    Route::middleware('guest')->group(function () {
+        Route::post('register', [AuthController::class, 'register']);
+        Route::post('registers', [AuthController::class, 'register']);
+        Route::post('login', [AuthController::class, 'login']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

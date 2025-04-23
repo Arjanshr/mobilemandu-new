@@ -47,6 +47,7 @@ class ProductDetailResource extends JsonResource
                 }),
             ];
         });
+        $user = $request->user();
 
         return [
             "id" => $this->id,
@@ -57,7 +58,9 @@ class ProductDetailResource extends JsonResource
             "discounted_amount" => $this->discounted_price,
             "original_amount" => $this->price,
             "added_to_cart" => false,
-            "added_to_wishlist" => false,
+            "added_to_wishlist" => $user
+                ? $user->hasInWishlist($this->product->id)
+                : false,
             "offer" => null,
             "status" => $this->status,
             "images" => $image_urls,
