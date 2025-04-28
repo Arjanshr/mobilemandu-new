@@ -24,22 +24,25 @@ class ProductController extends Controller
         $query = $request->get('query') ?? null;
 
         // Get the items per page value from the request or default to 10
-        $itemsPerPage = $request->get('items_per_page', 10);
+        $itemsPerPage = $request->get('items_per_page', 20);
 
         // Fetch products with filtering and pagination
         $products = Product::with(['categories', 'brand'])
-            ->when($selected_brand, function ($query, $selected_brand) {
-                return $query->where('brand_id', $selected_brand);
+            ->when($selected_brand, function ($queryBuilder, $selected_brand) {
+                return $queryBuilder->where('brand_id', $selected_brand);
             })
-            ->when(!empty($selected_categories), function ($query) use ($selected_categories) {
-                return $query->whereHas('categories', function ($q) use ($selected_categories) {
+            ->when(!empty($selected_categories), function ($queryBuilder) use ($selected_categories) {
+                return $queryBuilder->whereHas('categories', function ($q) use ($selected_categories) {
                     $q->whereIn('categories.id', $selected_categories);
                 });
             })
             ->when($query, function ($queryBuilder, $query) {
-                return $queryBuilder->where(function ($q) use ($query) {
-                    $q->where('name', 'like', '%' . $query . '%')
-                        ->orWhere('description', 'like', '%' . $query . '%');
+                $terms = array_map('trim', explode(',', $query));
+                return $queryBuilder->where(function ($q) use ($terms) {
+                    foreach ($terms as $term) {
+                        $q->orWhere('name', 'like', '%' . $term . '%')
+                            ->orWhere('description', 'like', '%' . $term . '%');
+                    }
                 });
             })
             ->orderBy('id', 'DESC')
@@ -54,6 +57,7 @@ class ProductController extends Controller
             'query' => $query,
         ]);
     }
+
 
     public function create()
     {
@@ -419,9 +423,32 @@ class ProductController extends Controller
         toastr()->success('Product Specification Deleted Successfully!');
         return redirect()->route('product.specifications', $product->id);
     }
-    public function export()
+    public function export(Request $request)
     {
-        $products = Product::with(['categories', 'brand', 'variants', 'media'])->get();
+        $selected_brand = $request->brand_id ?? null;
+        $selected_categories = $request->category_id ?? [];
+        $query = $request->get('query') ?? null;
+
+        $products = Product::with(['categories', 'brand', 'variants', 'media'])
+            ->when($selected_brand, function ($queryBuilder, $selected_brand) {
+                return $queryBuilder->where('brand_id', $selected_brand);
+            })
+            ->when(!empty($selected_categories), function ($queryBuilder) use ($selected_categories) {
+                return $queryBuilder->whereHas('categories', function ($q) use ($selected_categories) {
+                    $q->whereIn('categories.id', $selected_categories);
+                });
+            })
+            ->when($query, function ($queryBuilder, $query) {
+                $terms = array_map('trim', explode(',', $query));
+                return $queryBuilder->where(function ($q) use ($terms) {
+                    foreach ($terms as $term) {
+                        $q->orWhere('name', 'like', '%' . $term . '%')
+                            ->orWhere('description', 'like', '%' . $term . '%');
+                    }
+                });
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
 
         $csvData = [];
         $csvData[] = ['ID', 'Name', 'Price', 'Category', 'Brand', 'Variant', 'Status', 'Image Link', 'Product Link'];

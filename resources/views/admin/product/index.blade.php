@@ -19,7 +19,7 @@
                                             <i class="fas fa-plus-circle"></i> Create Product
                                         </a>
                                         @can('export-products')
-                                        <a href="{{ route('product.export') }}" class="btn btn-info btn-sm ml-2" title="Export to CSV">
+                                        <a href="{{ route('product.export', request()->query()) }}" class="btn btn-info btn-sm ml-2" title="Export to CSV">
                                             <i class="fas fa-file-csv"></i>
                                         </a>
                                         @endcan
