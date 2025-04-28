@@ -21,31 +21,21 @@ class ProductController extends Controller
     {
         $selected_brand = $request->brand_id ?? null;
         $selected_categories = $request->category_id ?? [];
-        $query = $request->get('query') ?? null;
-
-        // Get the items per page value from the request or default to 10
+        $search_query = $request->get('query') ?? null;
         $itemsPerPage = $request->get('items_per_page', 20);
 
-        // Fetch products with filtering and pagination
         $products = Product::with(['categories', 'brand'])
-            ->when($selected_brand, function ($queryBuilder, $selected_brand) {
-                return $queryBuilder->where('brand_id', $selected_brand);
-            })
-            ->when(!empty($selected_categories), function ($queryBuilder) use ($selected_categories) {
-                return $queryBuilder->whereHas('categories', function ($q) use ($selected_categories) {
-                    $q->whereIn('categories.id', $selected_categories);
-                });
-            })
-            ->when($query, function ($queryBuilder, $query) {
-                $terms = array_map('trim', explode(',', $query));
-                return $queryBuilder->where(function ($q) use ($terms) {
-                    foreach ($terms as $term) {
-                        $q->orWhere('name', 'like', '%' . $term . '%')
-                            ->orWhere('description', 'like', '%' . $term . '%');
-                    }
-                });
-            })
-            ->orderBy('id', 'DESC')
+            ->when($selected_brand, fn($query) => $query->where('brand_id', $selected_brand))
+            ->when(!empty($selected_categories), fn($query) => $query->whereHas('categories', function ($q) use ($selected_categories) {
+                $q->whereIn('categories.id', $this->getAllCategoryIds($selected_categories));
+            }))
+            ->when($search_query, fn($query) => $query->where(function ($q) use ($search_query) {
+                foreach (array_map('trim', explode(',', $search_query)) as $term) {
+                    $q->orWhere('name', 'like', "%$term%")
+                        ->orWhere('description', 'like', "%$term%");
+                }
+            }))
+            ->orderByDesc('id')
             ->paginate($itemsPerPage);
 
         return view('admin.product.index', [
@@ -54,8 +44,25 @@ class ProductController extends Controller
             'categories' => Category::all(),
             'selected_brand' => $selected_brand,
             'selected_categories' => $selected_categories,
-            'query' => $query,
+            'query' => $search_query,
         ]);
+    }
+
+    /**
+     * Get all category IDs including selected and their descendants.
+     */
+    protected function getAllCategoryIds(array $selected_categories)
+    {
+        $allCategoryIds = [];
+
+        $categories = Category::whereIn('id', $selected_categories)->with('children')->get();
+
+        foreach ($categories as $category) {
+            $allCategoryIds[] = $category->id;
+            $allCategoryIds = array_merge($allCategoryIds, $category->getAllChildrenIds()->toArray());
+        }
+
+        return $allCategoryIds;
     }
 
 
@@ -428,41 +435,38 @@ class ProductController extends Controller
         $selected_brand = $request->brand_id ?? null;
         $selected_categories = $request->category_id ?? [];
         $query = $request->get('query') ?? null;
-
+    
+        // Get the filtered products based on the applied filters
         $products = Product::with(['categories', 'brand', 'variants', 'media'])
-            ->when($selected_brand, function ($queryBuilder, $selected_brand) {
-                return $queryBuilder->where('brand_id', $selected_brand);
-            })
-            ->when(!empty($selected_categories), function ($queryBuilder) use ($selected_categories) {
-                return $queryBuilder->whereHas('categories', function ($q) use ($selected_categories) {
-                    $q->whereIn('categories.id', $selected_categories);
-                });
-            })
-            ->when($query, function ($queryBuilder, $query) {
-                $terms = array_map('trim', explode(',', $query));
-                return $queryBuilder->where(function ($q) use ($terms) {
-                    foreach ($terms as $term) {
-                        $q->orWhere('name', 'like', '%' . $term . '%')
-                            ->orWhere('description', 'like', '%' . $term . '%');
-                    }
-                });
-            })
-            ->orderBy('id', 'DESC')
+            ->when($selected_brand, fn($queryBuilder) => $queryBuilder->where('brand_id', $selected_brand))
+            ->when(!empty($selected_categories), fn($queryBuilder) => $queryBuilder->whereHas('categories', function ($q) use ($selected_categories) {
+                $q->whereIn('categories.id', $this->getAllCategoryIds($selected_categories));
+            }))
+            ->when($query, fn($queryBuilder, $query) => $queryBuilder->where(function ($q) use ($query) {
+                foreach (array_map('trim', explode(',', $query)) as $term) {
+                    $q->orWhere('name', 'like', "%$term%")
+                      ->orWhere('description', 'like', "%$term%");
+                }
+            }))
+            ->orderByDesc('id')
             ->get();
-
+    
+        // Prepare CSV data
         $csvData = [];
-        $csvData[] = ['ID', 'Name', 'Price', 'Category', 'Brand', 'Variant', 'Status', 'Image Link', 'Product Link'];
-
+        $csvData[] = ['ID', 'Name', 'Description', 'Price', 'Category', 'Brand', 'Variant', 'Status', 'Image Link', 'Product Link'];
+    
+        // Add each product to the CSV
         foreach ($products as $product) {
             $categories = $product->categories->pluck('name')->implode(', ');
             $brand = $product->brand ? $product->brand->name : 'N/A';
             $variants = $product->variants->pluck('name')->implode(', ');
             $imageLink = $product->getFirstMedia() ? $product->getFirstMedia()->getUrl() : 'N/A';
             $productLink = "https://www.mobilemandu.com/products/" . $product->slug;
-
+    
             $csvData[] = [
                 $product->id,
                 $product->name,
+                $product->description,
                 $product->price,
                 $categories,
                 $brand,
@@ -472,14 +476,18 @@ class ProductController extends Controller
                 $productLink,
             ];
         }
-
+    
+        // Generate CSV filename
         $filename = 'products_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
         $handle = fopen('php://temp', 'w+');
+    
+        // Write CSV data to file
         foreach ($csvData as $row) {
             fputcsv($handle, $row);
         }
         rewind($handle);
-
+    
+        // Return the CSV file as a download response
         return Response::stream(function () use ($handle) {
             fpassthru($handle);
         }, 200, [
@@ -487,4 +495,10 @@ class ProductController extends Controller
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ]);
     }
+    
+    /**
+     * Get all category IDs including selected and their descendants.
+     */
+
+    
 }
