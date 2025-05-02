@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Order extends Model
 {
@@ -18,7 +20,10 @@ class Order extends Model
         'status',
         'shipping_address',
         'coupon_code',
-        'coupon_discount'
+        'coupon_discount',
+        'shipping_price',
+        'area_id',
+        'address_id',
     ];
 
     public function customer()
@@ -37,5 +42,12 @@ class Order extends Model
     public function order_items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->setDescriptionForEvent(fn(string $eventName) => "Order has been {$eventName}");
     }
 }

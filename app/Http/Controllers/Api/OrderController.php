@@ -15,90 +15,161 @@ use App\Models\OrderItem;
 use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Models\ProductVariant;
 
 class OrderController extends BaseController
 {
+
     public function create(OrderRequest $request)
     {
-        $shipping_address = "Name: $request->reciever_name";
-        $shipping_address .= "<br/>Phone: $request->phone_number";
-        $shipping_address .= "<br/>Email: $request->email";
-        $area = Area::find($request->area_id);
-        $shipping_address .= "<br/><br/>" . $area != null ? $area->name : '' . "(" . (ucfirst($request->address_type)) . ")";
-        $shipping_address .= "<br/> $request->location";
-        $city = City::find($request->city_id);
-        $province = Province::find($request->province_id);
-        $shipping_address .= "<br/> $city->name";
-        $shipping_address .= "<br/> $province->name";
-        if (!$request->customer_id) {
-            $customer = User::where('email', $request->email)
-                ->orWhere('phone', $request->phone_number)
-                ->first();
-            if (!$customer) {
-                $customer = User::create(
-                    [
+        DB::beginTransaction();
+        try {
+            // Customer Handling
+            if (!$request->customer_id) {
+                $customer = User::where('email', $request->email)
+                    ->orWhere('phone', $request->phone_number)
+                    ->first();
+                if (!$customer) {
+                    $customer = User::create([
                         'name' => $request->reciever_name,
                         'email' => $request->email,
-                        'phone' => $request->phone,
+                        'phone' => $request->phone_number,
                         'password' => bcrypt('password'),
-                    ]
-                );
-                $customer->assignRole('customer');
+                    ]);
+                    $customer->assignRole('customer');
+                }
+            } else {
+                $customer = User::findOrFail($request->customer_id);
             }
-        } else {
-            $customer = User::find($request->customer_id);
-        }
 
-        if (!$request->address_id) {
-            $address = Address::where('user_id', $customer->id ?? $request->customer_id)
-                ->where('type', $request->address_type)
-                ->where('city_id', $request->city_id)
-                ->where('province_id', $request->province_id)
-                ->where('area_id', $request->area_id)
-                ->where('location', $request->location)
-                ->first();
-            if (!$address) {
-                $address = Address::create(
-                    [
-                        'user_id' =>  $customer->id ?? $request->customer_id,
-                        'type' => $request->address_type,
-                        'city_id' => $request->city_id,
-                        'province_id' => $request->province_id,
-                        'area_id' => $request->area_id,
-                        'location' => $request->location,
-                        'phone_number' => $request->phone_number,
-                    ]
-                );
+            $orderCountLastHour = Order::where('user_id', $customer->id)
+                ->where('created_at', '>=', now()->subHour())
+                ->count();
+
+            if ($orderCountLastHour >= 10) {
+                return $this->sendError('You have reached the limit of 3 orders per hour.');
             }
-        } else {
-            $address = Address::find($request->address_id);
+
+            // Address Handling
+            if (!$request->address_id) {
+                $address = Address::firstOrCreate([
+                    'user_id' => $customer->id,
+                    'type' => $request->address_type,
+                    'city_id' => $request->city_id,
+                    'province_id' => $request->province_id,
+                    'area_id' => $request->area_id,
+                    'location' => $request->location,
+                ], [
+                    'phone_number' => $request->phone_number,
+                ]);
+            } else {
+                $address = Address::findOrFail($request->address_id);
+            }
+
+            // Prepare shipping address (safe ternary logic)
+            $area = Area::findOrFail($request->area_id);
+            $city = City::findOrFail($request->city_id);
+            $province = Province::findOrFail($request->province_id);
+            $address_type = ucfirst($request->address_type);
+
+            $shipping_address  = "Name: {$request->reciever_name}";
+            $shipping_address .= "<br/>Phone: {$request->phone_number}";
+            $shipping_address .= "<br/>Email: {$request->email}";
+            $shipping_address .= "<br/><br/>{$area->name} ({$address_type})";
+            $shipping_address .= "<br/> {$request->location}";
+            $shipping_address .= "<br/> {$city->name}";
+            $shipping_address .= "<br/> {$province->name}";
+
+            // Order Item Calculations
+            $total_price = 0;
+            $total_discount = 0;
+            $final_items = [];
+
+            foreach ($request->items as $item) {
+                $product = Product::findOrFail($item['id']);
+                $variant = isset($item['variant_id']) ? ProductVariant::find($item['variant_id']) : null;
+
+                $price = $variant ? $variant->price : $product->discounted_price;
+                $quantity = $item['quantity'];
+                $item_discount = $product->discount ?? 0;
+
+                $total_price += $price * $quantity;
+                $total_discount += $item_discount * $quantity;
+
+                $final_items[] = [
+                    'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
+                    'quantity' => $quantity,
+                    'price' => $price,
+                    'discount' => $item_discount,
+                ];
+            }
+
+            // Coupon Discount
+            $coupon_discount = 0;
+            $free_delivery = false;
+            if ($request->coupon_code) {
+                $coupon = Coupon::where('code', $request->coupon_code)->where('status', 1)->first();
+                if ($coupon) {
+                    if ($coupon->type === 'percentage') {
+                        $coupon_discount = ($total_price - $total_discount) * ($coupon->discount / 100);
+                    } else {
+                        $coupon_discount = $coupon->discount;
+                    }
+
+                    if ($coupon->specific_type === 'free_delivery') {
+                        $free_delivery = true;
+                        $coupon_discount = $area->shipping_price ?? 0;
+                    }
+
+                    $coupon->increment('uses');
+                }
+            }
+
+            // Shipping
+            $shipping_price = $free_delivery ? 0 : ($area->shipping_price ?? 0);
+
+            // Final total
+            $grand_total = $total_price - $total_discount - $coupon_discount + $shipping_price;
+
+            // Save Order
+
+
+            $order = Order::create([
+                'user_id' => $customer->id,
+                'address_id' => $address->id,
+                'total_price' => $total_price,
+                'discount' => $total_discount,
+                'shipping_price' => $shipping_price,
+                'grand_total' => $grand_total,
+                'payment_type' => $request->payment_type,
+                'payment_status' => $request->payment_status,
+                'shipping_address' => $shipping_address,
+                'area_id' => $area->id,
+                'coupon_code' => $request->coupon_code,
+                'coupon_discount' => $coupon_discount,
+            ]);
+
+            // Save Order Items
+            foreach ($final_items as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'discount' => $item['discount'],
+                ]);
+            }
+
+            DB::commit();
+            return $this->sendResponse(null, 'Order created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Failed to create order', ['error' => $e->getMessage()]);
         }
-        $order = new Order();
-        $order->user_id =  $customer->id;
-        $order->address_id =  $address->id;
-        $order->total_price = $request->total_amount;
-        $order->discount = $request->total_discount;
-        $order->shipping_price = $request->shipping_price;
-        $order->grand_total = $request->grand_total;
-        $order->payment_type = $request->payment_type;
-        $order->payment_status = $request->payment_status;
-        $order->shipping_address = $shipping_address;
-        $order->area_id = $area->id;
-        $order->coupon_code = $request->coupon_code;
-        $order->coupon_discount = $request->coupon_discount;
-        $order->save();
-        foreach ($request->items as $item) {
-            $order_item = new OrderItem();
-            $order_item->order_id = $order->id;
-            $order_item->product_id = $item['id'];
-            $order_item->variant_id = $item['variant_id'] ?? null;
-            $order_item->quantity = $item['quantity'];
-            $order_item->price = $item['rate'];
-            $order_item->discount = $item['discount']??0;
-            $order_item->save();
-        }
-        Coupon::where('code', $request->coupon_code)->increment('uses');
-        return $this->sendResponse(null, 'Order created successfully.');
     }
 
     public function getProvinces()
