@@ -45,65 +45,106 @@
                                         {{-- <div class="date">Vat no: {{ $order->customer->vat_no }}</div> --}}
                                     </div>
                                 </div>
-                                <table class="table table-responsive-lg">
-                                    <thead>
+                                <table class="table table-bordered table-hover table-responsive-lg align-middle">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <th class="no">#</th>
+                                            <th class="no text-center">#</th>
+                                            <th class="photo text-center">Photo</th>
                                             <th class="title">Name</th>
-                                            <th class="qty">QUANTITY</th>
-                                            <th class="rate">RATE</th>
-                                            <th class="amnt">AMOUNT</th>
-                                            <th class="disc">Discount</th>
-                                            <th class="total">Total</th>
+                                            <th class="qty text-center">Quantity</th>
+                                            <th class="rate text-right">Rate</th>
+                                            <th class="amnt text-right">Amount</th>
+                                            <th class="disc text-right">Discount</th>
+                                            <th class="total text-right">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($order->order_items as $item)
                                             <tr>
-                                                <td class="no">{{ $loop->iteration }}</td>
-                                                <td class="desc">
+                                                <td class="no text-center align-middle">{{ $loop->iteration }}</td>
+                                                <td class="photo text-center align-middle">
+                                                    @php
+                                                        $img = $item->product->getFirstMediaUrl() ?: null;
+                                                    @endphp
+                                                    <img src="{{ $img ?: 'https://via.placeholder.com/50x50?text=No+Image' }}"
+                                                         alt="Product Image"
+                                                         style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
+                                                </td>
+                                                <td class="desc align-middle">
                                                     <a href="{{ route('product.show', $item->product_id) }}">
-                                                        ({{ $item->product->name }})
-                                                        {{ $item->variant ? $item->variant->sku : 'No Variant' }}
+                                                        {{ $item->product->name }}
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            {{ $item->variant ? $item->variant->sku : 'No Variant' }}
+                                                        </small>
                                                     </a>
                                                 </td>
-                                                <td class="unit">{{ $item->quantity }}</td>
-                                                <td class="rate">{{ $item->price }}</td>
-                                                <td class="total">{{ $item->quantity * $item->price }}</td>
-                                                <td class="disc">{{ $item->discount }}</td>
-                                                <td class="total">{{ $item->quantity * $item->price - $item->discount }}
+                                                <td class="unit text-center align-middle">{{ $item->quantity }}</td>
+                                                <td class="rate text-right align-middle">{{ number_format($item->price, 2) }}</td>
+                                                <td class="amnt text-right align-middle">{{ number_format($item->quantity * $item->price, 2) }}</td>
+                                                <td class="disc text-right align-middle">
+                                                    @php
+                                                        $productDiscount = $item->discount ?? 0;
+                                                        $couponDiscount = $item->coupon_discount ?? 0;
+                                                        // Check for free delivery coupon by loading coupon relation if not loaded
+                                                        $coupon = $order->relationLoaded('coupon') ? $order->coupon : \App\Models\Coupon::where('code', $order->coupon_code)->first();
+                                                        $isFreeDelivery = $coupon && $coupon->specific_type === 'free_delivery' && $couponDiscount > 0;
+                                                    @endphp
+                                                    @if($productDiscount && $couponDiscount)
+                                                        <span class="badge bg-info">Product: {{ number_format($productDiscount, 2) }}</span><br>
+                                                        <span class="badge bg-success">
+                                                            Coupon: Rs {{ number_format($couponDiscount, 2) }}
+                                                            @if($isFreeDelivery)
+                                                                <span class="badge bg-primary">Free Delivery</span>
+                                                            @endif
+                                                        </span>
+                                                    @elseif($couponDiscount)
+                                                        <span class="badge bg-success">
+                                                            Coupon: Rs {{ number_format($couponDiscount, 2) }}
+                                                            @if($isFreeDelivery)
+                                                                <span class="badge bg-primary">Free Delivery</span>
+                                                            @endif
+                                                        </span>
+                                                    @elseif($productDiscount)
+                                                        <span class="badge bg-info">Product: {{ number_format($productDiscount, 2) }}</span>
+                                                    @else
+                                                        <span class="text-muted">0</span>
+                                                    @endif
+                                                </td>
+                                                <td class="total text-right align-middle">
+                                                    {{ number_format($item->quantity * $item->price - ($productDiscount + $couponDiscount), 2) }}
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="3"></td>
-                                            <td colspan="3" class="table-light">SUBTOTAL</td>
-                                            <td class="table-light">Rs. {{ $order->total_price }}</td>
+                                            <td colspan="4"></td>
+                                            <td colspan="3" class="table-light text-right"><strong>SUBTOTAL</strong></td>
+                                            <td class="table-light text-right">Rs. {{ number_format($order->total_price, 2) }}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3"></td>
-                                            <td>DISCOUNT</td>
-                                            <td colspan="2">
-
+                                            <td colspan="4"></td>
+                                            <td class="text-right"><strong>DISCOUNT</strong></td>
+                                            <td colspan="2"></td>
+                                            <td class="text-right">
+                                                Rs. {{ number_format(($order->discount ?? 0) + ($order->coupon_discount ?? 0), 2) }}
                                             </td>
-                                            <td>Rs. {{ $order->discount }}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3"></td>
-                                            <td colspan="3">SHIPPING FEE</td>
-                                            <td>Rs. {{ $order->shipping_price }}</td>
+                                            <td colspan="4"></td>
+                                            <td colspan="3" class="text-right"><strong>SHIPPING FEE</strong></td>
+                                            <td class="text-right">Rs. {{ number_format($order->shipping_price, 2) }}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3"></td>
-                                            <td colspan="3" class="table-light">GRAND TOTAL</td>
-                                            <td class="table-light">Rs. {{ $order->grand_total }}</td>
+                                            <td colspan="4"></td>
+                                            <td colspan="3" class="table-light text-right"><strong>GRAND TOTAL</strong></td>
+                                            <td class="table-light text-right">Rs. {{ number_format($order->grand_total, 2) }}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3">
-                                            <td colspan="3">
-                                                <b>Total quantity:</b> {{ $order->order_items->count() }}
+                                            <td colspan="4"></td>
+                                            <td colspan="3" class="text-right">
+                                                <b>Total quantity:</b> {{ $order->order_items->sum('quantity') }}
                                             </td>
                                             <td></td>
                                         </tr>
@@ -117,7 +158,15 @@
                                         </tr>
                                     </thead>
                                     <tr>
-                                        <td>Coupon Discount:{{ $order->coupon_discount }}</td>
+                                        <td>
+                                            Coupon Discount:{{ $order->coupon_discount }}
+                                            @php
+                                                $coupon = $order->relationLoaded('coupon') ? $order->coupon : \App\Models\Coupon::where('code', $order->coupon_code)->first();
+                                            @endphp
+                                            @if($coupon && $coupon->specific_type === 'free_delivery')
+                                                <span class="badge bg-primary">Free Delivery</span>
+                                            @endif
+                                        </td>
                                         <td>Coupon Used:{{ $order->coupon_code }}</td>
                                         <td>Other Discount:{{ $order->other_discount ?? 0 }}
                                         </td>

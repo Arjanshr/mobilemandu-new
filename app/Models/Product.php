@@ -81,18 +81,18 @@ class Product extends Model implements HasMedia
     public function getPrimaryImageAttribute()
     {
         $images = $this->images->where('is_primary', 1);
-        // return $images;
         if ($images && $images->count() > 0) {
             $primary_image = $images->first()->image;
         } else {
-            $images = $this->images->first();
-            if ($images && $images->count() > 0) {
-                $primary_image = $images->image;
+            $image = $this->images->first();
+            if ($image) {
+                $primary_image = $image->image;
             } else {
                 return null;
             }
         }
-        return asset('storage/products/' . $primary_image);
+        // Return only the relative path, not asset()
+        return 'products/' . $primary_image;
     }
 
     public function getDiscountedPriceAttribute()
