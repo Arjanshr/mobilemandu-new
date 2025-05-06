@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\PopupBannerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +109,7 @@ Route::prefix('v1')->group(function () {
         //Popup Banner
         Route::get('popup-banner', [PopupBannerController::class, 'first']);
 
+        Route::post('/capi/purchase', [CAPIController::class, 'handle']);
     });
     Route::middleware('guest')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
