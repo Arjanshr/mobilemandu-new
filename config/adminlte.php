@@ -328,6 +328,13 @@ return [
                     'active' => ['users', 'users*', 'regex:@^content/[0-9]+$@'],
                 ],
                 [
+                    'icon'    => 'fas fa-store', // Updated icon for Manage Vendors
+                    'text' => 'Manage Vendors',
+                    'url'  => 'admin/vendors',
+                    'can' => ['browse-vendors'],
+                    'active' => ['vendors', 'vendors*', 'regex:@^content/[0-9]+$@'],
+                ],
+                [
                     'icon'    => 'fas fa-user-shield', // Updated icon for Manage Roles
                     'text' => 'Manage Roles',
                     'url'  => 'admin/roles',

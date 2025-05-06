@@ -117,7 +117,7 @@ Route::prefix('v1')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'ensure-user-active'])->group(function () {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::get('profile', [UserController::class, 'profile']);
         Route::post('profile', [UserController::class, 'editProfile']);

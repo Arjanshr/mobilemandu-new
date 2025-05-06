@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\IsAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'is_admin' => IsAdmin::class
+            'is_admin' => IsAdmin::class,
+            'ensure-user-active' => EnsureUserIsActive::class, // Ensure alias matches
         ]);
         // $middleware->web(append: [
         //     \App\Http\Middleware\CorsMiddleware::class,

@@ -42,6 +42,7 @@ class User extends Authenticatable
         'github_id',
         'avatar',
         'profile_photo_path',
+        'brand_id'
     ];
 
     /**
@@ -86,6 +87,10 @@ class User extends Authenticatable
         return true;
     }
 
+    public function isActive()
+    {
+        return $this->status == 'active' ? true : false;
+    }
     public  function adminlte_profile_url()
     {
         return route('profile.show');
@@ -124,5 +129,10 @@ class User extends Authenticatable
     public function hasInWishlist($product_id)
     {
         return $this->wishlists()->where('product_id', $product_id)->exists();
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(\App\Models\Brand::class);
     }
 }

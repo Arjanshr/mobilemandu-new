@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Users')
+@section('title', 'Vendors')
 
 @section('content_header')
-    <h1>Users</h1>
+    <h1>Vendors</h1>
 @stop
 
 @section('content')
@@ -12,9 +12,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        @can('add-users')
+                        @can('add-vendors')
                             <div class="card-header">
-                                <a href="{{ route('user.create') }}" class="btn btn-success">Create User</a>
+                                <a href="{{ route('vendor.create') }}" class="btn btn-success">Create Vendor</a>
                             </div>
                         @endcan
                         <div class="card-body">
@@ -31,49 +31,47 @@
                                                     <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Roles</th>
-                                                    <th>Brand</th> {{-- New --}}
-                                                    <th>Status</th> {{-- New --}}
+                                                    <th>Brand</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($users as $user)
+                                                @foreach ($vendors as $vendor)
                                                     @php
                                                         if (
-                                                            $user->hasRole('super-admin') &&
+                                                            $vendor->hasRole('super-admin') &&
                                                             !auth()->user()->hasRole('super-admin')
                                                         ) {
                                                             continue;
                                                         }
                                                         if (
-                                                            $user->hasRole('admin') &&
+                                                            $vendor->hasRole('admin') &&
                                                             auth()->user()->cannot('read-admin')
                                                         ) {
                                                             continue;
                                                         }
                                                     @endphp
-                                                    <tr @if($user->status!='active') class="table-danger" @endif>
+                                                    <tr @if ($vendor->status != 'active') class="table-danger" @endif>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>
-                                                            @can('read-users')
-                                                                <a href="{{ route('user.show', $user->id) }}"
+                                                            @can('read-vendors')
+                                                                <a href="{{ route('vendor.show', $vendor->id) }}"
                                                                     class="btn btn-sm btn-primary mb-1" title="View Details">
                                                                     <i class="fa fa-eye"></i>
                                                                 </a>
                                                             @endcan
-
-                                                            @can('edit-users')
-                                                                @if (!$user->hasRole('admin') || auth()->user()->can('edit-admin'))
-                                                                    <a href="{{ route('user.edit', $user->id) }}"
+                                                            @can('edit-vendors')
+                                                                @if (!$vendor->hasRole('admin') || auth()->user()->can('edit-admin'))
+                                                                    <a href="{{ route('vendor.edit', $vendor->id) }}"
                                                                         class="btn btn-sm btn-success mb-1" title="Edit">
                                                                         <i class="fa fa-pen"></i>
                                                                     </a>
                                                                 @endif
                                                             @endcan
-
-                                                            @can('delete-users')
-                                                                @if (!$user->hasRole('admin') || auth()->user()->can('delete-admin'))
+                                                            @can('delete-vendors')
+                                                                @if (!$vendor->hasRole('admin') || auth()->user()->can('delete-admin'))
                                                                     <form method="post"
-                                                                        action="{{ route('user.delete', $user->id) }}"
+                                                                        action="{{ route('vendor.delete', $vendor->id) }}"
                                                                         style="display: inline;">
                                                                         @csrf
                                                                         @method('delete')
@@ -84,29 +82,27 @@
                                                                     </form>
                                                                 @endif
                                                             @endcan
-
                                                             @can('read-activities')
-                                                                <a href="{{ route('user.activity', $user->id) }}"
+                                                                <a href="{{ route('vendor.activity', $vendor->id) }}"
                                                                     class="btn btn-sm btn-warning mb-1" title="View Activities">
                                                                     <i class="fa fa-list"></i>
                                                                 </a>
                                                             @endcan
-
-                                                            @can('edit-users')
-                                                                @if (!$user->hasRole('super-admin'))
-                                                                    @if ($user->status === 'active')
-                                                                        <form method="POST" action="{{ route('user.deactivate', $user->id) }}" style="display:inline-block" class="deactivate-form">
+                                                            @can('edit-vendors')
+                                                                @if (!$vendor->hasRole('super-admin'))
+                                                                    @if ($vendor->status === 'active')
+                                                                        <form method="POST" action="{{ route('user.deactivate', $vendor->id) }}" style="display:inline-block" class="deactivate-form">
                                                                             @csrf
                                                                             @method('PATCH')
-                                                                            <button class="btn btn-sm btn-danger mb-1" title="Deactivate User">
+                                                                            <button class="btn btn-sm btn-danger mb-1" title="Deactivate Vendor">
                                                                                 <i class="fas fa-user-slash"></i>
                                                                             </button>
                                                                         </form>
                                                                     @else
-                                                                        <form method="POST" action="{{ route('user.activate', $user->id) }}" style="display:inline-block" class="activate-form">
+                                                                        <form method="POST" action="{{ route('user.activate', $vendor->id) }}" style="display:inline-block" class="activate-form">
                                                                             @csrf
                                                                             @method('PATCH')
-                                                                            <button class="btn btn-sm btn-info mb-1" title="Activate User">
+                                                                            <button class="btn btn-sm btn-info mb-1" title="Activate Vendor">
                                                                                 <i class="fas fa-user-check"></i>
                                                                             </button>
                                                                         </form>
@@ -115,26 +111,26 @@
                                                             @endcan
 
                                                         </td>
-                                                        <td>{{ $user->name }}</td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>{{ $user->phone }}</td>
+                                                        <td>{{ $vendor->name }}</td>
+                                                        <td>{{ $vendor->email }}</td>
+                                                        <td>{{ $vendor->phone }}</td>
                                                         <td>
                                                             <ul>
-                                                                @foreach ($user->getRoleNames() as $role)
+                                                                @foreach ($vendor->getRoleNames() as $role)
                                                                     <li>{{ ucfirst($role) }}</li>
                                                                 @endforeach
                                                             </ul>
                                                         </td>
                                                         <td>
                                                             {{-- Show brand name if vendor --}}
-                                                            @if ($user->hasRole('vendor'))
-                                                                {{ optional($user->brand)->name ?? '—' }}
+                                                            @if ($vendor->hasRole('vendor'))
+                                                                {{ optional($vendor->brand)->name ?? '—' }}
                                                             @else
                                                                 —
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            @if($user->status == 'active')
+                                                            @if ($vendor->status == 'active')
                                                                 <span class="badge badge-success">Active</span>
                                                             @else
                                                                 <span class="badge badge-secondary">Inactive</span>
@@ -184,7 +180,7 @@
                 e.preventDefault();
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You are about to deactivate this user!",
+                    text: "You are about to deactivate this vendor!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -192,7 +188,7 @@
                     confirmButtonText: 'Yes, deactivate!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.submit();
+                        $(this).off('submit').submit(); // Ensure the form is submitted after confirmation
                     }
                 });
             });
@@ -202,7 +198,7 @@
                 e.preventDefault();
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You are about to activate this user!",
+                    text: "You are about to activate this vendor!",
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonColor: '#17a2b8',
@@ -210,7 +206,7 @@
                     confirmButtonText: 'Yes, activate!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.submit();
+                        $(this).off('submit').submit(); // Ensure the form is submitted after confirmation
                     }
                 });
             });

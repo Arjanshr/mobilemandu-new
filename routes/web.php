@@ -42,7 +42,8 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-    'is_admin'
+    'is_admin',
+    'ensure-user-active',
 ])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/test', [DashboardController::class, 'test'])->name('admin.test');
@@ -66,6 +67,33 @@ Route::middleware([
     Route::delete('/users/delete/{user}', [UserController::class, 'delete'])->name('user.delete')->middleware('can:delete-users');
     Route::get('/users/activities/{user}', [UserController::class, 'activities'])->name('user.activity')->middleware('can:browse-activities');
     Route::get('/users/activities/view/{activity}', [UserController::class, 'showActivity'])->name('user.activity.show')->middleware('can:read-activities');
+    Route::patch('/user/{user}/deactivate', [UserController::class, 'deactivate'])->name('user.deactivate');
+    Route::patch('/user/{user}/activate', [UserController::class, 'activate'])->name('user.activate');
+
+
+    Route::get('/vendors', [UserController::class, 'vendors'])->name('vendors.index')->middleware('can:read-users');
+
+    // Vendor routes
+    Route::middleware('can:browse-vendors')->group(function () {
+        Route::get('/vendors', [UserController::class, 'vendors'])->name('vendors.index');
+        Route::middleware('can:add-vendors')->group(function () {
+            Route::get('/vendors/create', [UserController::class, 'create'])->name('vendor.create');
+            Route::post('/vendors/insert', [UserController::class, 'insert'])->name('vendor.insert');
+        });
+        Route::get('/vendors/{vendor}', [UserController::class, 'show'])->name('vendor.show')->middleware('can:read-vendors');
+        Route::middleware('can:edit-vendors')->group(function () {
+            Route::get('/vendors/edit/{vendor}', [UserController::class, 'edit'])->name('vendor.edit');
+            Route::patch('/vendors/edit/{vendor}', [UserController::class, 'update'])->name('vendor.update');
+        });
+        Route::delete('/vendors/delete/{vendor}', [UserController::class, 'delete'])->name('vendor.delete')->middleware('can:delete-vendors');
+        Route::patch('/vendor/{vendor}/deactivate', [UserController::class, 'deactivate'])->name('vendor.deactivate');
+        Route::patch('/vendor/{vendor}/activate', [UserController::class, 'activate'])->name('vendor.activate');
+    });
+
+    Route::middleware('can:read-activities')->group(function () {
+        Route::get('/vendors/activities/{vendor}', [UserController::class, 'activities'])->name('vendor.activity');
+        Route::get('/vendors/activities/view/{activity}', [UserController::class, 'showActivity'])->name('vendor.activity.show');
+    });
 
     //Roles routes
     Route::get('/roles', [RoleController::class, 'index'])->name('roles')->middleware('can:browse-roles');

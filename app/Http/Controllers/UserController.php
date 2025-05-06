@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Models\Brand;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
@@ -18,17 +19,31 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all()->pluck('name');
-        return view('admin.user.form', compact('roles'));
+        $brands = Brand::all();
+        return view('admin.user.form', compact('roles', 'brands'));
     }
 
     public function insert(UserRequest $request)
     {
         $data = $request->all();
         $data['password'] = bcrypt('password');
+
+        if (in_array('vendor', $request->role)) {
+            $data['brand_id'] = $request->brand_id;
+        } else {
+            $data['brand_id'] = null;
+        }
+
         $user = User::create($data);
+
         $roles = $this->checkRoles($request->role);
-        // return $roles;
-        $user->assignRole($request->role);
+        $user->assignRole($roles);
+
+        if (in_array('vendor', $request->role)) {
+            toastr()->success('Vendor Created Successfully!');
+            return redirect()->route('vendors.index');
+        }
+
         toastr()->success('User Created Successfully!');
         return redirect()->route('users');
     }
@@ -41,52 +56,65 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all()->pluck('name');
-        return view('admin.user.form', compact('roles', 'user'));
+        $brands = Brand::all();
+        return view('admin.user.form', compact('roles', 'brands', 'user'));
     }
 
     public function update(User $user, UserRequest $request)
     {
-        // return $request;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->dob = $request->dob;
         $user->gender = $request->gender;
         $user->address = $request->address;
-        if (auth()->user()->can('change-user-password')&&$this->passwordValidation($request->password))
+
+        if (auth()->user()->can('change-user-password') && $this->passwordValidation($request->password)) {
             $user->password = bcrypt($request->password);
+        }
+
+        if (in_array('vendor', $request->role)) {
+            $user->brand_id = $request->brand_id;
+        } else {
+            $user->brand_id = null;
+        }
+
         $user->save();
-        $user->syncRoles([$request->input('role')]);
+
+        $roles = $this->checkRoles($request->role);
+        $user->syncRoles($roles);
+
         toastr()->success('User Edited Successfully!');
         return redirect()->route('users');
     }
 
     public function delete(User $user)
     {
-        if ($user->isAdmin() & !auth()->user()->can('delete-admin'))
+        if ($user->isAdmin() && !auth()->user()->can('delete-admin')) {
             return redirect()->route('users')->withError('User cannot be deleted!');
+        }
+
         $user->delete();
+
         toastr()->success('User Deleted Successfully!');
         return redirect()->route('users');
     }
 
     private function checkRoles(array $roles): array
     {
-        if (in_array('super-admin', $roles)) {
-            $index = array_search('super-admin', $roles);
-
-            if ($index !== false) {
-                unset($roles[$index]);
+        $roles = array_filter($roles, function ($role) {
+            if ($role === 'super-admin') {
+                return false;
             }
-        }
-        if (in_array('admin', $roles) && !auth()->user()->can('add-admin')) {
-            $index = array_search('admin', $roles);
 
-            if ($index !== false) {
-                unset($roles[$index]);
+            if ($role === 'admin' && !auth()->user()->can('add-admin')) {
+                return false;
             }
-        }
-        return $roles;
+
+            return true;
+        });
+
+        return array_values($roles);
     }
 
     public function activities(User $user)
@@ -102,7 +130,46 @@ class UserController extends Controller
 
     private function passwordValidation($password)
     {
-        if(strlen($password)>=6) return true;
-        return false;
+        return strlen($password) >= 6;
+    }
+
+    public function vendors()
+    {
+        $vendors = User::role('vendor')->with('brand')->get();
+        return view('admin.user.vendors', compact('vendors'));
+    }
+
+    public function deactivate(User $user)
+    {
+        if ($user->hasRole('super-admin')) {
+            return redirect()->back()->withError('Superadmins cannot be deactivated.');
+        }
+        if ($user->isAdmin() && !auth()->user()->can('edit-admin')) {
+            return redirect()->back()->withError('You do not have permission to deactivate this user.');
+        }
+
+        $user->status = 'inactive';
+        $user->save();
+
+        $message = $user->hasRole('vendor') ? 'Vendor deactivated successfully.' : 'User deactivated successfully.';
+        toastr()->success($message);
+        return redirect()->back();
+    }
+
+    public function activate(User $user)
+    {
+        if ($user->hasRole('super-admin')) {
+            return redirect()->back()->withError('Superadmins cannot be activated.');
+        }
+        if ($user->isAdmin() && !auth()->user()->can('edit-admin')) {
+            return redirect()->back()->withError('You do not have permission to activate this user.');
+        }
+
+        $user->status = 'active';
+        $user->save();
+
+        $message = $user->hasRole('vendor') ? 'Vendor activated successfully.' : 'User activated successfully.';
+        toastr()->success($message);
+        return redirect()->back();
     }
 }
