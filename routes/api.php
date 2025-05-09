@@ -116,8 +116,13 @@ Route::prefix('v1')->group(function () {
         Route::post('registers', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
     });
+    Route::middleware('auth:sanctum')->post('/email/resend', [AuthController::class, 'resendVerification']);
 
-    Route::middleware(['auth:sanctum', 'ensure-user-active'])->group(function () {
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed'])
+        ->name('verification.verify');
+
+    Route::middleware(['auth:sanctum', 'ensure-user-active', 'verified'])->group(function () {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::get('profile', [UserController::class, 'profile']);
         Route::post('profile', [UserController::class, 'editProfile']);

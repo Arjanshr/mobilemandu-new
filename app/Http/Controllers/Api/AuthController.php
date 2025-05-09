@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
-
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 
 class AuthController extends BaseController
 {
@@ -38,16 +39,21 @@ class AuthController extends BaseController
 
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+
         if ($request->hasFile('photo')) {
             $image_name = rand(0, 99999) . time() . '.' . $request->photo->extension();
             $request->photo->move(storage_path('app/public/profile-photos/'), $image_name);
             $input['profile_photo_path'] = 'profile-photos/' . $image_name;
         }
+
         $user = User::create($input)->assignRole('customer');
-        $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+
+        // 🔔 Send email verification
+        event(new Registered($user));
+
         $success['name'] =  $user->name;
 
-        return $this->sendResponse($success, 'User register successfully.');
+        return $this->sendResponse($success, 'User registered successfully. Please verify your email.');
     }
 
     /**
@@ -60,35 +66,58 @@ class AuthController extends BaseController
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
             $selected_user = User::where('email', $request->email)->first();
             if (!$selected_user)
-                return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                return $this->sendError('Unauthorized.', ['error' => 'Credentials do not match...']);
+
             if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
                 if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                     $user = Auth::user();
+
+                    if (is_null($user->email_verified_at)) {
+                        // Generate short-lived token just for resending verification
+                        $temp_token = $user->createToken('EmailVerify')->plainTextToken;
+
+                        return response()->json([
+                            'message' => 'Email not verified.',
+                            'error' => 'Please verify your email before logging in.',
+                            'resend_verification' => [
+                                'url' => url('/api/v1/email/resend'),
+                                'token' => $temp_token,
+                            ],
+                        ], 403);
+                    }
+
                     $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
-                    $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-                    $success['name'] =  $user->name;
+                    $success['token'] = $user->createToken('MyApp')->plainTextToken;
+                    $success['name'] = $user->name;
+
                     return $this->sendResponse($success, 'User login successfully.');
                 } else {
-                    return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                    return $this->sendError('Unauthorized.', ['error' => 'Credentials do not match...']);
                 }
             }
-        }else{
+        } else {
             $selected_user = User::where('phone', $request->email)->first();
             if (!$selected_user)
-                return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                return $this->sendError('Unauthorized.', ['error' => 'Credentials do not match...']);
+
             if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
                 if (Auth::attempt(['phone' => $request->email, 'password' => $request->password])) {
                     $user = Auth::user();
+
+                    // ✅ You may want to skip email verification for phone login or add a similar check
+
                     $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
-                    $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-                    $success['name'] =  $user->name;
+                    $success['token'] = $user->createToken('MyApp')->plainTextToken;
+                    $success['name'] = $user->name;
+
                     return $this->sendResponse($success, 'User login successfully.');
                 } else {
-                    return $this->sendError('Unauthorised.', ['error' => 'Crediantials do not match...']);
+                    return $this->sendError('Unauthorized.', ['error' => 'Credentials do not match...']);
                 }
-            } 
+            }
         }
-        return $this->sendError('This email has been registered via social login. Please login using your social login links...', ['error' => 'Unauthorised']);
+
+        return $this->sendError('This email has been registered via social login. Please login using your social login links...', ['error' => 'Unauthorized']);
     }
 
     public function logout()
@@ -162,5 +191,36 @@ class AuthController extends BaseController
         $notifications = Notification::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
         return $this->sendResponse($notifications, 'Notifications retrieved successfully.');
+    }
+
+    public function resendVerification(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified.'], 200);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification link sent.'], 200);
+    }
+
+    public function verifyEmail(Request $request, $id, $hash)
+    {
+        $user = User::findOrFail($id);
+
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Invalid verification link.'], 403);
+        }
+
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+        }
+
+        // Generate a new token so the frontend can log the user in
+        $token = $user->createToken('EmailVerifyLogin')->plainTextToken;
+
+        // Redirect to frontend with token (change this to your actual frontend domain)
+        return redirect()->away("https://mobilemandu.com/email-verified?token={$token}");
     }
 }
