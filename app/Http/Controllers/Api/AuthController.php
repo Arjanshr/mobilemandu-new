@@ -86,7 +86,7 @@ class AuthController extends BaseController
                         ], 403);
                     }
 
-                    $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
+                    $this->checkWishlistForCampaigns($user->id);
                     $success['token'] = $user->createToken('MyApp')->plainTextToken;
                     $success['name'] = $user->name;
 
@@ -103,10 +103,7 @@ class AuthController extends BaseController
             if ($selected_user->facebook_id == null && $selected_user->google_id == null && $selected_user->github_id == null) {
                 if (Auth::attempt(['phone' => $request->email, 'password' => $request->password])) {
                     $user = Auth::user();
-
-                    // ✅ You may want to skip email verification for phone login or add a similar check
-
-                    $this->checkWishlistForCampaigns($user->id); // Check wishlist for campaigns
+                    $this->checkWishlistForCampaigns($user->id);
                     $success['token'] = $user->createToken('MyApp')->plainTextToken;
                     $success['name'] = $user->name;
 
@@ -214,7 +211,9 @@ class AuthController extends BaseController
 
         if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
-            event(new Verified($user));
+            if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail) {
+                event(new Verified($user));
+            }
         }
 
         // Generate a new token so the frontend can log the user in

@@ -28,6 +28,9 @@ class SocialiteController extends Controller
         $user = User::firstOrCreate(
             [$provider . '_id' => $response->getId()],
         );
+        if (! $user->hasVerifiedEmail() && $request->email) {
+            $user->markEmailAsVerified();
+        }
 
         if ($user->wasRecentlyCreated) {
             $data['name'] = $response->getName() ?? $response->getNickname();

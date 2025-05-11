@@ -40,14 +40,18 @@ class SocialiteController extends BaseController
     public function callbackSocial(Request $request, $provider)
     {
         $providers['provider'] = $provider;
+        $data = [];
         $this->validateProvider($providers);
         if ($request->email && ($request->email != '' || $request->email != null)) {
-            $user = User::firstOrCreate(
-                ['email' => $request->email],
-            )->assignRole('customer');
+            $user = User::firstOrCreate(['email' => $request->email]);
+            if (! $user->hasVerifiedEmail() && $request->email) {
+                $user->markEmailAsVerified();
+            }
+
             if ($user->wasRecentlyCreated) {
+                $user->assignRole('customer');
                 $data[$provider . '_id'] = $request->provider_id;
-                $data['name'] = $request->name ?? $request->nickname;
+                $data['name'] = $request->name ?? $request->nickname ?? 'Guest User';
                 event(new Registered($user));
             }
         } elseif ($request->phone && ($request->phone != '' || $request->phone != null)) {
