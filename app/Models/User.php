@@ -81,6 +81,16 @@ class User extends Authenticatable  implements MustVerifyEmail
         ];
     }
 
+    public function mustVerifyEmail()
+    {
+        // Skip email verification for admin or super-admin
+        if ($this->hasRole('admin') || $this->hasRole('super-admin')) {
+            return false; // Admins don't need to verify email
+        }
+
+        return true; // Regular users still need to verify email
+    }
+
     public function isAdmin()
     {
 

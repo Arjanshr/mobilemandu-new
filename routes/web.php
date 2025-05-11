@@ -41,7 +41,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+    'ensure-email-verified', // Use the custom middleware
     'is_admin',
     'ensure-user-active',
 ])->prefix('admin')->group(function () {

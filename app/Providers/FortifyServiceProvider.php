@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Auth;
 
 class FortifyServiceProvider extends ServiceProvider
 {
