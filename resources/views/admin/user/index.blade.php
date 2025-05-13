@@ -72,13 +72,10 @@
 
                                                             @can('delete-users')
                                                                 @if (!$user->hasRole('admin') || auth()->user()->can('delete-admin'))
-                                                                    <form method="post"
-                                                                        action="{{ route('user.delete', $user->id) }}"
-                                                                        style="display: inline;">
+                                                                    <form method="post" action="{{ route('user.delete', $user->id) }}" style="display: inline;" class="delete-form">
                                                                         @csrf
                                                                         @method('delete')
-                                                                        <button class="delete btn btn-danger btn-sm mb-1"
-                                                                            type="submit" title="Delete">
+                                                                        <button class="delete btn btn-danger btn-sm mb-1" type="submit" title="Delete">
                                                                             <i class="fas fa-trash-alt"></i>
                                                                         </button>
                                                                     </form>
@@ -178,6 +175,24 @@
                 "pageLength": 100
             });
             $('.dataTables_length').addClass('bs-select');
+
+            // SweetAlert confirmation for delete
+            $('.delete-form').on('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to delete this user!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
 
             // SweetAlert confirmation for deactivate
             $('.deactivate-form').on('submit', function(e) {
