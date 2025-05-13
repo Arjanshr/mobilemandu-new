@@ -193,12 +193,12 @@ class AuthController extends BaseController
     public function resendVerification(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.'], 200);
+        return $this->sendResponse(null, 'Email already verified.');
         }
 
         $request->user()->sendEmailVerificationNotification();
 
-        return response()->json(['message' => 'Verification link sent.'], 200);
+        return $this->sendResponse(null, 'Verification email resent successfully.');
     }
 
     public function verifyEmail(Request $request, $id, $hash)
@@ -220,6 +220,6 @@ class AuthController extends BaseController
         $token = $user->createToken('EmailVerifyLogin')->plainTextToken;
 
         // Redirect to frontend with token (change this to your actual frontend domain)
-        return redirect()->away("https://mobilemandu.com/email-verified?token={$token}");
+        return redirect()->away("https://mobilemandu.com/email-verified?token={$token}&name={$user->name}");
     }
 }
