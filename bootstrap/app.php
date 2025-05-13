@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->renderable(function (Throwable $e, $request) {
             // Check if it's an email verification exception from Fortify
-            if ($e instanceof \Laravel\Fortify\Exceptions\EmailVerificationRequiredException) {
+            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) { // Replace with a valid exception
                 return response()->json([
                     'success' => false,
                     'message' => 'Your email address is not verified.',
