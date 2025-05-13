@@ -16,7 +16,7 @@ class OrderItemResource extends JsonResource
     {
         return [
             "order_id" => $this->order->id,
-            "product" => $this->product,
+            "product" => $this->product->except(['created_at', 'updated_at','media']),
             "primary_image" =>  $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
             "coupon_code" => $this->order->coupon_code,
             "shipping_price" => $this->order->shipping_price,
