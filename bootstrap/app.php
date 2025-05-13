@@ -25,27 +25,28 @@ return Application::configure(basePath: dirname(__DIR__))
         //     \App\Http\Middleware\CorsMiddleware::class,
         // ]);
     })
-    // Register exception handler to use your custom Handler
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->reportable(function (Throwable $e) {
-            // Here you can handle exception reporting if needed
-            // For example, send the exception to a monitoring service
-        });
-
         $exceptions->renderable(function (Throwable $e, $request) {
-            // Check if it's an email verification exception from Fortify
-            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) { // Replace with a valid exception
+            // Only apply to API routes
+            if ($request->is('api/*')) {
+
+                // Handle specific Fortify email verification exception
+                if ($e instanceof \Laravel\Fortify\Exceptions\EmailVerificationRequiredException) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Your email address is not verified.',
+                    ], 403);
+                }
+
+                // Handle other exceptions for API
                 return response()->json([
                     'success' => false,
-                    'message' => 'Your email address is not verified.',
-                ], 400); // Custom status code
+                    'message' => $e->getMessage(),
+                ], 500);
             }
 
-            // General API error handling
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500); // Generic internal server error
+            // For non-API requests (web), let Laravel handle it normally
+            return null;
         });
     })
     ->create();
