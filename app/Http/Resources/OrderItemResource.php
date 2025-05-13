@@ -17,7 +17,7 @@ class OrderItemResource extends JsonResource
         return [
             "order_id" => $this->order->id,
             "product" => $this->product,
-            "primary_image" => $this->product->primary_image,
+            "primary_image" =>  $this->product->getFirstMedia() ? $this->product->getFirstMedia()->getUrl() : null,
             "coupon_code" => $this->order->coupon_code,
             "shipping_price" => $this->order->shipping_price,
             "quantity" => $this->quantity,
