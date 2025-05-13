@@ -220,6 +220,6 @@ class AuthController extends BaseController
         $token = $user->createToken('EmailVerifyLogin')->plainTextToken;
 
         // Redirect to frontend with token (change this to your actual frontend domain)
-        return redirect()->away("https://mobilemandu.com/email-verified?token={$token}&name={$user->name}");
+        return redirect()->away("https://mobilemandu.com/login?token={$token}&name={$user->name}");
     }
 }
