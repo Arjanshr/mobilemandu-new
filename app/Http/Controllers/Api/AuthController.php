@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends BaseController
 {
@@ -190,17 +192,28 @@ class AuthController extends BaseController
         return $this->sendResponse($notifications, 'Notifications retrieved successfully.');
     }
 
-    public function resendVerification(Request $request)
-    {
-        if ($request->user()->hasVerifiedEmail()) {
+public function resendVerification(Request $request)
+{
+    if ($request->user()->hasVerifiedEmail()) {
         return $this->sendResponse(null, 'Email already verified.');
-        }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return $this->sendResponse(null, 'Verification email resent successfully.');
     }
 
+    try {
+        $request->user()->sendEmailVerificationNotification();
+        return $this->sendResponse(null, 'Verification email resent successfully.');
+    } catch (TransportExceptionInterface $e) {
+        Log::error('Verification email failed: ' . $e->getMessage());
+
+        if (str_contains($e->getMessage(), '550 No Such User Here')) {
+            return $this->sendError('Invalid or non-existent email address.', 422);
+        }
+
+        return $this->sendError('Failed to resend verification email.', 500);
+    } catch (\Exception $e) {
+        Log::error('Unexpected email error: ' . $e->getMessage());
+        return $this->sendError('An unexpected error occurred.', 500);
+    }
+}
     public function verifyEmail(Request $request, $id, $hash)
     {
         $user = User::findOrFail($id);
