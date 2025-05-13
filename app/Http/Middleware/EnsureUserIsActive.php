@@ -18,12 +18,6 @@ class EnsureUserIsActive
             $user = $user->fresh();
         }
 
-        Log::info('EnsureUserIsActive middleware triggered', [
-            'user_id' => $user?->id,
-            'user_status' => $user?->status,
-            'is_api' => $request->expectsJson()
-        ]);
-
         if ($user && $user->status !== 'active') {
             // Revoke all tokens for the user (for Sanctum)
             if (method_exists($user, 'tokens')) {

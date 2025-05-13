@@ -6,6 +6,7 @@ use App\Http\Middleware\IsAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Fortify\Fortify;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,6 +25,27 @@ return Application::configure(basePath: dirname(__DIR__))
         //     \App\Http\Middleware\CorsMiddleware::class,
         // ]);
     })
+    // Register exception handler to use your custom Handler
     ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+        $exceptions->reportable(function (Throwable $e) {
+            // Here you can handle exception reporting if needed
+            // For example, send the exception to a monitoring service
+        });
+
+        $exceptions->renderable(function (Throwable $e, $request) {
+            // Check if it's an email verification exception from Fortify
+            if ($e instanceof \Laravel\Fortify\Exceptions\EmailVerificationRequiredException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your email address is not verified.',
+                ], 400); // Custom status code
+            }
+
+            // General API error handling
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500); // Generic internal server error
+        });
+    })
+    ->create();

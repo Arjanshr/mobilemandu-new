@@ -27,6 +27,13 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
+        // ✅ Log to confirm this is hit
+        \Log::debug('Custom exception handler triggered.', [
+            'type' => get_class($exception),
+            'message' => $exception->getMessage(),
+        ]);
+
+        // Handle HTTP Exceptions (like "email not verified")
         if ($exception instanceof HttpException) {
             return response()->json([
                 'success' => false,
@@ -34,6 +41,7 @@ class Handler extends ExceptionHandler
             ], $exception->getStatusCode() ?: 400);
         }
 
+        // Fallback: show clean JSON for all exceptions in API
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => false,
