@@ -17,29 +17,23 @@ class CategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         $subcategories = [];
-        foreach ($this->children as $count => $subcategory) {
-            $subcategories[$count]['id'] = $subcategory->id;
-            $subcategories[$count]['name'] = $subcategory->name;
-            $subcategories[$count]['slug'] = $subcategory->slug;
-            $subcategories[$count]['brand'] = $this->brands($subcategory->products ?? []);
-            if ($subcategory->children->count() > 0) {
-                foreach ($subcategory->children as $count1=> $scat) {
-                    $subcategories[$count][$count1]['id'] = $scat->id;
-                    $subcategories[$count][$count1]['name'] = $scat->name;
-                    $subcategories[$count][$count1]['slug'] = $scat->slug;
-                    $subcategories[$count][$count1]['brand'] = $this->brands($scat->products ?? []);
-                }
-            }
+        foreach ($this->children as $subcategory) {
+            $subcategories[] = [
+                'id' => $subcategory->id,
+                'name' => $subcategory->name,
+                'slug' => $subcategory->slug,
+                'brand' => $this->brands($subcategory->products ?? []),
+            ];
         }
 
         return [
             'id' => $this->id,
             'name' => $this->name,
-            "description" => $this->description,
-            "slug" => $this->slug,
-            "imageLink" => $this->image ? asset('storage/categories/' . $this->image) : asset('images/default.png'),
-            "subcategories" => $subcategories,
-            "brands" => $this->brands($this->products),
+            'description' => $this->description,
+            'slug' => $this->slug,
+            'imageLink' => $this->image ? asset('storage/categories/' . $this->image) : asset('images/default.png'),
+            'subcategories' => $subcategories,
+            'brands' => $this->brands($this->products),
         ];
     }
 

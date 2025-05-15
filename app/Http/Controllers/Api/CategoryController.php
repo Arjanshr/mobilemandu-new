@@ -10,15 +10,23 @@ use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
 {
-    public function categories()
-    {
-        $categories =  Category::where('status', 'active')
-            ->where('parent_id', null)
-            ->with('products')
-            ->with('children.products.brand')
-            ->get();
-        return $this->sendResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
-    }
+public function categories()
+{
+    $categories = Category::where('status', 'active')
+        ->where('parent_id', null)
+        ->with(['products.brand', 'children.products.brand'])
+        ->get()
+        ->filter(function ($category) {
+            $category->children = $category->children->filter(function ($subcat) {
+                return $subcat->products->isNotEmpty();
+            })->values();
+            return $category->products->isNotEmpty() || $category->children->isNotEmpty();
+        })
+        ->values();
+
+    return $this->sendResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
+}
+
 
     public function details($category_id_or_slug)
     {
