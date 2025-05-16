@@ -169,9 +169,21 @@ class ProductController extends BaseController
     public function searchProducts(Request $request, $paginate = 8)
     {
         $searchQuery = $request->query('query', '');
+        $filters = $this->buildFilters($request);
+
+        try {
+            $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
+        } catch (\Throwable $e) {
+        $products = $this->performFallbackSearch($request, $searchQuery, $paginate);
+        }
+
+        return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
+    }
+
+    private function buildFilters(Request $request)
+    {
         $filters = [];
 
-        // === Meilisearch-compatible filter strings ===
         if (!empty($request->categories) && is_array($request->categories)) {
             $filters[] = 'categories.id IN [' . implode(',', $request->categories) . ']';
         }
@@ -191,70 +203,75 @@ class ProductController extends BaseController
         if (isset($request->min_rating) || isset($request->max_rating)) {
             $min_rating = $request->min_rating ?? 0;
             $max_rating = $request->max_rating ?? 5;
-            // In Meilisearch, you have a virtual rating attribute
             $filters[] = "rating >= $min_rating AND rating <= $max_rating";
         }
 
-        $filterString = implode(' AND ', $filters);
-        $filterString = "status = 'publish'" . (empty($filterString) ? '' : " AND $filterString");
-
-        try {
-            // === Attempt Meilisearch ===
-            $meilisearch = new \Meilisearch\Client(config('scout.meilisearch.host'), config('scout.meilisearch.key'));
-            $index = $meilisearch->index('products');
-            $index->updateFilterableAttributes([
-                'price',
-                'rating',
-                'categories.id',
-                'brand_id',
-                'status'
-            ]);
-
-            $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
-                $options['filter'] = $filterString;
-                return $meilisearch->search($query, $options);
-            })->paginate($paginate);
-        } catch (\Throwable $e) {
-            DB::statement("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
-            $min_rating = $request->min_rating ?? 0;
-            $max_rating = $request->max_rating ?? 5;
-
-            $products = Product::query()
-                ->select('products.*')
-                ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-                ->leftJoin('category_product', 'products.id', '=', 'category_product.product_id')
-                ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
-                ->leftJoin('reviews', 'products.id', '=', 'reviews.product_id')
-                ->where('products.status', 'publish')
-                ->when(!empty($searchQuery), function ($query) use ($searchQuery) {
-                    $query->where(function ($q) use ($searchQuery) {
-                        $q->whereRaw("MATCH(products.name, products.description, products.keywords) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery])
-                            ->orWhereRaw("MATCH(brands.name, brands.description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery])
-                            ->orWhereRaw("MATCH(categories.name, categories.description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery]);
-                    });
-                })
-                ->when(!empty($request->categories), function ($query) use ($request) {
-                    $query->whereIn('categories.id', $request->categories);
-                })
-                ->when(!empty($request->brand), function ($query) use ($request) {
-                    $query->whereIn('products.brand_id', $request->brand);
-                })
-                ->when(!empty($request->min_price), function ($query) use ($request) {
-                    $query->where('products.price', '>=', $request->min_price);
-                })
-                ->when(!empty($request->max_price), function ($query) use ($request) {
-                    $query->where('products.price', '<=', $request->max_price);
-                })
-                ->groupBy('products.id')
-                ->when(isset($request->min_rating) || isset($request->max_rating), function ($query) use ($min_rating, $max_rating) {
-                    $query->havingRaw('COALESCE(AVG(reviews.rating), 0) BETWEEN ? AND ?', [$min_rating, $max_rating]);
-                })
-                ->paginate($paginate);
-        }
-
-        return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
+        return "status = 'publish'" . (empty($filters) ? '' : " AND " . implode(' AND ', $filters));
     }
 
+    private function performMeilisearch($searchQuery, $filterString, $paginate)
+    {
+        $meilisearch = new \Meilisearch\Client(config('scout.meilisearch.host'), config('scout.meilisearch.key'));
+        $index = $meilisearch->index('products');
+        $index->updateFilterableAttributes(['price', 'rating', 'categories.id', 'brand_id', 'status']);
+
+        return Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
+            $options['filter'] = $filterString;
+            return $meilisearch->search($query, $options);
+        })->paginate($paginate);
+    }
+
+    private function performFallbackSearch(Request $request, $searchQuery, $paginate)
+    {
+        DB::statement("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+
+        $min_rating = $request->min_rating ?? 0;
+        $max_rating = $request->max_rating ?? 5;
+
+        $query = Product::query()
+            ->with(['brand', 'categories']) // eager load to reduce N+1 queries
+            ->withAvg('reviews', 'rating') // calculate average rating
+            ->where('status', 'publish');
+
+        // Fulltext search across products, brands, and categories
+        if (!empty($searchQuery)) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->whereRaw("MATCH(name, description, keywords) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery])
+                    ->orWhereHas('brand', function ($b) use ($searchQuery) {
+                        $b->whereRaw("MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery]);
+                    })
+                    ->orWhereHas('categories', function ($c) use ($searchQuery) {
+                        $c->whereRaw("MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery]);
+                    });
+            });
+        }
+
+        // Category filter
+        if (!empty($request->categories) && is_array($request->categories)) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->whereIn('categories.id', $request->categories);
+            });
+        }
+
+        // Brand filter
+        if (!empty($request->brand) && is_array($request->brand)) {
+            $query->whereIn('brand_id', $request->brand);
+        }
+
+        // Price filters
+        if (!empty($request->min_price)) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if (!empty($request->max_price)) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Rating filter on the average rating from reviews
+        $query->having('reviews_avg_rating', '>=', $min_rating)
+            ->having('reviews_avg_rating', '<=', $max_rating);
+
+        return $query->paginate($paginate);
+    }
 
     public function getBrandsForSearch(Request $request)
     {
