@@ -168,14 +168,22 @@ class ProductController extends BaseController
 
     public function searchProducts(Request $request, $paginate = 8)
     {
+        $use_old_fallback = true;
+        if ($request->query('use_old_fallback') && $request->query('use_old_fallback') == false) {
+            $use_old_fallback = false;
+        }
         $searchQuery = $request->query('query', '');
         $filters = $this->buildFilters($request);
 
-        try {
-            $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
-        } catch (\Throwable $e) {
-        $products = $this->performFallbackSearch($request, $searchQuery, $paginate);
-        }
+        // try {
+        //     $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
+        // } catch (\Throwable $e) {
+            if (!$request->query($use_old_fallback, false)) {
+                $products = $this->oldSearch($request, $searchQuery, $paginate);
+            } else {
+                $products = $this->performFallbackSearch($request, $searchQuery, $paginate);
+            }
+        // }
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
@@ -219,6 +227,50 @@ class ProductController extends BaseController
             $options['filter'] = $filterString;
             return $meilisearch->search($query, $options);
         })->paginate($paginate);
+    }
+
+    private function oldSearch(Request $request, $searchQuery, $paginate)
+    {
+        $products = Product::query()->where('status', 'publish');
+
+        $filters = $this->buildFilters($request);
+        if (!empty($filters)) {
+            $products->whereRaw($filters);
+        }
+
+        if (!empty($searchQuery)) {
+            $pluralQuery = \Illuminate\Support\Str::plural($searchQuery);
+            $singularQuery = \Illuminate\Support\Str::singular($searchQuery);
+
+            $category_ids = Category::where('name', 'like', '%' . $searchQuery . '%')
+                ->orWhere('name', 'like', '%' . $pluralQuery . '%')
+                ->orWhere('name', 'like', '%' . $singularQuery . '%')
+                ->pluck('id');
+
+            $products->where(function ($query) use ($searchQuery, $pluralQuery, $singularQuery, $category_ids) {
+                $query->whereHas('categories', function ($q) use ($category_ids) {
+                    $q->whereIn('categories.id', $category_ids);
+                })
+                    ->orWhere('name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('name', 'like', '%' . $pluralQuery . '%')
+                    ->orWhere('name', 'like', '%' . $singularQuery . '%')
+                    ->orWhere('keywords', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('keywords', 'like', '%' . $pluralQuery . '%')
+                    ->orWhere('keywords', 'like', '%' . $singularQuery . '%');
+            });
+
+            $tempQuery = clone $products;
+            if ($tempQuery->count() <= 5) {
+                $products->orWhere('description', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('description', 'like', '%' . $pluralQuery . '%')
+                    ->orWhere('description', 'like', '%' . $singularQuery . '%');
+            }
+        }
+
+        // Ensure the query is executed and paginated before returning the response
+        $products = $products->orderBy('id', 'DESC')->paginate($paginate);
+
+        return $products; // Return the paginated query result, not a JsonResponse
     }
 
     private function performFallbackSearch(Request $request, $searchQuery, $paginate)
