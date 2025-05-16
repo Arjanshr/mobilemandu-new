@@ -168,21 +168,20 @@ class ProductController extends BaseController
 
     public function searchProducts(Request $request, $paginate = 8)
     {
-        $use_old_fallback = true;
-        if ($request->query('use_old_fallback') && $request->query('use_old_fallback') == false) {
-            $use_old_fallback = false;
-        }
         $searchQuery = $request->query('query', '');
         $filters = $this->buildFilters($request);
 
         try {
-            $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
+            // Perform Meilisearch
+            $meilisearchResults = $this->performMeilisearch($searchQuery, $filters, $paginate);
+            $products = $meilisearchResults;
         } catch (\Throwable $e) {
-            if (!$request->query($use_old_fallback, false)) {
-                $products = $this->oldSearch($request, $searchQuery, $paginate);
-            } else {
-                $products = $this->performFallbackSearch($request, $searchQuery, $paginate);
-            }
+            // If Meilisearch fails, perform fallback search and old search
+            $fallbackResults = $this->performFallbackSearch($request, $searchQuery, $paginate);
+            $oldSearchResults = $this->oldSearch($request, $searchQuery, $paginate);
+
+            // Concatenate fallback and old search results and remove duplicates
+            $products = $fallbackResults->merge($oldSearchResults)->unique('id');
         }
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
