@@ -21,6 +21,7 @@ use App\Models\ProductVariant;
 use App\Models\QuestionsAndAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends BaseController
 {
@@ -163,11 +164,14 @@ class ProductController extends BaseController
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
 
+
+
     public function searchProducts(Request $request, $paginate = 8)
     {
         $searchQuery = $request->query('query', '');
         $filters = [];
 
+        // === Meilisearch-compatible filter strings ===
         if (!empty($request->categories) && is_array($request->categories)) {
             $filters[] = 'categories.id IN [' . implode(',', $request->categories) . ']';
         }
@@ -187,28 +191,70 @@ class ProductController extends BaseController
         if (isset($request->min_rating) || isset($request->max_rating)) {
             $min_rating = $request->min_rating ?? 0;
             $max_rating = $request->max_rating ?? 5;
-            $filters[] = "rating >= $min_rating AND rating <= $max_rating"; // Replace BETWEEN with valid syntax
+            // In Meilisearch, you have a virtual rating attribute
+            $filters[] = "rating >= $min_rating AND rating <= $max_rating";
         }
 
         $filterString = implode(' AND ', $filters);
-
-        // Add status filter to ensure only published products are retrieved
         $filterString = "status = 'publish'" . (empty($filterString) ? '' : " AND $filterString");
 
-        // Use Meilisearch\Client directly
-        $meilisearch = new \Meilisearch\Client(config('scout.meilisearch.host'), config('scout.meilisearch.key'));
-        $index = $meilisearch->index('products'); // Replace 'products' with your actual index name
-        $index->updateFilterableAttributes([
-            'price', 'rating', 'categories.id', 'brand_id', 'status'
-        ]);
+        try {
+            // === Attempt Meilisearch ===
+            $meilisearch = new \Meilisearch\Client(config('scout.meilisearch.host'), config('scout.meilisearch.key'));
+            $index = $meilisearch->index('products');
+            $index->updateFilterableAttributes([
+                'price',
+                'rating',
+                'categories.id',
+                'brand_id',
+                'status'
+            ]);
 
-        $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
-            $options['filter'] = $filterString;
-            return $meilisearch->search($query, $options);
-        })->paginate($paginate);
+            $products = Product::search($searchQuery, function ($meilisearch, $query, $options) use ($filterString) {
+                $options['filter'] = $filterString;
+                return $meilisearch->search($query, $options);
+            })->paginate($paginate);
+        } catch (\Throwable $e) {
+            DB::statement("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+            $min_rating = $request->min_rating ?? 0;
+            $max_rating = $request->max_rating ?? 5;
+
+            $products = Product::query()
+                ->select('products.*')
+                ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
+                ->leftJoin('category_product', 'products.id', '=', 'category_product.product_id')
+                ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
+                ->leftJoin('reviews', 'products.id', '=', 'reviews.product_id')
+                ->where('products.status', 'publish')
+                ->when(!empty($searchQuery), function ($query) use ($searchQuery) {
+                    $query->where(function ($q) use ($searchQuery) {
+                        $q->whereRaw("MATCH(products.name, products.description, products.keywords) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery])
+                            ->orWhereRaw("MATCH(brands.name, brands.description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery])
+                            ->orWhereRaw("MATCH(categories.name, categories.description) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchQuery]);
+                    });
+                })
+                ->when(!empty($request->categories), function ($query) use ($request) {
+                    $query->whereIn('categories.id', $request->categories);
+                })
+                ->when(!empty($request->brand), function ($query) use ($request) {
+                    $query->whereIn('products.brand_id', $request->brand);
+                })
+                ->when(!empty($request->min_price), function ($query) use ($request) {
+                    $query->where('products.price', '>=', $request->min_price);
+                })
+                ->when(!empty($request->max_price), function ($query) use ($request) {
+                    $query->where('products.price', '<=', $request->max_price);
+                })
+                ->groupBy('products.id')
+                ->when(isset($request->min_rating) || isset($request->max_rating), function ($query) use ($min_rating, $max_rating) {
+                    $query->havingRaw('COALESCE(AVG(reviews.rating), 0) BETWEEN ? AND ?', [$min_rating, $max_rating]);
+                })
+                ->paginate($paginate);
+        }
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
+
 
     public function getBrandsForSearch(Request $request)
     {
@@ -297,7 +343,7 @@ class ProductController extends BaseController
 
     public function productDetails($product_id_or_slug)
     {
-        $product = Product::where('status','publish')->where('slug', $product_id_or_slug)->first();
+        $product = Product::where('status', 'publish')->where('slug', $product_id_or_slug)->first();
         if (!$product) {
             $product  = Product::find($product_id_or_slug);
         }
@@ -403,7 +449,7 @@ class ProductController extends BaseController
         if (!$variant) {
             return $this->sendError('Variant not found.', [], 404);
         }
-    
+
         return $this->sendResponse(new VariantDetailResource($variant), 'Variant details retrieved successfully.');
     }
 }
