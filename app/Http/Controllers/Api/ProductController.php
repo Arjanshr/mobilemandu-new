@@ -175,15 +175,15 @@ class ProductController extends BaseController
         $searchQuery = $request->query('query', '');
         $filters = $this->buildFilters($request);
 
-        // try {
-        //     $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
-        // } catch (\Throwable $e) {
+        try {
+            $products = $this->performMeilisearch($searchQuery, $filters, $paginate);
+        } catch (\Throwable $e) {
             if (!$request->query($use_old_fallback, false)) {
                 $products = $this->oldSearch($request, $searchQuery, $paginate);
             } else {
                 $products = $this->performFallbackSearch($request, $searchQuery, $paginate);
             }
-        // }
+        }
 
         return $this->sendResponse(ProductResource::collection($products)->resource, 'Products retrieved successfully.');
     }
